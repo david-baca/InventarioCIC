@@ -1,21 +1,18 @@
 // src/controllers/articleController.js
 const articleView = require('../views/articulosView');
-
-let articulos = []; // Simulación de base de datos en memoria
+const { Articulos } = require('../model');
+let articulos = [];
 
 exports.buscarArticulos = (req, res) => {
     const { query } = req.params;
-    const resultado = articulos.filter(a => a.nombre.includes(query) || a.descripcion.includes(query));
-
+    const resultado = Articulos.filter(a => a.nombre.includes(query) || a.descripcion.includes(query));
     res.json(articleView.listaArticulos(resultado));
 };
 
 exports.crearArticulo = (req, res) => {
     const { no_inventario, nombre, descripcion, costo, consumible, area, grupo } = req.body;
-    
     const nuevoArticulo = { id: articulos.length + 1, no_inventario, nombre, descripcion, costo, consumible, area, grupo };
-    articulos.push(nuevoArticulo);
-
+    Articulos.create(nuevoArticulo);
     res.json(articleView.confirmacionCreacion(nuevoArticulo));
 };
 

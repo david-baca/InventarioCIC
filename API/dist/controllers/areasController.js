@@ -5,7 +5,6 @@ let areas = []; // Simulación de base de datos en memoria
 
 exports.crearArea = (req, res) => {
     const { codigo, descripcion } = req.body;
-
     const nuevaArea = { id: areas.length + 1, codigo, descripcion };
     areas.push(nuevaArea);
 

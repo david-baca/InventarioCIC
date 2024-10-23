@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const areaController = require('../controllers/areasController');
 
-// Endpoint para crear una nueva área
+// Endpoint para crear una nueva área 
 router.post('/', areaController.crearArea);
 
 // Endpoint para editar un área
