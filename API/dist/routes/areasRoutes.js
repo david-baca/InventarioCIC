@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const areaController = require('../controllers/areasController');
 
-// Endpoint para crear una nueva área
+// Endpoint para crear una nueva área 
 router.post('/', areaController.crearArea);
 
 // Endpoint para editar un área
@@ -13,6 +13,6 @@ router.put('/:id', areaController.editarArea);
 router.get('/search/:query', areaController.buscarAreas);
 
 // Endpoint para dar de baja un área
-router.delete('/:id/baja', areaController.darDeBajaArea);
+router.patch('/:id/baja', areaController.darDeBajaArea);
 
 module.exports = router;
