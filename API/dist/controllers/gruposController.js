@@ -1,53 +1,64 @@
-// src/controllers/grupoController.js
 const grupoView = require('../views/gruposView');
+const { Grupos } = require('../model'); // Asegúrate de tener el modelo Grupos importado
+const { Op } = require('sequelize');
 
-let grupos = []; // Simulación de base de datos en memoria
-
-exports.buscarGrupos = (req, res) => {
+exports.buscarGrupos = async (req, res) => {
     const { query } = req.params;
-    const resultado = grupos.filter(g => 
-        g.nombre.includes(query) || 
-        g.descripcion.includes(query)
-    );
-
-    res.json(grupoView.listaGrupos(resultado));
+    try {
+        const resultado = await Grupos.findAll({
+            where: {
+                [Op.or]: [
+                    { nombre: { [Op.like]: `%${query}%` } },
+                    { descripcion: { [Op.like]: `%${query}%` } }
+                ],
+                disponible: 1 // Solo buscar grupos disponibles
+            }
+        });
+        res.json(grupoView.listaGrupos(resultado));
+    } catch (error) {
+        res.status(500).json({ error: 'Error en la búsqueda de grupos' });
+    }
 };
 
-exports.crearGrupo = (req, res) => {
+exports.crearGrupo = async (req, res) => {
     const { nombre, descripcion } = req.body;
-
-    const nuevoGrupo = { id: grupos.length + 1, nombre, descripcion };
-    grupos.push(nuevoGrupo);
-
-    res.json(grupoView.datosGrupoCreado(nuevoGrupo));
+    try {
+        const nuevoGrupo = await Grupos.create({ nombre, descripcion });
+        res.json(grupoView.datosGrupoCreado(nuevoGrupo));
+    } catch (error) {
+        res.status(500).json({ error: 'Error al crear el grupo' });
+    }
 };
 
-exports.editarGrupo = (req, res) => {
+exports.editarGrupo = async (req, res) => {
     const { id } = req.params;
     const { nombre, descripcion } = req.body;
 
-    const grupo = grupos.find(g => g.id == id);
-    if (!grupo) {
-        return res.status(404).json(grupoView.errorGrupo('Grupo no encontrado'));
+    try {
+        const grupo = await Grupos.findByPk(id);
+        if (!grupo) {
+            return res.status(404).json(grupoView.errorGrupo('Grupo no encontrado'));
+        }
+
+        await grupo.update({ nombre, descripcion });
+        res.json(grupoView.confirmacionEdicion(grupo));
+    } catch (error) {
+        res.status(500).json({ error: 'Error al editar el grupo' });
     }
-
-    grupo.nombre = nombre;
-    grupo.descripcion = descripcion;
-
-    res.json(grupoView.confirmacionEdicion(grupo));
 };
 
-exports.darDeBajaGrupo = (req, res) => {
+exports.darDeBajaGrupo = async (req, res) => {
     const { id } = req.params;
-    const { motivo } = req.body;
 
-    const index = grupos.findIndex(g => g.id == id);
-    if (index === -1) {
-        return res.status(404).json(grupoView.errorGrupo('Grupo no encontrado'));
+    try {
+        const grupo = await Grupos.findByPk(id);
+        if (!grupo) {
+            return res.status(404).json(grupoView.errorGrupo('Grupo no encontrado'));
+        }
+
+        await grupo.update({ disponible: 0 }); // Marcar como no disponible
+        res.json(grupoView.confirmacionBaja(grupo));
+    } catch (error) {
+        res.status(500).json({ error: 'Error al dar de baja el grupo' });
     }
-
-    const grupoBaja = grupos[index];
-    grupos.splice(index, 1);
-
-    res.json(grupoView.confirmacionBaja(grupoBaja));
 };
