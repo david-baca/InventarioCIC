@@ -1,22 +1,31 @@
 // src/controllers/userController.js
 const userView = require('../views/usuariosView');
- 
-let usuarios = []; // Simulación de base de datos en memoria
+const {Usuarios,Funciones,Permisos} = require('../model/')
+
 
 exports.crearUsuario = async (req, res) => 
 {
     try{
-        const { nombre, apellido_p, apellido_m, correo} = req.body; //removi (rol, permisos) pero puede que los ocupe
+        const { nombre, apellidoP, apellidoM, correo, permisos} = req.body; //removi (rol) pero puede que los ocupe
 
-        const nuevoUsuario = await usuarios.create(
+        const nuevoUsuario = await Usuarios.create(
         { 
-            id: usuarios.length + 1,
-            nombres, 
-            apellido_p, 
-            apellido_m, 
-            correo
+            nombres: nombre, 
+            apellido_p: apellidoP, 
+            apellido_m: apellidoM, 
+            correo: correo,
+            master: 0,
+            disponible: 1
         });
     
+        for (const permiso of permisos) {
+            await Permisos.create({
+                Usuarios_pk: nuevoUsuario.pk,
+                Funciones_pk: permiso.pk,
+            });
+        }
+            
+        
         /*const nuevoUsuario = { id: usuarios.length + 1, nombre, correo, rol, estado: true, permisos };
         usuarios.push(nuevoUsuario);*/
 
@@ -24,7 +33,7 @@ exports.crearUsuario = async (req, res) =>
         
     } catch (error) 
     {
-        res.status(500).json(responsableView.errorResponsable('Error al crear el responsable'));
+        res.status(500).json(userView.errorUsuario('Error al crear el usuario ' + error));
     }
     
 };
