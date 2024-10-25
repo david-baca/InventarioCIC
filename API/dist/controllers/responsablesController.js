@@ -1,56 +1,73 @@
-// src/controllers/responsableController.js
 const responsableView = require('../views/responsablesView');
+const { Responsables } = require('../model'); // Asegúrate de tener el modelo Responsables importado
+const { Op } = require('sequelize');
 
-let responsables = []; // Simulación de base de datos en memoria
-
-exports.crearResponsable = (req, res) => {
+exports.crearResponsable = async (req, res) => {
     const { nombres, apellido_p, apellido_m, cargo, disponible } = req.body;
 
-    const nuevoResponsable = { id: responsables.length + 1, nombres, apellido_p, apellido_m, cargo, disponible };
-    responsables.push(nuevoResponsable);
-
-    res.json(responsableView.datosResponsableCreado(nuevoResponsable));
+    try {
+        const nuevoResponsable = await Responsables.create({
+            nombres,
+            apellido_p,
+            apellido_m,
+            cargo,
+            disponible
+        });
+        res.json(responsableView.datosResponsableCreado(nuevoResponsable));
+    } catch (error) {
+        res.status(500).json({ error: 'Error al crear el responsable' });
+    }
 };
 
-exports.editarResponsable = (req, res) => {
+exports.editarResponsable = async (req, res) => {
     const { id } = req.params;
     const { nombres, apellido_p, apellido_m, cargo } = req.body;
 
-    const responsable = responsables.find(r => r.id == id);
-    if (!responsable) {
-        return res.status(404).json(responsableView.errorResponsable('Responsable no encontrado'));
+    try {
+        const responsable = await Responsables.findByPk(id);
+        if (!responsable) {
+            return res.status(404).json(responsableView.errorResponsable('Responsable no encontrado'));
+        }
+
+        await responsable.update({ nombres, apellido_p, apellido_m, cargo });
+        res.json(responsableView.confirmacionEdicion(responsable));
+    } catch (error) {
+        res.status(500).json({ error: 'Error al editar el responsable' });
     }
-
-    responsable.nombres = nombres;
-    responsable.apellido_p = apellido_p;
-    responsable.apellido_m = apellido_m;
-    responsable.cargo = cargo;
-
-    res.json(responsableView.confirmacionEdicion(responsable));
 };
 
-exports.buscarResponsables = (req, res) => {
+exports.buscarResponsables = async (req, res) => {
     const { query } = req.params;
-    const resultado = responsables.filter(r => 
-        r.nombres.includes(query) || 
-        r.apellido_p.includes(query) || 
-        r.apellido_m.includes(query)
-    );
 
-    res.json(responsableView.listaResponsables(resultado));
+    try {
+        const resultado = await Responsables.findAll({
+            where: {
+                [Op.or]: [
+                    { nombres: { [Op.like]: `%${query}%` } },
+                    { apellido_p: { [Op.like]: `%${query}%` } },
+                    { apellido_m: { [Op.like]: `%${query}%` } }
+                ],
+                disponible: 1 // Solo buscar responsables disponibles
+            }
+        });
+        res.json(responsableView.listaResponsables(resultado));
+    } catch (error) {
+        res.status(500).json({ error: 'Error en la búsqueda de responsables' });
+    }
 };
 
-exports.darDeBajaResponsable = (req, res) => {
+exports.darDeBajaResponsable = async (req, res) => {
     const { id } = req.params;
-    const { motivo } = req.body;
 
-    const index = responsables.findIndex(r => r.id == id);
-    if (index === -1) {
-        return res.status(404).json(responsableView.errorResponsable('Responsable no encontrado'));
+    try {
+        const responsable = await Responsables.findByPk(id);
+        if (!responsable) {
+            return res.status(404).json(responsableView.errorResponsable('Responsable no encontrado'));
+        }
+
+        await responsable.update({ disponible: 0 }); // Marcar como no disponible
+        res.json(responsableView.confirmacionBaja(responsable));
+    } catch (error) {
+        res.status(500).json({ error: 'Error al dar de baja el responsable' });
     }
-
-    const responsableBaja = responsables[index];
-    responsables.splice(index, 1);
-
-    res.json(responsableView.confirmacionBaja(responsableBaja));
 };

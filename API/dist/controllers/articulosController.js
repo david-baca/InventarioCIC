@@ -1,78 +1,163 @@
-// src/controllers/articleController.js
-const articleView = require('../views/articulosView');
+const { Articulos, Condiciones, Imagenes } = require('../model');
+const { Op } = require('sequelize');
 
-let articulos = []; // Simulación de base de datos en memoria
-
-exports.buscarArticulos = (req, res) => {
+exports.buscarArticulos = async (req, res) => {
     const { query } = req.params;
-    const resultado = articulos.filter(a => a.nombre.includes(query) || a.descripcion.includes(query));
-
-    res.json(articleView.listaArticulos(resultado));
+    try {
+        const resultado = await Articulos.findAll({
+            where: {
+                [Op.or]: [
+                    { nombre: { [Op.like]: `%${query}%` } },
+                    { descripcion: { [Op.like]: `%${query}%` } }
+                ],
+                disponible: 1
+            }
+        });
+        res.json({ articulos: resultado });
+    } catch (error) {
+        res.status(500).json({ error: 'Error en la búsqueda de artículos' });
+    }
 };
 
-exports.crearArticulo = (req, res) => {
-    const { no_inventario, nombre, descripcion, costo, consumible, area, grupo } = req.body;
+exports.middleCreateArticle = (req, res, next) => {
+    try{
+        const { no_inventario, nombre, descripcion, costo } = req.body;
+        let errores = [];
+        if (!no_inventario) errores.push('Es necesario definir el (no_inventario)');
+        if (!nombre) errores.push('Es necesario definir el (nombre)');
+        if (!descripcion) errores.push('Es necesario definir el (descripcion)');
+        if (!costo) errores.push('Es necesario definir el (costo)');
     
-    const nuevoArticulo = { id: articulos.length + 1, no_inventario, nombre, descripcion, costo, consumible, area, grupo };
-    articulos.push(nuevoArticulo);
-
-    res.json(articleView.confirmacionCreacion(nuevoArticulo));
+        if (errores.length > 0) {
+            return res.status(400).json({ error: errores.join(' ') });
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Error en la proteccion del articulo' });
+    }
+    next();
 };
 
-exports.editarArticulo = (req, res) => {
+exports.crearArticulo = async (req, res) => {
+    try{
+        const { no_inventario, nombre, descripcion, costo } = req.body;
+        let errores = [];
+        if (!no_inventario) errores.push('Es necesario definir el (no_inventario)');
+        if (!nombre) errores.push('Es necesario definir el (nombre)');
+        if (!descripcion) errores.push('Es necesario definir el (descripcion)');
+        if (!costo) errores.push('Es necesario definir el (costo)');
+    
+        if (errores.length > 0) {
+            return res.status(400).json({ error: errores.join(' ') });
+        }
+    } catch (error) {
+        res.status(500).json({ error: 'Error en la proteccion del articulo' });
+    }
+
+    try {
+        const { no_inventario, nombre, descripcion, costo } = req.body;
+        const nuevoArticulo = await Articulos.create({
+            no_inventario,
+            nombre,
+            descripcion,
+            costo,
+            consumible: 1,
+            disponible: 1,
+        });
+        if (req.files && req.files.length > 0) {
+            const nuevaCondicion = await Condiciones.create({
+                Articulos_pk: nuevoArticulo.pk,
+                fecha: new Date(),
+                disponible: 1,
+            });
+            const imagenesData = req.files.map(file => {
+                return {
+                    imagen: file.path,
+                    Condiciones_pk: nuevaCondicion.pk,
+                };
+            });
+            await Imagenes.bulkCreate(imagenesData);
+        }
+        res.json({ message: 'Artículo creado exitosamente', articulo: nuevoArticulo });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al crear el artículo' });
+    }
+};
+
+exports.editarArticulo = async (req, res) => {
     const { id } = req.params;
     const { no_inventario, nombre, descripcion, costo, consumible } = req.body;
-
-    const articulo = articulos.find(a => a.id == id);
-    if (!articulo) {
-        return res.status(404).json(articleView.errorArticulo('Artículo no encontrado'));
+    try {
+        const articulo = await Articulos.findByPk(id);
+        if (!articulo) {
+            return res.status(404).json({ error: 'Artículo no encontrado' });
+        }
+        await articulo.update({ no_inventario, nombre, descripcion, costo, consumible });
+        res.json({ message: 'Artículo editado exitosamente', articulo });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al editar el artículo' });
     }
-
-    articulo.no_inventario = no_inventario;
-    articulo.nombre = nombre;
-    articulo.descripcion = descripcion;
-    articulo.costo = costo;
-    articulo.consumible = consumible;
-
-    res.json(articleView.confirmacionEdicion(articulo));
 };
 
-exports.darDeBajaArticulo = (req, res) => {
+exports.darDeBajaArticulo = async (req, res) => {
     const { id } = req.params;
-    const { imagenes, motivo } = req.body;
-
-    const index = articulos.findIndex(a => a.id == id);
-    if (index === -1) {
-        return res.status(404).json(articleView.errorArticulo('Artículo no encontrado'));
+    try {
+        const articulo = await Articulos.findByPk(id);
+        if (!articulo) {
+            return res.status(404).json({ error: 'Artículo no encontrado' });
+        }
+        await articulo.update({ disponible: 0 });
+        res.json({ message: 'Artículo dado de baja exitosamente', articulo });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al dar de baja el artículo' });
     }
-
-    const articuloBaja = articulos[index];
-    articulos.splice(index, 1);
-
-    res.json(articleView.confirmacionBaja(articuloBaja));
 };
 
-exports.detallesArticulo = (req, res) => {
+exports.detallesArticulo = async (req, res) => {
     const { no_inventario } = req.params;
-    const articulo = articulos.find(a => a.no_inventario === no_inventario);
 
-    if (!articulo) {
-        return res.status(404).json(articleView.errorArticulo('Artículo no encontrado'));
+    try {
+        const articulo = await Articulos.findOne({
+            where: { no_inventario, disponible: 1 }
+        });
+
+        if (!articulo) {
+            return res.status(404).json({ error: 'Artículo no encontrado' });
+        }
+
+        res.json({ articulo });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al obtener los detalles del artículo' });
     }
-
-    res.json(articleView.detallesArticulo(articulo));
 };
 
-exports.articulosSinGrupo = (req, res) => {
+exports.articulosSinGrupo = async (req, res) => {
     const { fk_Grupo_execpcion } = req.params;
-    const resultado = articulos.filter(a => a.grupo !== fk_Grupo_execpcion);
 
-    res.json(articleView.listaArticulos(resultado));
+    try {
+        const resultado = await Articulos.findAll({
+            where: {
+                Grupos_pk: { [Op.ne]: fk_Grupo_execpcion },
+                disponible: 1
+            }
+        });
+        res.json({ articulos: resultado });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al obtener artículos sin grupo' });
+    }
 };
 
-exports.articulosSinArea = (req, res) => {
+exports.articulosSinArea = async (req, res) => {
     const { fk_Area_execpcion } = req.params;
-    const resultado = articulos.filter(a => a.area !== fk_Area_execpcion);
 
-    res.json(articleView.listaArticulos(resultado));
+    try {
+        const resultado = await Articulos.findAll({
+            where: {
+                Areas_pk: { [Op.ne]: fk_Area_execpcion },
+                disponible: 1
+            }
+        });
+        res.json({ articulos: resultado });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al obtener artículos sin área' });
+    }
 };

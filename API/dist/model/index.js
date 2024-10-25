@@ -1,5 +1,5 @@
 // index.js
-const sequelize = require('./config/database');
+const sequelize = require('../config/database');
 const Responsables = require('./responsables');
 const Areas = require('./areas');
 const Grupos = require('./grupos');
