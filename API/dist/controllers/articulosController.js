@@ -1,4 +1,4 @@
-const { Articulos, Condiciones, Imagenes } = require('../model');
+const { Articulos, Condiciones, Imagenes, Areas, Grupos, Asignaciones } = require('../model');
 const { Op } = require('sequelize');
 
 exports.buscarArticulos = async (req, res) => {
@@ -17,42 +17,9 @@ exports.buscarArticulos = async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: 'Error en la búsqueda de artículos' });
     }
-};
-
-exports.middleCreateArticle = (req, res, next) => {
-    try{
-        const { no_inventario, nombre, descripcion, costo } = req.body;
-        let errores = [];
-        if (!no_inventario) errores.push('Es necesario definir el (no_inventario)');
-        if (!nombre) errores.push('Es necesario definir el (nombre)');
-        if (!descripcion) errores.push('Es necesario definir el (descripcion)');
-        if (!costo) errores.push('Es necesario definir el (costo)');
-    
-        if (errores.length > 0) {
-            return res.status(400).json({ error: errores.join(' ') });
-        }
-    } catch (error) {
-        res.status(500).json({ error: 'Error en la proteccion del articulo' });
-    }
-    next();
-};
+}; 
 
 exports.crearArticulo = async (req, res) => {
-    try{
-        const { no_inventario, nombre, descripcion, costo } = req.body;
-        let errores = [];
-        if (!no_inventario) errores.push('Es necesario definir el (no_inventario)');
-        if (!nombre) errores.push('Es necesario definir el (nombre)');
-        if (!descripcion) errores.push('Es necesario definir el (descripcion)');
-        if (!costo) errores.push('Es necesario definir el (costo)');
-    
-        if (errores.length > 0) {
-            return res.status(400).json({ error: errores.join(' ') });
-        }
-    } catch (error) {
-        res.status(500).json({ error: 'Error en la proteccion del articulo' });
-    }
-
     try {
         const { no_inventario, nombre, descripcion, costo } = req.body;
         const nuevoArticulo = await Articulos.create({
@@ -114,19 +81,40 @@ exports.darDeBajaArticulo = async (req, res) => {
 
 exports.detallesArticulo = async (req, res) => {
     const { no_inventario } = req.params;
-
+    console.log(no_inventario);
     try {
-        const articulo = await Articulos.findOne({
-            where: { no_inventario, disponible: 1 }
+        const articulos = await Articulos.findAll({
+            where: { no_inventario: no_inventario },
+            include: [
+                {
+                    model: Condiciones,
+                    as: 'Condiciones'
+                },
+                {
+                    model: Areas,
+                    as: 'Area'
+                },
+                {
+                    model: Grupos,
+                    as: 'Grupo'
+                }
+            ]
         });
 
-        if (!articulo) {
+        // Check if any articles were found
+        if (articulos.length === 0) {
             return res.status(404).json({ error: 'Artículo no encontrado' });
         }
 
-        res.json({ articulo });
+        const articulo = articulos[0]; // Get the first article
+        const responsable = await Asignaciones.findAll({
+            where: { Articulos_pk: articulo.pk, disponible: 1 }
+        });
+
+        const respuesta = { articulo, responsable };
+        res.json({ respuesta });
     } catch (error) {
-        res.status(500).json({ error: 'Error al obtener los detalles del artículo' });
+        res.status(500).json({ error: 'Error al obtener los detalles del artículo: ' + error.message });
     }
 };
 

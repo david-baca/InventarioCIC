@@ -1,5 +1,5 @@
 // Middleware para validar los datos de creación de un nuevo grupo
-exports.middleCreateGrupo = (req, res, next) => {
+exports.createGrupo = (req, res, next) => {
     try {
         const { nombre, descripcion } = req.body;
         let errores = [];
@@ -17,7 +17,7 @@ exports.middleCreateGrupo = (req, res, next) => {
 };
 
 // Middleware para validar los datos de edición de un grupo existente
-exports.middleEditGrupo = (req, res, next) => {
+exports.editGrupo = (req, res, next) => {
     try {
         const { id, nombre, descripcion } = req.body;
         let errores = [];
@@ -36,7 +36,7 @@ exports.middleEditGrupo = (req, res, next) => {
 };
 
 // Middleware para validar la baja de un grupo
-exports.middleBajaGrupo = (req, res, next) => {
+exports.bajaGrupo = (req, res, next) => {
     try {
         const { id, motivo } = req.body;
         let errores = [];
@@ -49,19 +49,6 @@ exports.middleBajaGrupo = (req, res, next) => {
         }
     } catch (error) {
         return res.status(500).json({ error: 'Error en la validación de la baja del grupo' });
-    }
-    next();
-};
-
-// Middleware para validar la búsqueda de un grupo
-exports.middleSearchGrupo = (req, res, next) => {
-    try {
-        const { query } = req.params;
-        if (!query) {
-            return res.status(400).json({ error: 'Es necesario definir un parámetro de búsqueda (query).' });
-        }
-    } catch (error) {
-        return res.status(500).json({ error: 'Error en la búsqueda del grupo' });
     }
     next();
 };
