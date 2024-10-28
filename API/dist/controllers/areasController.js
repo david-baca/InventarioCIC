@@ -3,7 +3,7 @@ const areaView = require('../views/areasView');
 const {Areas } = require ('../model');
 const { Op } = require('sequelize');
 let areas = []; // Simulación de base de datos en memoria
-//______________________________________________________________________________________________________________crear (POST)
+//__________________prueba de que si se actualizo el git_________________________________________________________________________________________crear (POST)
 exports.crearArea = async (req, res) => {
     const { codigo, descripcion } = req.body;  
     if (!codigo || !descripcion) {
