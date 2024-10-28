@@ -12,7 +12,7 @@ articulosRoutes.get('/search/:query', articleController.buscarArticulos);
 articulosRoutes.post('/', uploadImg.array('imagenes', 5), articulosMiddlewares.createArticle, articleController.crearArticulo); // Máximo 5 imágenes
 
 // Endpoint para editar un artículo
-articulosRoutes.put('/:id', articulosMiddlewares.editArticle,  articleController.editarArticulo);
+articulosRoutes.put('/:id', uploadImg.array('imagenes', 5), articulosMiddlewares.editArticle,  articleController.editarArticulo);
 
 // Endpoint para dar de baja un artículo
 articulosRoutes.patch('/:id/baja', articulosMiddlewares.bajaArticle, articleController.darDeBajaArticulo);
