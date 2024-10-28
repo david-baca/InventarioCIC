@@ -1,7 +1,9 @@
 // models/documentos.js
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
+const Asignaciones = require('./asignaciones'); // Asegúrate de importar Asignaciones correctamente
 
+// Definir el modelo Documentos
 const Documentos = sequelize.define('Documentos', {
   pk: {
     type: DataTypes.INTEGER,
@@ -31,5 +33,8 @@ const Documentos = sequelize.define('Documentos', {
   tableName: 'Documentos',
   timestamps: false,
 });
+
+// Relacion de documentos y asignacion
+Documentos.belongsTo(Asignaciones, { foreignKey: 'Asignaciones_pk', as: 'asignacion' });
 
 module.exports = Documentos;
