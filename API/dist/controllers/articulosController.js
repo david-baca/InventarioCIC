@@ -8,10 +8,11 @@ exports.buscarArticulos = async (req, res) => {
             where: {
                 [Op.or]: [
                     { nombre: { [Op.like]: `%${query}%` } },
-                    { descripcion: { [Op.like]: `%${query}%` } }
+                    { no_inventario: { [Op.like]: `%${query}%` } }
                 ],
                 disponible: 1
-            }
+            },
+            attributes: ['pk','nombre','no_inventario']
         });
         res.json({ articulos: resultado });
     } catch (error) {
@@ -51,6 +52,8 @@ exports.crearArticulo = async (req, res) => {
 };
 
 exports.editarArticulo = async (req, res) => {
+    //este apartado es condicional
+    //te pteguntaras a que bueno pues es condicional a que?
     const { id } = req.params;
     const { no_inventario, nombre, descripcion, costo, consumible } = req.body;
     try {
@@ -58,12 +61,47 @@ exports.editarArticulo = async (req, res) => {
         if (!articulo) {
             return res.status(404).json({ error: 'Artículo no encontrado' });
         }
-        await articulo.update({ no_inventario, nombre, descripcion, costo, consumible });
-        res.json({ message: 'Artículo editado exitosamente', articulo });
+        //si el articylo esta asignado
+        const isAsigned = awaitAsignaciones.findAll({
+            where:{ Articulos_pk:articulo.pk}
+        })
+        if(isAsigned.length()==0){
+            //si no esta asignado este articulo
+            //eso significa que el usuario puede editar TODOS sus campos
+                try {
+                const { Articulo, Condiciones } = req.body;
+                const nuevoartículo = await Articulos.update(Articulo)
+                if (req.files && req.files.length > 0) {
+                    const nuevaCondicion = await Condiciones.create(Condiciones);
+                    const imagenesData = req.files.map(file => {
+                        return {
+                             imagen: file.path,
+                             Condiciones_pk: nuevaCondicion.pk,
+                        };
+                    })      
+                    //deben de apagar las antiguas condiciones de la bd
+                    await Condiciones.update({
+                        where:{Articulos_pk:Articulo.pk, disponible:1}//base esta condicion
+                        disponible:0 //apagar su diponibilidad
+                    })       
+                    //despues se debe crear una condicion nueva
+                    //agregarle las imagenes comk en crear un articulo
+                    //y devolver una respuesta de viewartocle
+                }                                                                                                                                                                                                                                                 
+                }catch{
+//en caso de que no se pueda err menage api level
+                }
+        }
+        //ahora si el if (condicion si estaba asignado o mo el articulo)
+        //nos dice que no esta asignado AriticuloisAsigned=false
+        //actialmente este aticulo
+        //no se puede editar por que esta asignado a un responable
+        //y cambios del articulo puede comprometer a las 
+        //confiabilidad administrativa del programa
     } catch (error) {
-        res.status(500).json({ error: 'Error al editar el artículo' });
+        res.status(500).json({ error: 'Error al editar el artículo'})
     }
-};
+}
 
 exports.darDeBajaArticulo = async (req, res) => {
     const { id } = req.params;
