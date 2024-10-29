@@ -3,13 +3,13 @@ const { Responsables } = require('../model'); // Asegúrate de tener el modelo R
 const { Op } = require('sequelize');
 
 exports.crearResponsable = async (req, res) => {
-    const { nombres, apellido_p, apellido_m, disponible } = req.body;
+    const { nombres, apellido_p, apellido_m } = req.body;
     try {
         const nuevoResponsable = await Responsables.create({
-            nombres,
-            apellido_p,
-            apellido_m,
-            disponible
+            nombres:nombres,
+            apellido_p:apellido_p,
+            apellido_m:apellido_m,
+            disponible:1
         });
         res.json(responsableView.datosResponsableCreado(nuevoResponsable));
     } catch (error) {

@@ -22,13 +22,13 @@ exports.buscarArticulos = async (req, res) => {
 
 exports.crearArticulo = async (req, res) => {
     try {
-        const { no_inventario, nombre, descripcion, costo } = req.body;
+        const { no_inventario, nombre, descripcion, costo, consumible} = req.body;
         const nuevoArticulo = await Articulos.create({
-            no_inventario,
-            nombre,
-            descripcion,
-            costo,
-            consumible: 1,
+            no_inventario:no_inventario,
+            nombre:nombre,
+            descripcion:descripcion,
+            costo:costo,
+            consumible: consumible,
             disponible: 1,
         });
         if (req.files && req.files.length > 0) {
