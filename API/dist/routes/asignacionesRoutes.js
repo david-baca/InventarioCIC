@@ -1,19 +1,21 @@
-// src/routes/asignacionRoutes.js
+// module.exports = router;
 const express = require('express');
 const router = express.Router();
 const asignacionController = require('../controllers/asignacionesController');
+const asignacionMiddlewares = require('../middlewares/asignacionesMiddlewares');
 
 // Endpoint para buscar asignaciones
 router.get('/search/:query', asignacionController.buscarAsignaciones);
 
-// Endpoint para crear una nueva asignación
-router.post('/', asignacionController.crearAsignacion);
+// Crear una nueva asignación con middleware
+router.post('/', asignacionMiddlewares.middleCreateAsignacion, asignacionController.crearAsignacion);
 
-// Endpoint para dar de baja una asignación
+// Dar de baja una asignación con middleware
+// router.patch('/:id/baja', asignacionMiddlewares.middleBajaAsignacion, asignacionController.darDeBajaAsignacion); Error
 router.patch('/:id/baja', asignacionController.darDeBajaAsignacion);
 
-// Endpoint para obtener detalles de una asignación
-router.get('/:id', asignacionController.obtenerDetallesAsignacion);
+// Obtener detalles de una asignación con middleware
+router.get('/:id', asignacionMiddlewares.middleGetAsignacionDetails, asignacionController.obtenerDetallesAsignacion);
 
 // Endpoint para obtener registro de asignaciones por artículo
 router.get('/articulo/:fk_Articulo', asignacionController.registroAsignacionesPorArticulo);

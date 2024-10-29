@@ -1,4 +1,4 @@
-const { Articulos, Condiciones, Imagenes } = require('../model');
+const { Articulos, Condiciones, Imagenes, Areas, Grupos, Asignaciones } = require('../model');
 const { Op } = require('sequelize');
 
 exports.buscarArticulos = async (req, res) => {
@@ -8,59 +8,27 @@ exports.buscarArticulos = async (req, res) => {
             where: {
                 [Op.or]: [
                     { nombre: { [Op.like]: `%${query}%` } },
-                    { descripcion: { [Op.like]: `%${query}%` } }
+                    { no_inventario: { [Op.like]: `%${query}%` } }
                 ],
                 disponible: 1
-            }
+            },
+            attributes: ['pk','nombre','no_inventario']
         });
         res.json({ articulos: resultado });
     } catch (error) {
         res.status(500).json({ error: 'Error en la búsqueda de artículos' });
     }
-};
-
-exports.middleCreateArticle = (req, res, next) => {
-    try{
-        const { no_inventario, nombre, descripcion, costo } = req.body;
-        let errores = [];
-        if (!no_inventario) errores.push('Es necesario definir el (no_inventario)');
-        if (!nombre) errores.push('Es necesario definir el (nombre)');
-        if (!descripcion) errores.push('Es necesario definir el (descripcion)');
-        if (!costo) errores.push('Es necesario definir el (costo)');
-    
-        if (errores.length > 0) {
-            return res.status(400).json({ error: errores.join(' ') });
-        }
-    } catch (error) {
-        res.status(500).json({ error: 'Error en la proteccion del articulo' });
-    }
-    next();
-};
+}; 
 
 exports.crearArticulo = async (req, res) => {
-    try{
-        const { no_inventario, nombre, descripcion, costo } = req.body;
-        let errores = [];
-        if (!no_inventario) errores.push('Es necesario definir el (no_inventario)');
-        if (!nombre) errores.push('Es necesario definir el (nombre)');
-        if (!descripcion) errores.push('Es necesario definir el (descripcion)');
-        if (!costo) errores.push('Es necesario definir el (costo)');
-    
-        if (errores.length > 0) {
-            return res.status(400).json({ error: errores.join(' ') });
-        }
-    } catch (error) {
-        res.status(500).json({ error: 'Error en la proteccion del articulo' });
-    }
-
     try {
-        const { no_inventario, nombre, descripcion, costo } = req.body;
+        const { no_inventario, nombre, descripcion, costo, consumible} = req.body;
         const nuevoArticulo = await Articulos.create({
-            no_inventario,
-            nombre,
-            descripcion,
-            costo,
-            consumible: 1,
+            no_inventario:no_inventario,
+            nombre:nombre,
+            descripcion:descripcion,
+            costo:costo,
+            consumible: consumible,
             disponible: 1,
         });
         if (req.files && req.files.length > 0) {
@@ -85,27 +53,37 @@ exports.crearArticulo = async (req, res) => {
 
 exports.editarArticulo = async (req, res) => {
     const { id } = req.params;
-    const { no_inventario, nombre, descripcion, costo, consumible } = req.body;
+    const { no_inventario, nombre, descripcion, costo, consumible} = req.body;
     try {
-        const articulo = await Articulos.findByPk(id);
-        if (!articulo) {
-            return res.status(404).json({ error: 'Artículo no encontrado' });
+        // Actualizar los campos del artículo
+        await Articulos.update(
+            { no_inventario, nombre, descripcion, costo, consumible },
+            { where: { id } }
+        );
+        // Desactivar condiciones antiguas
+        await Condiciones.update(
+            { disponible: 0 },
+            { where: { Articulos_pk: Articulo.pk, disponible: 1 } }
+        );
+        if (req.files && req.files.length > 0) {
+            const nuevaCondicion = await Condiciones.create(Condiciones);
+            const imagenesData = req.files.map(file => ({
+                imagen: file.path,
+                Condiciones_pk: nuevaCondicion.pk,
+            }));
+            await Imagenes.bulkCreate(imagenesData);
         }
-        await articulo.update({ no_inventario, nombre, descripcion, costo, consumible });
-        res.json({ message: 'Artículo editado exitosamente', articulo });
+        return res.status(200).json({ message: 'Artículo editado con éxito' });
     } catch (error) {
-        res.status(500).json({ error: 'Error al editar el artículo' });
+        console.error(error);
+        return res.status(500).json({ error: 'Error al editar el artículo' });
     }
 };
 
 exports.darDeBajaArticulo = async (req, res) => {
     const { id } = req.params;
     try {
-        const articulo = await Articulos.findByPk(id);
-        if (!articulo) {
-            return res.status(404).json({ error: 'Artículo no encontrado' });
-        }
-        await articulo.update({ disponible: 0 });
+        articulo = await articulo.update({ disponible: 0 }, { where: { pk:id } });
         res.json({ message: 'Artículo dado de baja exitosamente', articulo });
     } catch (error) {
         res.status(500).json({ error: 'Error al dar de baja el artículo' });
@@ -114,19 +92,36 @@ exports.darDeBajaArticulo = async (req, res) => {
 
 exports.detallesArticulo = async (req, res) => {
     const { no_inventario } = req.params;
-
     try {
-        const articulo = await Articulos.findOne({
-            where: { no_inventario, disponible: 1 }
+        const articulos = await Articulos.findAll({
+            where: { no_inventario: no_inventario },
+            include: [
+                {
+                    model: Condiciones,
+                    as: 'Condiciones'
+                },
+                {
+                    model: Areas,
+                    as: 'Area'
+                },
+                {
+                    model: Grupos,
+                    as: 'Grupo'
+                }
+            ]
         });
-
-        if (!articulo) {
+        // Check if any articles were found
+        if (articulos.length === 0) {
             return res.status(404).json({ error: 'Artículo no encontrado' });
         }
-
-        res.json({ articulo });
+        const articulo = articulos[0]; // Get the first article
+        const responsable = await Asignaciones.findAll({
+            where: { Articulos_pk: articulo.pk, disponible: 1 }
+        });
+        const respuesta = { articulo, responsable };
+        res.json({ respuesta });
     } catch (error) {
-        res.status(500).json({ error: 'Error al obtener los detalles del artículo' });
+        res.status(500).json({ error: 'Error al obtener los detalles del artículo: ' + error.message });
     }
 };
 
