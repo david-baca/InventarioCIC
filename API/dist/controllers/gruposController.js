@@ -1,5 +1,5 @@
 const grupoView = require('../views/gruposView');
-const { Grupos } = require('../model'); // Asegúrate de tener el modelo Grupos importado
+const { Grupos, Articulos } = require('../model'); // Asegúrate de tener el modelo Grupos importado
 const { Op } = require('sequelize');
 // Buscar grupos
 exports.buscarGrupos = async (req, res) => {
@@ -19,7 +19,20 @@ exports.buscarGrupos = async (req, res) => {
         res.status(500).json({ error: 'Error en la búsqueda de grupos' });
     }
 };
-
+// Detalles de un grupo en espesifico
+exports.detallesGrupo = async (req, res) => {
+    const { pk } = req.params;
+    try {
+        const grupo = await Grupos.findByPk(pk)
+        if(grupo=== undefined) return res.status(404).json({ error: 'Grupo no encontrado' });
+        const articulos = await Articulos.findAll({
+            where: { Grupos_pk: pk },
+        });
+        res.json({ articulos, grupo });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al obtener los detalles del artículo: ' + error.message });
+    }
+};
 // Crear un nuevo grupo
 exports.crearGrupo = async (req, res) => {
     const { nombre, descripcion, articulos } = req.body; // Captura la lista de artículos

@@ -92,7 +92,6 @@ exports.darDeBajaArticulo = async (req, res) => {
 
 exports.detallesArticulo = async (req, res) => {
     const { no_inventario } = req.params;
-    console.log(no_inventario);
     try {
         const articulos = await Articulos.findAll({
             where: { no_inventario: no_inventario },

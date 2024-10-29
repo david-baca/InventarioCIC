@@ -7,6 +7,9 @@ const grupoController = require('../controllers/gruposController');
 // Endpoint para buscar grupos
 router.get('/search/:query', grupoController.buscarGrupos);
 
+// Endpoint para buscar grupos
+router.get('/details/:pk', grupoController.detallesGrupo);
+
 // Endpoint para crear un nuevo grupo
 router.post('/', gruposMiddlewares.createGrupo, grupoController.crearGrupo);
 
