@@ -1,6 +1,6 @@
 // src/controllers/asignacionController.js
 const asignacionView = require('../views/asignacionesView');
-const { Asignaciones, Articulos, Responsables } = require('../model'); // Asegurándote de que todos los modelos están cargados correctamente
+const { Documentos, Asignaciones, Articulos, Responsables, Historial } = require('../model');
 
 // const { Asignaciones } = require('../model')
 
@@ -57,7 +57,6 @@ exports.buscarAsignaciones = async (req, res) => {
     }
 };
 
-
 // Crear una nueva asignación
 exports.crearAsignacion = async (req, res) => {
     const { fk_Articulo, fk_Responsable, urlDoc } = req.body;
@@ -70,43 +69,61 @@ exports.crearAsignacion = async (req, res) => {
     }
 
     try {
-        // Verificar si ya existe una asignación con el mismo artículo o documento para el mismo responsable
+        // Verificar si ya existe una asignación con el mismo artículo y responsable
         const asignacionExistente = await Asignaciones.findOne({
             where: {
-                [Op.or]: [
-                    { Articulos_pk: fk_Articulo, Responsables_pk: fk_Responsable },
-                    { urlDoc: urlDoc, Responsables_pk: fk_Responsable }
-                ]
+                Articulos_pk: fk_Articulo,
+                Responsables_pk: fk_Responsable
             }
         });
 
-        // Si ya existe una asignación, devolver un mensaje de error
+        // Si ya existe una asignación, verificar si el documento también existe
         if (asignacionExistente) {
-            return res.status(400).json({
-                error: 'Este artículo o documento ya está asignado a este responsable. No se puede volver a asignar.'
+            const documentoExistente = await Documentos.findOne({
+                where: {
+                    doc_firma: urlDoc,
+                    Asignaciones_pk: asignacionExistente.pk
+                }
             });
+
+            if (documentoExistente) {
+                return res.status(400).json({
+                    error: 'Este artículo ya está asignado a este responsable con el mismo documento. No se puede volver a asignar.'
+                });
+            }
         }
 
         // Crear la nueva asignación en la base de datos
         const nuevaAsignacion = await Asignaciones.create({
             Articulos_pk: fk_Articulo,
             Responsables_pk: fk_Responsable,
-            urlDoc: urlDoc,
-            disponible: true, // Asignar disponible como true por defecto
-            fecha_recibido: new Date() // Fecha de creación actual
+            disponible: true,
+            fecha_recibido: new Date()
         });
 
-        // Obtener la asignación creada con los detalles del artículo y del responsable
+        // Crear el documento vinculado a la asignación
+        const nuevoDocumento = await Documentos.create({
+            doc_firma: urlDoc, // Guardar el URL del documento
+            fecha: new Date(),
+            Asignaciones_pk: nuevaAsignacion.pk
+        });
+
+        // Obtener la asignación creada con los detalles del artículo, responsable y documento
         const asignacionConDetalles = await Asignaciones.findOne({
             where: { pk: nuevaAsignacion.pk },
             include: [
                 {
-                    model: require('../model').Articulos, // Incluir el modelo Articulos
-                    attributes: ['nombre'] // Solo queremos el nombre del artículo
+                    model: Articulos,
+                    attributes: ['nombre']
                 },
                 {
-                    model: require('../model').Responsables, // Incluir el modelo Responsables
-                    attributes: ['nombres', 'apellido_p', 'apellido_m'] // Obtener el nombre completo del responsable
+                    model: Responsables,
+                    attributes: ['nombres', 'apellido_p', 'apellido_m']
+                },
+                {
+                    model: Documentos,
+                    as: 'Documentos', // Especifica el alias aquí
+                    attributes: ['doc_firma', 'fecha']
                 }
             ]
         });
@@ -114,91 +131,195 @@ exports.crearAsignacion = async (req, res) => {
         // Devolver la respuesta con los datos de la nueva asignación y los detalles
         return res.status(201).json({
             message: 'Asignación creada exitosamente.',
-            asignacion: asignacionConDetalles
+            asignacion: asignacionConDetalles,
+            documento: nuevoDocumento
         });
     } catch (error) {
-        // Manejar posibles errores
         console.error('Error al crear la asignación:', error);
         return res.status(500).json({
-            error: 'Error al crear la asignación.'
+            error: `Error al crear la asignación: ${error.message}`
         });
     }
 };
 
-
-
 // Dar de baja una asignación por ID
-exports.darDeBajaAsignacion = (req, res) => {
-    const { id } = req.params;
+exports.darDeBajaAsignacion = async (req, res) => {
+    console.log('Parametros de la URL:', req.params); // Verificar que el id está siendo recibido
+    const { id } = req.params; // Obtener el id de los parámetros de la URL
+    console.log('ID capturado:', id);
 
+    const { motivo, usuarioId } = req.body; // Obtener el motivo de baja y el usuario que realiza la acción
+    console.log('Motivo:', motivo);
+    console.log('Usuario ID:', usuarioId);
+
+    // Validar si el ID es numérico
     if (isNaN(id)) {
-        return res.status(400).json(asignacionView.errorAsignacion('No existe la asignacion solicitada.'));
+        return res.status(400).json({ error: 'El ID de la asignación es inválido.' });
     }
 
-    const index = asignaciones.findIndex(a => a.id == id);
+    try {
+        // Buscar la asignación en la base de datos
+        const asignacion = await Asignaciones.findOne({
+            where: { pk: id }
+        });
 
-    if (index === -1) {
-        return res.status(404).json(asignacionView.errorAsignacion('Asignación no encontrada.'));
+        // Si no se encuentra la asignación
+        if (!asignacion) {
+            return res.status(404).json({ error: 'Asignación no encontrada.' });
+        }
+
+        // Crear un registro en la tabla Historial con la baja
+        const historialRegistro = await Historial.create({
+            descripcion: motivo || 'Asignación dada de baja',
+            fecha_accion: new Date(),
+            Usuarios_pk: usuarioId, // El usuario que realiza la acción
+            disponible: false, // Indica que la asignación ha sido dada de baja
+            Asignaciones_pk: asignacion.pk // Relaciona el historial con la asignación
+        });
+
+        // Respuesta de confirmación
+        return res.json({
+            message: 'Asignación dada de baja exitosamente y registrada en el historial.',
+            historial: historialRegistro
+        });
+    } catch (error) {
+        console.error('Error al dar de baja la asignación:', error);
+        return res.status(500).json({ error: 'Error al dar de baja la asignación.' });
     }
-
-    const asignacionBaja = asignaciones[index];
-    asignaciones.splice(index, 1);
-    Asignaciones.delete(asignacionBaja);
-
-    res.json(asignacionView.confirmacionBaja(asignacionBaja));
 };
 
 // Obtener detalles de una asignación por ID
-exports.obtenerDetallesAsignacion = (req, res) => {
+exports.obtenerDetallesAsignacion = async (req, res) => {
     const { id } = req.params;
 
+    // Validar si el ID es numérico
     if (isNaN(id)) {
-        return res.status(400).json(asignacionView.errorAsignacion('No se encontro la asignacion solicitada.'));
+        return res.status(400).json({ error: 'El ID de la asignación debe ser un número válido.' });
     }
 
-    const asignacion = asignaciones.find(a => a.id == id);
+    try {
+        // Buscar la asignación en la base de datos con el ID proporcionado
+        const asignacion = await Asignaciones.findOne({
+            where: { pk: id }, // Buscar por ID de la asignación
+            include: [
+                {
+                    model: Responsables, // Incluir el responsable
+                    as: 'Responsable', // Usa el alias correcto si has definido uno
+                    attributes: ['nombres', 'apellido_p', 'apellido_m'] // Atributos que deseas mostrar
+                },
+                {
+                    model: Documentos, // Incluir los documentos relacionados
+                    as: 'Documentos', // Usa el alias correcto
+                    attributes: ['doc_firma', 'fecha'] // Atributos que deseas mostrar
+                },
+                {
+                    model: Articulos, // Incluir los artículos relacionados
+                    as: 'Articulo', // Usa el alias correcto
+                    attributes: ['nombre', 'descripcion'] // Atributos que deseas mostrar
+                }
+            ]
+        });
 
-    if (!asignacion) {
-        return res.status(404).json(asignacionView.errorAsignacion('Asignación no encontrada.'));
+        // Si no se encuentra la asignación, devolver un error 404
+        if (!asignacion) {
+            return res.status(404).json({ error: 'Asignación no encontrada.' });
+        }
+
+        // Devolver la asignación en formato JSON
+        return res.json(asignacion);
+    } catch (error) {
+        // Manejar errores
+        console.error('Error al obtener los detalles de la asignación:', error);
+        return res.status(500).json({ error: 'Error al obtener los detalles de la asignación.' });
     }
-
-    res.json(asignacionView.detallesAsignacion(asignacion));
 };
 
 // Registro de asignaciones por Artículo
-exports.registroAsignacionesPorArticulo = (req, res) => {
+exports.registroAsignacionesPorArticulo = async (req, res) => {
     const { fk_Articulo } = req.params;
 
-    // Validar que el artículo existe y tiene formato adecuado
-    if (!fk_Articulo || !fk_Articulo.startsWith('UPQROO-')) {
-        return res.status(400).json(asignacionView.errorAsignacion('El artículo es inválido o no sigue el formato correcto.'));
+    // Validar que el artículo está presente
+    if (!fk_Articulo) {
+        return res.status(400).json({ error: 'El artículo es inválido o no se proporcionó.' });
     }
 
-    const resultado = asignaciones.filter(a => a.fk_Articulo == fk_Articulo);
+    try {
+        // Buscar asignaciones relacionadas con el artículo en la base de datos
+        const asignaciones = await Asignaciones.findAll({
+            where: { Articulos_pk: fk_Articulo }, // Filtrar por el número del artículo
+            include: [
+                {
+                    model: Articulos, // Incluir los detalles del artículo
+                    as: 'Articulo',
+                    attributes: ['nombre', 'descripcion']
+                },
+                {
+                    model: Responsables, // Incluir los detalles del responsable
+                    as: 'Responsable',
+                    attributes: ['nombres', 'apellido_p', 'apellido_m']
+                },
+                {
+                    model: Documentos, // Incluir los documentos relacionados
+                    as: 'Documentos',
+                    attributes: ['doc_firma', 'fecha']
+                }
+            ]
+        });
 
-    // Si no se encuentran asignaciones
-    if (resultado.length === 0) {
-        return res.status(404).json(asignacionView.errorAsignacion('No se encontraron asignaciones para este artículo.'));
+        // Si no se encuentran asignaciones para ese artículo
+        if (!asignaciones || asignaciones.length === 0) {
+            return res.status(404).json({ error: 'No se encontraron asignaciones para este artículo.' });
+        }
+
+        // Devolver la lista de asignaciones en formato JSON
+        return res.json(asignaciones);
+    } catch (error) {
+        console.error('Error al obtener asignaciones por artículo:', error);
+        return res.status(500).json({ error: 'Error al obtener asignaciones por artículo.' });
     }
-
-    res.json(asignacionView.listaAsignaciones(resultado));
 };
 
 // Registro de asignaciones por Responsable
-exports.registroAsignacionesPorResponsable = (req, res) => {
+exports.registroAsignacionesPorResponsable = async (req, res) => {
     const { fk_Responsable } = req.params;
 
-    // Validar que el responsable sea un ID numérico válido
+    // Validar que el fk_Responsable es un número válido
     if (isNaN(fk_Responsable)) {
-        return res.status(400).json(asignacionView.errorAsignacion('No se encontro al responsable.'));
+        return res.status(400).json({ error: 'El ID del responsable es inválido.' });
     }
 
-    const resultado = asignaciones.filter(a => a.fk_Responsable == fk_Responsable);
+    try {
+        // Buscar asignaciones relacionadas con el responsable en la base de datos
+        const asignaciones = await Asignaciones.findAll({
+            where: { Responsables_pk: fk_Responsable }, // Filtrar por el ID del responsable
+            include: [
+                {
+                    model: Articulos, // Incluir los detalles del artículo
+                    as: 'Articulo',
+                    attributes: ['nombre', 'descripcion']
+                },
+                {
+                    model: Responsables, // Incluir los detalles del responsable
+                    as: 'Responsable',
+                    attributes: ['nombres', 'apellido_p', 'apellido_m']
+                },
+                {
+                    model: Documentos, // Incluir los documentos relacionados
+                    as: 'Documentos',
+                    attributes: ['doc_firma', 'fecha']
+                }
+            ]
+        });
 
-    // Si no se encuentran asignaciones
-    if (resultado.length === 0) {
-        return res.status(404).json(asignacionView.errorAsignacion('No se encontraron asignaciones para este responsable.'));
+        // Si no se encuentran asignaciones para ese responsable
+        if (!asignaciones || asignaciones.length === 0) {
+            return res.status(404).json({ error: 'No se encontraron asignaciones para este responsable.' });
+        }
+
+        // Devolver la lista de asignaciones en formato JSON
+        return res.json(asignaciones);
+    } catch (error) {
+        console.error('Error al obtener asignaciones por responsable:', error);
+        return res.status(500).json({ error: 'Error al obtener asignaciones por responsable.' });
     }
-
-    res.json(asignacionView.listaAsignaciones(resultado));
 };

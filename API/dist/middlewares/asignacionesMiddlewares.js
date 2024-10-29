@@ -1,36 +1,37 @@
 // Middleware para crear una asignación
 exports.middleCreateAsignacion = (req, res, next) => {
     try {
-        const { fk_Area, fk_Articulo, fecha_asignacion } = req.body;
+        const { fk_Articulo, fk_Responsable, urlDoc } = req.body;
         let errores = [];
-        if (!fk_Area) errores.push('Es necesario definir el (fk_Area)');
-        if (!fk_Articulo) errores.push('Es necesario definir el (fk_Articulo)');
-        if (!fecha_asignacion) errores.push('Es necesario definir la (fecha_asignacion)');
-    
+        if (!fk_Articulo) errores.push('Es necesario definir el fk_Articulo.');
+        if (!fk_Responsable) errores.push('Es necesario definir el fk_Responsable.');
+        if (!urlDoc) errores.push('Es necesario definir el urlDoc.');
+
         if (errores.length > 0) {
             return res.status(400).json({ error: errores.join(' ') });
         }
     } catch (error) {
-        return res.status(500).json({ error: 'Error en la protección de la asignación' });
+        return res.status(500).json({ error: 'Error al validar los datos de la asignación.' });
     }
     next();
 };
 
+
 // Middleware para editar una asignación
 exports.middleEditAsignacion = (req, res, next) => {
     try {
-        const { id, fk_Area, fk_Articulo, fecha_asignacion } = req.body;
+        const { id, fk_Articulo, fk_Responsable, fecha_asignacion } = req.body;
         let errores = [];
-        if (!id) errores.push('Es necesario definir el (id)');
-        if (!fk_Area) errores.push('Es necesario definir el (fk_Area)');
-        if (!fk_Articulo) errores.push('Es necesario definir el (fk_Articulo)');
-        if (!fecha_asignacion) errores.push('Es necesario definir la (fecha_asignacion)');
+        if (!id) errores.push('Es necesario definir el ID de la asignación.');
+        if (!fk_Articulo) errores.push('Es necesario definir el fk_Articulo.');
+        if (!fk_Responsable) errores.push('Es necesario definir el fk_Responsable.');
+        if (!fecha_asignacion) errores.push('Es necesario definir la fecha_asignacion.');
     
         if (errores.length > 0) {
             return res.status(400).json({ error: errores.join(' ') });
         }
     } catch (error) {
-        return res.status(500).json({ error: 'Error en la protección de la asignación' });
+        return res.status(500).json({ error: 'Error al validar los datos de la asignación.' });
     }
     next();
 };
@@ -40,14 +41,14 @@ exports.middleBajaAsignacion = (req, res, next) => {
     try {
         const { id, motivo } = req.body;
         let errores = [];
-        if (!id) errores.push('Es necesario definir el (id)');
-        if (!motivo) errores.push('Es necesario definir el (motivo)');
+        if (!id) errores.push('Es necesario definir el ID de la asignación.');
+        if (!motivo) errores.push('Es necesario definir el motivo de la baja.');
     
         if (errores.length > 0) {
             return res.status(400).json({ error: errores.join(' ') });
         }
     } catch (error) {
-        return res.status(500).json({ error: 'Error en la protección de la asignación' });
+        return res.status(500).json({ error: 'Error al validar la baja de la asignación.' });
     }
     next();
 };
@@ -57,23 +58,10 @@ exports.middleGetAsignacionDetails = (req, res, next) => {
     try {
         const { id } = req.params;
         if (!id) {
-            return res.status(400).json({ error: 'Es necesario definir el (id)' });
+            return res.status(400).json({ error: 'Es necesario definir el ID de la asignación.' });
         }
     } catch (error) {
-        return res.status(500).json({ error: 'Error al obtener los detalles de la asignación' });
-    }
-    next();
-};
-
-// Middleware para obtener asignaciones sin áreas o artículos asignados
-exports.middleGetAsignacionesWithoutAreaOrArticulo = (req, res, next) => {
-    try {
-        const { fk_Area_execpcion, fk_Articulo_execpcion } = req.params;
-        if (!fk_Area_execpcion && !fk_Articulo_execpcion) {
-            return res.status(400).json({ error: 'Es necesario definir al menos un (fk_Area_execpcion) o (fk_Articulo_execpcion)' });
-        }
-    } catch (error) {
-        return res.status(500).json({ error: 'Error al obtener las asignaciones sin área o artículo' });
+        return res.status(500).json({ error: 'Error al obtener los detalles de la asignación.' });
     }
     next();
 };
