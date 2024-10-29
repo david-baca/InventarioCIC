@@ -1,10 +1,11 @@
 // src/routes/userRoutes.js
 const express = require('express');
 const usuariosRoutes = express.Router();
+const usuariosMiddlewares = require("../middlewares/usuariosMiddlewares")
 const userController = require('../controllers/usuariosController');
  
 // Endpoint para crear un nuevo usuario
-usuariosRoutes.post('/', userController.crearUsuario);
+usuariosRoutes.post('/',usuariosMiddlewares.createUsuario, userController.crearUsuario);
 
 // Endpoint para editar un usuario existente
 usuariosRoutes.put('/:id', userController.editarUsuario);
