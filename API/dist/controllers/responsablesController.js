@@ -3,15 +3,13 @@ const { Responsables } = require('../model'); // Asegúrate de tener el modelo R
 const { Op } = require('sequelize');
 
 exports.crearResponsable = async (req, res) => {
-    const { nombres, apellido_p, apellido_m, cargo, disponible } = req.body;
-
+    const { nombres, apellido_p, apellido_m } = req.body;
     try {
         const nuevoResponsable = await Responsables.create({
-            nombres,
-            apellido_p,
-            apellido_m,
-            cargo,
-            disponible
+            nombres:nombres,
+            apellido_p:apellido_p,
+            apellido_m:apellido_m,
+            disponible:1
         });
         res.json(responsableView.datosResponsableCreado(nuevoResponsable));
     } catch (error) {
@@ -21,15 +19,14 @@ exports.crearResponsable = async (req, res) => {
 
 exports.editarResponsable = async (req, res) => {
     const { id } = req.params;
-    const { nombres, apellido_p, apellido_m, cargo } = req.body;
-
+    const { nombres, apellido_p, apellido_m } = req.body;
     try {
         const responsable = await Responsables.findByPk(id);
         if (!responsable) {
             return res.status(404).json(responsableView.errorResponsable('Responsable no encontrado'));
         }
 
-        await responsable.update({ nombres, apellido_p, apellido_m, cargo });
+        await responsable.update({ nombres, apellido_p, apellido_m });
         res.json(responsableView.confirmacionEdicion(responsable));
     } catch (error) {
         res.status(500).json({ error: 'Error al editar el responsable' });
@@ -38,7 +35,6 @@ exports.editarResponsable = async (req, res) => {
 
 exports.buscarResponsables = async (req, res) => {
     const { query } = req.params;
-
     try {
         const resultado = await Responsables.findAll({
             where: {
@@ -58,13 +54,11 @@ exports.buscarResponsables = async (req, res) => {
 
 exports.darDeBajaResponsable = async (req, res) => {
     const { id } = req.params;
-
     try {
         const responsable = await Responsables.findByPk(id);
         if (!responsable) {
             return res.status(404).json(responsableView.errorResponsable('Responsable no encontrado'));
         }
-
         await responsable.update({ disponible: 0 }); // Marcar como no disponible
         res.json(responsableView.confirmacionBaja(responsable));
     } catch (error) {
