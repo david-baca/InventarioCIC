@@ -14,6 +14,7 @@ exports.crearArea = async (req, res) => {
     const disponible = 1;  
     const nuevaArea = { codigo, descripcion, disponible };
 
+
     try {
         const area = await Areas.create(nuevaArea);   
         res.status(201).json(areaView.datosAreaCreada(area));

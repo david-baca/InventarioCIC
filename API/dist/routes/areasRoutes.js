@@ -4,7 +4,6 @@ const router = express.Router();
 const areaController = require('../controllers/areasController');
 const validateLength = require('../middlewares/validateLength'); 
 
-
 // Endpoint para crear una nueva área
 router.post('/', validateLength, areaController.crearArea);
 
