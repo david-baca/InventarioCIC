@@ -8,7 +8,7 @@ const sequelize = new Sequelize('inventarioCIC', user, password, {
     host: 'localhost',
     dialect: 'mysql',
     port: puente,
-    logging: false,
+    //logging: false,
 });
 
 module.exports = sequelize;

@@ -1,8 +1,7 @@
 // Middleware para validar los datos de creación de un nuevo usuario
-exports.middleCreateUsuario = (req, res, next) => {
+exports.createUsuario = (req, res, next) => {
     try {
         const { nombre, email, password, rol_id } = req.body;
-        let errores = [];
 
         if (!nombre) errores.push('Es necesario definir el (nombre) del usuario.');
         if (!email) errores.push('Es necesario definir el (email) del usuario.');

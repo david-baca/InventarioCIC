@@ -1,4 +1,5 @@
 // models/responsables.js
+//definir los datos para la 
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
