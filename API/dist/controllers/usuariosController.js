@@ -1,30 +1,35 @@
 // src/controllers/userController.js
 const userView = require('../views/usuariosView');
- 
-let usuarios = []; // Simulación de base de datos en memoria
+const {Usuarios,Funciones,Permisos} = require('../model/')
+
 
 exports.crearUsuario = async (req, res) => 
 {
     try{
-        const { nombre, apellido_p, apellido_m, correo} = req.body; //removi (rol, permisos) pero puede que los ocupe
+        const { nombre, apellidoP, apellidoM, correo, permisos} = req.body; //removi (rol) pero puede que los ocupe
 
-        const nuevoUsuario = await usuarios.create(
+        const nuevoUsuario = await Usuarios.create(
         { 
-            id: usuarios.length + 1,
-            nombres, 
-            apellido_p, 
-            apellido_m, 
-            correo
+            nombres: nombre, 
+            apellido_p: apellidoP, 
+            apellido_m: apellidoM, 
+            correo: correo,
+            master: 0,
+            disponible: 1
         });
     
-        /*const nuevoUsuario = { id: usuarios.length + 1, nombre, correo, rol, estado: true, permisos };
-        usuarios.push(nuevoUsuario);*/
+        for (const permiso of permisos) {
+            await Permisos.create({
+                Usuarios_pk: nuevoUsuario.pk,
+                Funciones_pk: permiso.pk,
+            });
+        }           
 
         res.json(userView.confirmacionCreacion(nuevoUsuario));
         
     } catch (error) 
     {
-        res.status(500).json(responsableView.errorResponsable('Error al crear el responsable'));
+        res.status(500).json(userView.errorUsuario('Error al crear el usuario ' + error));
     }
     
 };
@@ -34,36 +39,26 @@ exports.editarUsuario = async(req, res) =>
 {
     try{
 
-        const { id } = req.params;
-        const { nombre, apellido_p, apellido_m, correo } = req.body;
+        const { pk } = req.params;
+        const { permisos } = req.body;
     
-        const usuario = await usuarios.findByPk(id);
+        const usuario = await usuarios.findByPk(pk);
         if (!usuario) 
         {
             return res.status(404).json(usuarioView.errorUsuario('Usuario no encontrado'));
         }
     
-        usuario.nombre = nombre;
-        usuario.apellido_p = apellido_p;
-        usuario.apellido_m = apellido_m;
-        usuario.rol = rol;        
-        usuario.correo = correo;
+        await Permisos.destroy({ where: { Usuarios_pk: pk } }); // Elimina los permisos actuales del usuario
 
-        /*const usuario = usuarios.find(u => u.id == id);
-        if (!usuario) {
-            return res.status(404).json(userView.errorUsuario('Usuario no encontrado'));
-        }*/
-    
-            await responsable.update(
-            { 
-                nombres, 
-                apellido_p, 
-                apellido_m, 
-                cargo 
+        // Añade los nuevos permisos
+        for (const permiso of permisos) {
+            await Permisos.create({
+                Usuarios_pk: pk,
+                Funciones_pk: permiso.pk,
             });
+        }
 
-        res.json(userView.confirmacionEdicion(usuario));
-
+        res.json(userView.confirmacionActualizacion(`Permisos actualizados para el usuario con pk: ${pk}`))
     }catch (error) 
     {
         res.status(500).json(responsableView.errorResponsable('Error al editar el responsable'));
@@ -71,34 +66,32 @@ exports.editarUsuario = async(req, res) =>
 };
 
 
+
 exports.mostrarUsuarios = async(req, res) => {
 
     try {
-        const usuarios = await Usuarios.findAll();
-        res.json(userView.listaUsuarios(usuarios));
-    } catch (error) {
-        res.status(500).json(userView.errorUsuario('Error al consultar usuario'));
-    }
+        const usuarios = await Usuarios.findAll({
+            attributes: ['nombres', 'apellido_p', 'apellido_m', 'correo']
+        });
 
-    //res.json(userView.listaUsuarios(usuarios));
+        res.json(usuarios);
+    } catch (error) {
+        res.status(500).json(userView.errorUsuario('Error al obtener los usuarios: ' + error));
+    }
 };
+
 
 
 exports.detallesUsuario = async(req, res) => {
 
-    try{
-    const { correo } = req.params;
-    //const usuario = usuarios.find(u => u.correo === correo);
-    const usuario = await Usuarios.findOne({ where: { correo } });
+    try {
+        const usuarios = await Usuarios.findAll({
+            attributes: ['correo']
+        });
 
-    if (!usuario) {
-        return res.status(404).json(userView.errorUsuario('Usuario no encontrado'));
-    }
-
-    res.json(userView.detallesUsuario(usuario));
-
-    }catch (error){
-        res.status(500).json(userView.errorUsuario('Error al obtener los detalles del usuario'));
+        res.json(usuarios);
+    } catch (error) {
+        res.status(500).json(userView.errorUsuario('Error al obtener los usuarios: ' + error));
     }
     
 };
