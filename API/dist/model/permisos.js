@@ -9,6 +9,7 @@ const Permisos = sequelize.define('Permisos', {
       model: 'Usuarios',
       key: 'pk',
     },
+    primaryKey: true
   },
   Funciones_pk: {
     type: DataTypes.INTEGER,
@@ -16,6 +17,7 @@ const Permisos = sequelize.define('Permisos', {
       model: 'Funciones',
       key: 'pk',
     },
+    primaryKey: true
   },
 }, {
   tableName: 'Permisos',
