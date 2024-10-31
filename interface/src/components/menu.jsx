@@ -16,10 +16,10 @@ const options = [
 
 const OptionNav = ({ name, isSelected }) => (
   <div className={`w-[100%] p-2 flex flex-row justify-start items-center 
-    gap-1 border-[0.5px] border-UP-Opaco border-s-[1rem] rounded-e-md
+    gap-1 border-[0.5px] border-UP-Opaco border-s-[1.5rem] rounded-e-md
     ${isSelected ? 'border-s-UP-Primario' : 'border-s-UP-Blanco'}`}>
-    <div className='ps-2 p-1 border border-UP-Opaco rounded-e-md'>
-      {isSelected ? <h1>●</h1> : <h1>○</h1>}
+    <div className='ps-2 p-1 border border-UP-Opaco rounded-e-md justify-center items-center'>
+      {isSelected ? <h1 className=' inline-block'>●</h1> : <h1 className=' inline-block'>○</h1>}
     </div>
     <h1>{name}</h1>
   </div>

@@ -14,7 +14,7 @@ exports.buscarArticulos = async (req, res) => {
             },
             attributes: ['pk','nombre','no_inventario']
         });
-        res.json({ articulos: resultado });
+        res.json(resultado);
     } catch (error) {
         res.status(500).json({ error: 'Error en la búsqueda de artículos' });
     }

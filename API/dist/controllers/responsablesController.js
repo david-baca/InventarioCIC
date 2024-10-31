@@ -46,7 +46,7 @@ exports.buscarResponsables = async (req, res) => {
                 disponible: 1 // Solo buscar responsables disponibles
             }
         });
-        res.json(responsableView.listaResponsables(resultado));
+        res.json(resultado);
     } catch (error) {
         res.status(500).json({ error: 'Error en la búsqueda de responsables' });
     }
