@@ -1,6 +1,6 @@
 import React from 'react';
 
-    function buscador({ text, onClick }) {
+const buscador = ({ text, onClick }) => {
     return (
     <div
         class="relative flex"
@@ -42,4 +42,7 @@ import React from 'react';
     );
   }
   
-  export default buscador;
+  const Buscador ={
+    buscador
+  }
+  export default Buscador;

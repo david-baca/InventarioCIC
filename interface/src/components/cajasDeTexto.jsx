@@ -1,6 +1,6 @@
 import React from 'react';
 
-    function cajaDeTexto({ text, onClick }) {
+const cajaDeTexto = ({ text, onClick }) => {
     return (
     <div
         class="relative flex"
@@ -21,5 +21,9 @@ import React from 'react';
         </div>
     );
   }
+
+const CajaDeTexto = {
+    cajaDeTexto
+}
   
-  export default cajaDeTexto;
+  export default CajaDeTexto;
