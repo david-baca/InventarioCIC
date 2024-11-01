@@ -46,7 +46,7 @@ const botonCancelar = ({ text, onClick }) => {
 const botonCrear = ({ text, onClick }) => {
   return (
       <>
-      <button onClick={onClick} className="bg-UP-Exito hover:bg-green-600 text-white font-bold py-2 px-4 rounded-full">
+      <button onClick={onClick} className="bg-UP-Exito hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">
       + Crear
       </button>
       </>
@@ -56,7 +56,7 @@ const botonCrear = ({ text, onClick }) => {
 const botonImprimir = ({ text, onClick }) => {
   return (
       <>
-      <button onClick={onClick} className="bg-UP-Primario hover:bg-UP-Secundario text-white font-bold py-2 px-4 rounded-full">
+      <button onClick={onClick} className="bg-UP-Primario hover:bg-UP-Secundario text-white font-bold py-2 px-4 rounded-lg">
       Imprimir
       </button>
       </>
