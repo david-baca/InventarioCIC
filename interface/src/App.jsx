@@ -11,23 +11,23 @@ function App() {
           {/* Rutas que incluyen el menú */}
           <Route path="/articles" element={<Menu children={<Page.Articles.panel/>}/>}/>
           <Route path="/articles/edit/:pk" element={<Menu children={<Page.Articles.edit />}/>}/>
-          <Route path="/articles/detalles/:no_inventario" element={<Page.Articles.information />} />
-          <Route path="/articles/cargar" element={<Page.Articles.load />} />
-          <Route path="/articles/removal/:pk" element={<Page.Articles.removal />} />
+          <Route path="/articles/detalles/:no_inventario" element={<Menu children={<Page.Articles.information/>}/>}/>
+          <Route path="/articles/cargar" element={<Menu children={<Page.Articles.load/>}/>}/>
+          <Route path="/articles/removal/:pk" element={<Menu children={<Page.Articles.removal/>}/>}/> 
           <Route path="/groups" element={<Menu children={<Page.Groups.panel/>}/>}/>
-          <Route path="/groups/edit/:pk" element={<Page.Groups.edit />} />
-          <Route path="/groups/information/:pk" element={<Page.Groups.information />} />
-          <Route path="/groups/load" element={<Page.Groups.load />} />
-          <Route path="/groups/removal/:pk" element={<Page.Groups.removal />} />
+          <Route path="/groups/edit/:pk" element={<Menu children={<Page.Groups.edit/>}/>}/>
+          <Route path="/groups/information/:pk" element={<Menu children={<Page.Groups.information/>}/>}/> 
+          <Route path="/groups/load" element={<Menu children={<Page.Groups.load/>}/>}/>
+          <Route path="/groups/removal/:pk" element={<Menu children={<Page.Groups.removal/>}/>}/> 
           <Route path="/almacen" element={<Page.Almacen.panel />} />
           <Route path="/almacen/edit/:pk" element={<Page.Almacen.edit />} />
           <Route path="/almacen/information/:pk" element={<Page.Almacen.information />} />
           <Route path="/almacen/load" element={<Page.Almacen.load />} />
           <Route path="/almacen/removal/:pk" element={<Page.Almacen.removal />} />
-          <Route path="/responsable" element={<Page.Responsable.panel />} />
-          <Route path="/responsable/edit/:pk" element={<Page.Responsable.edit />} />
-          <Route path="/responsable/load" element={<Page.Responsable.load />} />
-          <Route path="/responsable/removal/:pk" element={<Page.Responsable.removal />} />
+          <Route path="/responsable" element={<Menu children={<Page.Responsable.panel/>}/>}/> 
+          <Route path="/responsable/edit/:pk" element={<Menu children={<Page.Responsable.edit/>}/>}/> 
+          <Route path="/responsable/load" element={<Menu children={<Page.Responsable.load/>}/>}/>
+          <Route path="/responsable/removal/:pk"  element={<Menu children={<Page.Responsable.removal/>}/>}/>
           <Route path="/movimientos" element={<Page.Movimientos.panel />} />
           <Route path="/asignaciones/" element={<Page.Movimientos.Asignaciones.seleccionResponsable />} />
           <Route path="/asignaciones/:pkResponsable" element={<Page.Movimientos.Asignaciones.seleccionArticulos />} />
