@@ -5,9 +5,6 @@ import imgAsignacion from "../../../public/asignacion.png";
 const ViewTransactions = () => {
 
   return (
-    
-        
-        
      <>
      {/* Contenedor del encabezado y recuadro */}
      <div className="p-5 w-full">
@@ -34,7 +31,6 @@ const ViewTransactions = () => {
             </div>
           </div>
         </div>
-     
      </>
   );
 };

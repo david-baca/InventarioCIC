@@ -1,29 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useLocation, Link } from 'react-router-dom';
-import { FaFileExcel } from 'react-icons/fa'; // Icono de Excel
-import { useNavigate } from 'react-router-dom';
-
-const options = [
-  { name: "Inicio", path: "/" },
-  { name: "Artículos", path: "/articles" },
-  { name: "Grupos", path: "/groups" },
-  { name: "Almacén", path: "/almacen" },
-  { name: "Responsable", path: "/responsable" },
-  { name: "Movimientos", path: "/movimientos" },
-  { name: "Reportes", path: "/reportes" },
-  { name: "Historial", path: "/historial" },
-  { name: "Coordinadores", path: "/coordinadores" },
-];
-
-const OptionNav = ({ name, isSelected }) => (
-  <div className={`w-full p-2 flex items-center gap-1 border-[0.5px] border-UP-Opaco rounded-e-md
-    ${isSelected ? 'border-s-UP-Primario' :'border-s-UP-Gris'}`}>
-    <div className='ps-2 p-1 border border-UP-Opaco rounded-e-md'>
-      {isSelected ? <h1>●</h1> : <h1>○</h1>}
-    </div>
-    <h1 className="text-sm md:text-base">{name}</h1>
-  </div>
-);
+import { useLocation, Link, useNavigate, } from 'react-router-dom';
+// import { FaFileExcel } from 'react-icons/fa'; // Icono de Excel
 
 const ViewHistory = ({ children }) => {
   const location = useLocation();
@@ -73,30 +50,7 @@ const ViewHistory = ({ children }) => {
   };
 
   return (
-    <div className='flex flex-col lg:flex-row min-h-screen'>
-      {/* Barra lateral de navegación */}
-      <div className="w-full lg:w-1/5 bg-UP-Gris overflow-y-auto">
-        <div className="flex justify-center py-4">
-          {/* Logo comentado */}
-        </div>
-        <div className="py-5 flex flex-col gap-2.5 w-full">
-          <div className="text-UP-Negro text-center lg:text-left">Apartados</div>
-          {options.map(({ name, path }) => (
-            <Link key={name} to={path}>
-              <OptionNav name={name} isSelected={location.pathname === path} />
-            </Link>
-          ))}
-        </div>
-      </div>
-      
-      {/* Contenido principal */}
-      <div className='flex flex-col w-full lg:w-4/5'>
-        <div className='bg-UP-Secundario text-UP-Blanco p-5'>
-          <h1 className='font-semibold font-montserrat text-center lg:text-left'>
-            Bienvenido Fernando Castillo
-          </h1>
-        </div>
-        
+        <>
         {/* Sección de Administración de Historial */}
         <div className='p-5 w-full bg-gray-100 rounded-md'>
           <div className="bg-red-800 text-white text-lg font-bold p-4 rounded-t-md">
@@ -110,7 +64,7 @@ const ViewHistory = ({ children }) => {
               onClick={handleDownload} 
               className="flex items-center mb-4 px-4 py-2 bg-green-600 text-white rounded-md shadow hover:bg-green-700"
             >
-              <FaFileExcel className="mr-2" />
+              {/* <FaFileExcel className="mr-2" /> */}
               Descargar reporte completo
             </button>
             
@@ -183,8 +137,7 @@ const ViewHistory = ({ children }) => {
             </div>
           </div>
         </div>
-      </div>
-    </div>
+        </>
   );
 };
 
