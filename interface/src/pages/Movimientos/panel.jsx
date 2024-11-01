@@ -21,13 +21,13 @@ const ViewTransactions = () => {
             <div className="flex flex-col lg:flex-row justify-center gap-4">
               
               {/* Primer recuadro interno */}
-              <Link to="/Movimientos/asignaciones/responsibleSelect" className="flex-1 max-w-xs border rounded-md p-4 text-center hover:shadow-lg">
+              <Link to="/asignaciones/responsibleSelect" className="flex-1 max-w-xs border rounded-md p-4 text-center hover:shadow-lg">
                 <h2 className="text-lg font-semibold mb-2">Asignaciones</h2>
                 <img src={imgAsignacion} alt="Artículos" className="mt-4 mx-auto h-32 w-auto" />
               </Link>
               
               {/* Segundo recuadro interno */}
-              <Link to="/Movimientos/devoluciones/responsibleSelect" className="flex-1 max-w-xs border rounded-md p-4 text-center hover:shadow-lg">
+              <Link to="/devoluciones/responsibleSelect" className="flex-1 max-w-xs border rounded-md p-4 text-center hover:shadow-lg">
                 <h2 className="text-lg font-semibold mb-2">Devolución</h2>
                 <img src="interface\public\devolucion.png" alt="Responsables" className="mt-4 mx-auto h-32 w-auto" />
               </Link>

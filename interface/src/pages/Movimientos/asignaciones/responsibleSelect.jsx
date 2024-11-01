@@ -64,10 +64,13 @@ const ViewAssigned_ResponsibleSelect = () => {
 
   const handleNext = () => {
     // Redirige a la ruta especificada en index.js
-    navigate("../Movimientos/asignaciones/responsibleSelect");
+    navigate("/asignaciones/responsibleSelect");
   };
 
   return (
+
+    <>
+    
     <div className='flex flex-row min-h-[100vh] max-h-[100vh] min-w-[100vw] max-w-[100vw] overflow-scroll'>
       {/* Menú lateral */}
       <div className="min-h-[100%] max-h-[100%] min-w-[15%] max-w-[15%] overflow-scroll flex-col inline-flex bg-UP-Gris">
@@ -173,6 +176,9 @@ const ViewAssigned_ResponsibleSelect = () => {
         </div>
       </div>
     </div>
+
+    </>
+    
   );
 };
 
