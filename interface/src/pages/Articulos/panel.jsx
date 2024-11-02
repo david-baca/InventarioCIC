@@ -52,6 +52,14 @@ const ViewArticle = () => {
     navigate('./cargar');
   };
 
+  const handleEdit = (pk) => {
+    navigate(`/articles/edit/${pk}`);
+  };
+
+  const handleDelete = (pk) => {
+    navigate(`/articles/removal/${pk}`);
+  };
+
   return (
     <>
       <div className="bg-blue-950 flex flex-col">
@@ -67,10 +75,19 @@ const ViewArticle = () => {
         />
         {error && <div className="text-red-600">{error}</div>}
         {data.length > 0 ? (
-          data.map((element, index) => (
-            <h1 key={index} className="bg-blue-600">
-              {element.nombres || element.nombre} {/* Asegúrate de que las propiedades existan */}
-            </h1>
+          data.map((element) => (
+            <div key={element.pk} className="bg-blue-600 p-2 flex justify-between">
+              <div>
+                <h1>{element.nombre}</h1>
+                <p>No. Inventario: {element.no_inventario}</p>
+                <p>Descripción: {element.descripcion}</p>
+                <p>Costo: {element.costo}</p>
+              </div>
+              <div>
+                <button onClick={() => handleEdit(element.pk)}>Editar</button>
+                <button onClick={() => handleDelete(element.pk)}>Eliminar</button>
+              </div>
+            </div>
           ))
         ) : (
           <h1 className="text-gray-500">No hay datos disponibles</h1>
