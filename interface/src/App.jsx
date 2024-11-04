@@ -19,7 +19,11 @@ function App() {
           <Route path="/groups/information/:pk" element={<Page.Groups.information />} />
           <Route path="/groups/load" element={<Page.Groups.load />} />
           <Route path="/groups/removal/:pk" element={<Page.Groups.removal />} />
-          <Route path="/almacen" element={<Page.Almacen.panel />} />
+          <Route path="/almacen" 
+            
+            element={<Menu children={<Page.Almacen.panel />}/>}/>
+            
+                         /{/* Rutas que incluyen el menú */}     
           <Route path="/almacen/edit/:pk" element={<Page.Almacen.edit />} />
           <Route path="/almacen/information/:pk" element={<Page.Almacen.information />} />
           <Route path="/almacen/load" element={<Page.Almacen.load />} />
