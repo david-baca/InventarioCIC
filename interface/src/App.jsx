@@ -15,11 +15,12 @@ function App() {
           <Route path="/articles/cargar" element={<Menu children={<Page.Articles.load/>}/>}/>
           <Route path="/articles/removal/:pk" element={<Menu children={<Page.Articles.removal/>}/>}/> 
           <Route path="/groups" element={<Menu children={<Page.Groups.panel/>}/>}/>
+
           <Route path="/groups/edit/:pk" element={<Menu children={<Page.Groups.edit/>}/>}/>
           <Route path="/groups/information/:pk" element={<Menu children={<Page.Groups.information/>}/>}/> 
           <Route path="/groups/load" element={<Menu children={<Page.Groups.load/>}/>}/>
           <Route path="/groups/removal/:pk" element={<Menu children={<Page.Groups.removal/>}/>}/> 
-          <Route path="/almacen" element={<Page.Almacen.panel />} />
+          <Route path="/almacen" element={<Menu children={<Page.Almacen.panel />}/>}/>/{/* Rutas que incluyen el menú */}
           <Route path="/almacen/edit/:pk" element={<Page.Almacen.edit />} />
           <Route path="/almacen/information/:pk" element={<Page.Almacen.information />} />
           <Route path="/almacen/load" element={<Page.Almacen.load />} />
