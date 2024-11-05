@@ -10,7 +10,7 @@ exports.createArticle = async (req, res, next) => {
         if (nombre && nombre.length > 100) errores.push('El nombre no debe exceder 100 caracteres.');
         if (descripcion && descripcion.length > 250) errores.push('La descripción no debe exceder 250 caracteres.');
         if (costo !== undefined && (isNaN(costo) || costo < 0)) errores.push('El costo debe ser un número positivo.');
-        if (consumible !== undefined && (isNaN(consumible) || consumible === 0|| consumible === 1)) errores.push('Consumible solo puede ser 0 o 1');
+        if (consumible !== null && (!consumible === 0 || !consumible === 1)) errores.push('Consumible solo puede ser 0 o 1');
         // Validar duplicidad del número de inventario
         const fill = await Articulos.findAll({ where: { no_inventario } });
         if (fill.length > 0) errores.push('Ya existe el número de inventario: ' + no_inventario);
@@ -19,7 +19,7 @@ exports.createArticle = async (req, res, next) => {
         if (!nombre) errores.push('Es necesario definir el (nombre)');
         if (!descripcion) errores.push('Es necesario definir el (descripcion)');
         if (costo === undefined) errores.push('Es necesario definir el (costo)');
-        if (consumible !== undefined) errores.push('Consumible no puede ser null');
+        if (consumible === undefined) errores.push('Consumible no puede ser null');
         if (errores.length > 0)return res.status(400).json({ error: errores });
     } catch (error) {
         return res.status(500).json({ error: 'Error en la protección del artículo' });

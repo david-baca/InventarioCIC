@@ -9,6 +9,7 @@ const Articulos = sequelize.define('Articulos', {
     autoIncrement: true,
   },
   no_inventario: {
+    unique: true,
     type: DataTypes.STRING(100),
     allowNull: false,
   },

@@ -1,6 +1,19 @@
 const { Articulos, Condiciones, Imagenes, Areas, Grupos, Asignaciones } = require('../model');
 const { Op } = require('sequelize');
 
+exports.buscarArticulosAll = async (req, res) => {
+    try {
+        const resultado = await Articulos.findAll({
+            where: {disponible: 1},
+            attributes: ['pk','nombre','no_inventario','costo']
+        });
+        res.json(resultado);
+    } catch (error) {
+        res.status(500).json({ error: 'Error en la búsqueda de artículos' });
+    }
+}; 
+
+
 exports.buscarArticulos = async (req, res) => {
     const { query } = req.params;
     try {
@@ -12,7 +25,7 @@ exports.buscarArticulos = async (req, res) => {
                 ],
                 disponible: 1
             },
-            attributes: ['pk','nombre','no_inventario']
+            attributes: ['pk','nombre','no_inventario','costo']
         });
         res.json(resultado);
     } catch (error) {

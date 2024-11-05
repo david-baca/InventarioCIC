@@ -32,8 +32,6 @@ const ViewArticle = () => {
   // Función que se activa cada vez que se cambia la query
   useEffect(() => {
     const cargarData = async () => {
-      if (!query) return; // Evitar llamada a la API si la query está vacía
-
       const Peticion = peticion();
       setError(null);
       setData([]);
@@ -62,7 +60,7 @@ const ViewArticle = () => {
 
   return (
     <>
-      <div className="bg-blue-950 flex flex-col">
+      <div className="bg-UP-Exito text-UP-Blanco flex flex-col">
         <button onClick={handlePublish}>Crear</button>
       </div>
       <div className="bg-gray-900 flex flex-col">
@@ -80,11 +78,11 @@ const ViewArticle = () => {
               <div>
                 <h1>{element.nombre}</h1>
                 <p>No. Inventario: {element.no_inventario}</p>
-                <p>Descripción: {element.descripcion}</p>
+                <p>nombre: {element.nombre}</p>
                 <p>Costo: {element.costo}</p>
               </div>
               <div>
-                <button onClick={() => handleEdit(element.pk)}>Editar</button>
+                <button onClick={() => handleEdit(element.no_inventario)}>Editar</button>
                 <button onClick={() => handleDelete(element.pk)}>Eliminar</button>
               </div>
             </div>
