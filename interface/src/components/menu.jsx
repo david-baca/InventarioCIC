@@ -53,9 +53,10 @@ const Menu = ({ children }) => {
       <div className='flex flex-col w-[100%]'>
         <div className='bg-UP-Secundario text-UP-Blanco p-5'>
           <h1 className=' font-semibold font-montserrat'>
-            Bienvenido Fernando Castillo
+            Bienvenido Fernando Castillo a
           </h1>
         </div>
+        
           <div className='p-5 min-w-[100%] max-w-[100%] min-h-[100%]
           max-h-[100%]'>
             {children}
@@ -65,4 +66,5 @@ const Menu = ({ children }) => {
     </>
   );
 };
+
 export default Menu;
