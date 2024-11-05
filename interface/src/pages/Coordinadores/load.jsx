@@ -4,8 +4,8 @@ const ViewUserLoad = () => {
 
   const [formData, setFormData] = useState({
     nombre: '',
-    apellidoPaterno: '',
-    apellidoMaterno: '',
+    apellidoP: '',
+    apellidoM: '',
     correo: '',
   });
 
