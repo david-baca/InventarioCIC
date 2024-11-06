@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+// import Botones from '../components/botones';
+
 const ViewUserLoad = () => {
 
   const [formData, setFormData] = useState({

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 const ViewUser = () => {
   return (
     <>
@@ -14,6 +15,7 @@ const ViewUser = () => {
         <h2 className="text-2xl font-bold text-red-800 mb-2">Administración de permisos</h2>
         <p className="text-gray-600 mb-4">Estos son los permisos del Inventario. Los cambios se hacen en tiempo real.</p>
 
+        {/* <Botones.botonCrear/> */}
         <button className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded mb-4">
           + Crear Administrador
         </button>
@@ -49,3 +51,11 @@ const ViewUser = () => {
   );
 };
 export default ViewUser;
+
+{/* <Botones.botonContinuar text={'Continuar'}/>
+        <Botones.botonConfirmarVerde text={'onfimo'}/>
+        <Botones.botonConfirmarRojo text={'onfimo'}/>
+        <Botones.botonCancelar text={'Cancelar'}/>
+        <Botones.botonCrear/>
+        <Botones.botonImprimir/>
+        <Buscador.buscador/> */}
