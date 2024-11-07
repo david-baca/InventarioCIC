@@ -17,7 +17,8 @@ const botonContinuar = ({ text, onClick, isActive }) => {
 const botonConfirmarVerde = ({ text, onClick }) => {
   return (
     <>
-    <button onClick={onClick} className="bg-UP-Exito hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">
+    <button onClick={onClick} className="bg-UP-Exito w-[100%]
+    hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">
     {text}
     </button>
     </>
@@ -27,7 +28,8 @@ const botonConfirmarVerde = ({ text, onClick }) => {
 const botonConfirmarRojo = ({ text, onClick }) => {
   return (
     <>
-    <button onClick={onClick} className="bg-UP-Error hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">
+    <button onClick={onClick} className="bg-UP-Error w-[100%]
+     text-white font-bold py-2 px-4 rounded-lg">
     Confirmar
     </button>
     </>
@@ -36,8 +38,10 @@ const botonConfirmarRojo = ({ text, onClick }) => {
 
 const botonCancelar = ({ text, onClick }) => {
     return (
-      <button
-        onClick={onClick} className="bg-UP-Gris hover:bg-gray-400 text-UP-Negro font-bold py-2 px-4 border border-UP-Negro rounded-lg">
+      <button type="button" onClick={onClick} 
+      className="bg-UP-Gris hover:bg-gray-400 text-UP-Negro 
+      font-bold py-2 px-4 border border-UP-Negro rounded-lg
+      w-[100%]">
         {text}
       </button>
     );
@@ -46,7 +50,9 @@ const botonCancelar = ({ text, onClick }) => {
 const botonCrear = ({ text, onClick }) => {
   return (
       <>
-      <button onClick={onClick} className="bg-UP-Exito hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">
+      <button onClick={onClick} className="bg-UP-Exito w-[100%]
+      hover:bg-green-600 text-white font-bold h-fit p-1 
+      rounded-lg">
       + Crear
       </button>
       </>

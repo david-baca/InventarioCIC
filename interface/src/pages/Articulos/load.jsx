@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import Componentes from "../../components/";
 
 const peticion = () => {
   const section = "articulos";
@@ -8,12 +9,11 @@ const peticion = () => {
   const instance = axios.create({
     baseURL: baseApi,
   });
-
   const Publicar = async (data) => {
     try {
       const response = await instance.post(`/${section}`, data, {
         headers: {
-          'Content-Type': 'multipart/form-data', // Necesario para enviar archivos
+          'Content-Type': 'multipart/form-data',
         },
       });
       return response.data;
@@ -22,7 +22,6 @@ const peticion = () => {
       throw new Error(error.response?.data?.error || 'Error in API interaction');
     }
   };
-
   return { Publicar };
 };
 
@@ -32,43 +31,51 @@ const ViewArticleLoad = () => {
   const [nombre, setNombre] = useState('');
   const [descripcion, setDescripcion] = useState('');
   const [costo, setCosto] = useState('');
-  const [consumible, setConsumible] = useState(false); // Consumible como booleano
-  const [imagenes, setImagenes] = useState([]); // Para manejar las imágenes seleccionadas
+  const [consumible, setConsumible] = useState(false);
+  const [imagenes, setImagenes] = useState([]);
   const [error, setError] = useState(null);
   const Peticion = peticion();
-
-  // Handle file selection
-  const handleFileChange = (e) => {
-    setImagenes(e.target.files); // Guardamos los archivos seleccionados
+  // Handle image upload
+  const handleImageUpload = (event) => {
+    const files = Array.from(event.target.files);
+    if (imagenes.length + files.length > 5) {
+      alert("No puedes cargar más de 5 imágenes.");
+      return;
+    }
+    setImagenes([...imagenes, ...files]);
   };
-
+  // Handle deleting an image
+  const handImageDelete = (index) => {
+    setImagenes(imagenes.filter((_, i) => i !== index));
+  };
+  const handleCancel = () => {
+    navigate('/articles');
+  }
+  // Handle form submission
   const handlePublish = async (e) => {
-    e.preventDefault(); // Prevent default form submission
-
+    e.preventDefault();
     const formData = new FormData();
     formData.append('no_inventario', noInventario);
     formData.append('nombre', nombre);
     formData.append('descripcion', descripcion);
-    formData.append('costo', parseFloat(costo)); // Convert to float
-    formData.append('consumible', consumible ? 1 : 0); // Convert boolean to 1 or 0
-
-    // Agregar las imágenes al FormData
+    formData.append('costo', parseFloat(costo));
+    formData.append('consumible', consumible ? 1 : 0);
     for (let i = 0; i < imagenes.length; i++) {
       formData.append('imagenes', imagenes[i]);
     }
-
     try {
-      const result = await Peticion.Publicar(formData); // Enviar FormData al servidor
+      const result = await Peticion.Publicar(formData);
       console.log('Published:', result);
-      navigate('/articles'); // Redirigir a la lista de artículos después de publicar
+      navigate('/articles');
     } catch (err) {
       setError(err.message);
     }
   };
-
   return (
     <>
       <h1>Carga de Artículo</h1>
+      <Componentes.Information titulo={"Datos de un articulo"} 
+        contenido={"Rellene todos los campos para poder crear un articulo. "}/>
       <form onSubmit={handlePublish} className="flex flex-col space-y-4">
         <input
           type="text"
@@ -106,27 +113,16 @@ const ViewArticleLoad = () => {
           <input
             type="checkbox"
             checked={consumible}
-            onChange={() => setConsumible(prev => !prev)} // Alterna el valor de consumible
+            onChange={() => setConsumible(prev => !prev)}
             className="p-2"
           />
         </div>
-        
-        {/* Campo para subir imágenes */}
-        <div>
-          <h2>Imágenes</h2>
-          <input
-            type="file"
-            multiple
-            onChange={handleFileChange}
-            accept="image/*"
-            className="p-2"
-          />
-          <p>{imagenes.length} archivo(s) seleccionado(s)</p>
+        {/* Pass image delete handler to Upimagen */}
+        <Componentes.Upimagen.Upimagen images={imagenes} ImageUpload={handleImageUpload} clikDelete={handImageDelete}/>
+        <div className='flex flex-row w-[100%] gap-4'>
+          <Componentes.Botones.botonCancelar text={"Cancelar"} onClick={handleCancel}/>
+          <Componentes.Botones.botonConfirmarVerde text={"Confirmar"}/>
         </div>
-
-        <button type="submit" className="bg-blue-500 text-white p-2">
-          Publicar
-        </button>
       </form>
       {error && <div className="text-red-600">{error}</div>}
     </>

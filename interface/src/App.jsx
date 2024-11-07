@@ -10,10 +10,10 @@ function App() {
           <Route path="/" element={<Page.Login />} />
           {/* Rutas que incluyen el menú */}
           <Route path="/articles" element={<Menu children={<Page.Articles.panel/>}/>}/>
-          <Route path="/articles/edit/:pk" element={<Menu children={<Page.Articles.edit />}/>}/>
+          <Route path="/articles/edit/:NoInventario" element={<Menu children={<Page.Articles.edit />}/>}/>
           <Route path="/articles/detalles/:no_inventario" element={<Menu children={<Page.Articles.information/>}/>}/>
           <Route path="/articles/cargar" element={<Menu children={<Page.Articles.load/>}/>}/>
-          <Route path="/articles/removal/:pk" element={<Menu children={<Page.Articles.removal/>}/>}/> 
+          <Route path="/articles/removal/:no_inventario" element={<Menu children={<Page.Articles.removal/>}/>}/> 
           <Route path="/groups" element={<Menu children={<Page.Groups.panel/>}/>}/>
 
           <Route path="/groups/edit/:pk" element={<Menu children={<Page.Groups.edit/>}/>}/>

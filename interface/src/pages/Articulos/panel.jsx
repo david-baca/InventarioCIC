@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import Componentes from "../../components/";
 // Objeto que contiene las peticiones de esta página
 export const peticion = () => {
   const section = "articulos";
@@ -58,19 +58,35 @@ const ViewArticle = () => {
     navigate(`/articles/removal/${pk}`);
   };
 
+  const handleSearchChange = (value) => {
+    setQuery(value);
+
+    // Si hay un timeout previo, lo limpiamos
+    if (debounceTimeout) {
+      clearTimeout(debounceTimeout);
+    }
+
+    // Establecemos un nuevo timeout para la búsqueda después de 500ms
+    const newTimeout = setTimeout(() => {
+      cargarData(value); // Llamamos a cargarData después de 500ms
+    }, 500);
+
+    setDebounceTimeout(newTimeout);
+  };
+
   return (
     <>
-      <div className="bg-UP-Exito text-UP-Blanco flex flex-col">
-        <button onClick={handlePublish}>Crear</button>
+      <div className='flex items-center'>
+        <div className='flex items-center w-[100%]'>
+          <Componentes.Information titulo={"Estos son los Articulos del inventario."} 
+          contenido={"busque por token o nombre del articulo"}/>
+        </div>
+        <div className='flex items-center w-[100%]'>
+          <Componentes.Buscador query={query} OnChange={handleSearchChange} />
+          <Componentes.Botones.botonCrear onClick={handlePublish}/>
+        </div>
       </div>
-      <div className="bg-gray-900 flex flex-col">
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)} // Actualiza la query con el valor del input
-          placeholder="Buscar artículos..."
-          className="mb-4 p-2"
-        />
+      <div className="bg-gray-900 flex flex-col flex-wrap">
         {error && <div className="text-red-600">{error}</div>}
         {data.length > 0 ? (
           data.map((element) => (
@@ -91,6 +107,10 @@ const ViewArticle = () => {
           <h1 className="text-gray-500">No hay datos disponibles</h1>
         )}
       </div>
+      <iframe src="http://localhost:3730/uploads/01.pdf" type="application/pdf" width="100%" height="100%"></iframe>  
+      {/* Example view docs
+      <img src="http://localhost:3730/uploads/images/1730841801651-06.jfif" alt="Imagen del artículo" />
+      <iframe src="http://localhost:3730/uploads/01.pdf" type="application/pdf" width="100%" height="100%"></iframe> */}
     </>
   );
 };
