@@ -42,9 +42,9 @@ function App() {
           <Route path="/reportes/responsable/:pk" element={<Page.Reportes.responsable />} />
           <Route path="/reportes/responsables" element={<Page.Reportes.responsables />} />
           <Route path="/historial" element={<Page.Historial.panel />} />
-          <Route path="/coordinadores" element={<Page.Users.panel />} />
-          <Route path="/coordinadores/edit/:pk" element={<Page.Users.edit />} />
-          <Route path="/coordinadores/load" element={<Page.Users.load />} />
+          <Route path="/coordinadores" element={<Menu children={<Page.Users.panel/>} />} />
+          <Route path="/coordinadores/edit/:pk" element={<Menu children={<Page.Users.edit/>} />} />
+          <Route path="/coordinadores/load" element={<Menu children={<Page.Users.load />} />} />
         {/* Ruta no encontrada */}
         <Route path="*" element={<Page.notFund />} />
       </Routes>
