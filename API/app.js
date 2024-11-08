@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const authRoutes = require('./dist/routes/authRoutes'); 
@@ -8,7 +9,6 @@ const responsablesRoutes = require('./dist/routes/responsablesRoutes');
 const gruposRoutes = require('./dist/routes/gruposRoutes');
 const areasRoutes = require('./dist/routes/areasRoutes');
 const asignacionesRoutes = require('./dist/routes/asignacionesRoutes');
-
 const sequelize = require('./dist/config/database');
 const app = express();
 require('dotenv').config();
@@ -16,7 +16,7 @@ const port_front = process.env.ORIGIN_PORT_FRONT || 3720;
 
 // Configuración básica de CORS para permitir todas las solicitudes
 app.use(cors({
-    origin: `http://localhost:${port_front}`, // Permitir solicitudes solo desde este dominio
+    origin: `*`, // Permitir solicitudes solo desde este dominio
     methods: ['GET', 'POST', 'DELETE', 'UPDATE', 'PUT'], // Métodos HTTP permitidos
     allowedHeaders: ['Content-Type', 'Authorization'], // Encabezados permitidos en las solicitudes
   }));
@@ -31,6 +31,7 @@ app.use('/responsables', responsablesRoutes);
 app.use('/grupos', gruposRoutes);
 app.use('/areas', areasRoutes);
 app.use('/asignaciones', asignacionesRoutes);
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
 // Sincronización y creación de la base de datos si no existe  
