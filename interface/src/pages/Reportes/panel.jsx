@@ -1,10 +1,9 @@
 import React from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import logo from "/upqroo.svg";
-
+import articulosImg from "../../../public/img/asignacion.png"
+import responsableImg from "../../../public/img/devolucion.png"
 const ViewReport = () => {
   const location = useLocation();
-
   return (
     <>
       {/* Contenedor del encabezado y recuadro */}
@@ -21,14 +20,14 @@ const ViewReport = () => {
               <Link to="/Reportes/articulos" className="flex-1 max-w-xs border rounded-md p-4 text-center hover:shadow-lg">
                 <h2 className="text-lg font-semibold mb-2">Artículos</h2>
                 <p>Daños y Asignaciones.</p>
-                <img src="/articles_image.svg" alt="Artículos" className="mt-4 mx-auto h-32 w-auto" />
+                <img src={articulosImg} alt="Artículos" className="mt-4 mx-auto h-32 w-auto" />
               </Link>
               
               {/* Segundo recuadro interno */}
               <Link to="/Reportes/responsables" className="flex-1 max-w-xs border rounded-md p-4 text-center hover:shadow-lg">
                 <h2 className="text-lg font-semibold mb-2">Responsables</h2>
                 <p>Asignaciones actuales.</p>
-                <img src="/responsibles_image.svg" alt="Responsables" className="mt-4 mx-auto h-32 w-auto" />
+                <img src={responsableImg} alt="Responsables" className="mt-4 mx-auto h-32 w-auto" />
               </Link>
             </div>
           </div>

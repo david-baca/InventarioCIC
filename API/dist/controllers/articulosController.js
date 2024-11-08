@@ -1,6 +1,5 @@
 const { Articulos, Condiciones, Imagenes, Areas, Grupos, Asignaciones } = require('../model');
 const { Op } = require('sequelize');
-
 exports.buscarArticulosAll = async (req, res) => {
     try {
         const resultado = await Articulos.findAll({
@@ -86,11 +85,8 @@ exports.editarArticulo = async (req, res) => {
                 fecha: new Date(),
                 disponible: 1,
             });
-            console.log("hola si me escuachas?")
             // verificamos si es necesario agregar condiciones de files
             if (req.files && req.files.length > 0) {
-                console.log("chi")
-                console.log(req.files)
                 const imagenesData = req.files.map(file => ({
                     imagen: file.path,
                     Condiciones_pk: nuevaCondicion.pk,
@@ -106,7 +102,6 @@ exports.editarArticulo = async (req, res) => {
                         Condiciones_pk: nuevaCondicion.pk,
                     });
                 }
-                console.log(imagenesAntiguas);
                 await Imagenes.bulkCreate(imagenesAntiguas); // Insertamos múltiples imágenes
             } else if (pathimg && typeof pathimg === 'string') {
                 // Si es una cadena de texto (solo una imagen)
@@ -119,7 +114,6 @@ exports.editarArticulo = async (req, res) => {
         //cargar condiciones viejas que se mentionene en esta nueva concidion
         return res.status(200).json({ message: 'Artículo editado con éxito' });
     } catch (error) {
-        console.error(error);
         return res.status(500).json({ error: 'Error al editar el artículo' });
     }
 };

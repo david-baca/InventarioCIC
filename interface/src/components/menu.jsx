@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import logo from "../../public/upqroo.svg";
-import menu from "../../public/menu.svg";
+import logo from "../../public/img/upqroo.png";
+import menu from "../../public/img/menu.svg";
 const options = [
   { name: "Inicio", path: "/" },
   { name: "Artículos", path: "/articles" },

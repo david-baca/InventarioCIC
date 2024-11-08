@@ -9,7 +9,7 @@ const peticiones = {
       const data = await response.json();
       setResponsables(data);
     } catch (error) {
-      console.error(error);
+      Error(error);
     }
   },
   buscarResponsables: async (query, setResponsables) => {

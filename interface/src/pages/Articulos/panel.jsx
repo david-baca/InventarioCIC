@@ -78,12 +78,12 @@ const ViewArticle = () => {
     <>
       <div className='flex items-center'>
         <div className='flex items-center w-[100%]'>
-          <Componentes.Information titulo={"Estos son los Articulos del inventario."} 
+          <Componentes.Inputs.TitleSubtitle titulo={"Estos son los Articulos del inventario."} 
           contenido={"busque por token o nombre del articulo"}/>
         </div>
         <div className='flex items-center w-[100%]'>
           <Componentes.Buscador query={query} OnChange={handleSearchChange} />
-          <Componentes.Botones.botonCrear onClick={handlePublish}/>
+          <Componentes.Botones.Crear onClick={handlePublish}/>
         </div>
       </div>
       <div className="bg-gray-900 flex flex-col flex-wrap">
@@ -107,7 +107,6 @@ const ViewArticle = () => {
           <h1 className="text-gray-500">No hay datos disponibles</h1>
         )}
       </div>
-      <iframe src="http://localhost:3730/uploads/01.pdf" type="application/pdf" width="100%" height="100%"></iframe>  
       {/* Example view docs
       <img src="http://localhost:3730/uploads/images/1730841801651-06.jfif" alt="Imagen del artículo" />
       <iframe src="http://localhost:3730/uploads/01.pdf" type="application/pdf" width="100%" height="100%"></iframe> */}
