@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import imgAsignacion from "../../../public/asignacion.png";
-import imgDevolucion from "../../../public/devolucion.png";
+import imgAsignacion from "../../../public/img/asignacion.png";
+import imgDebolucion from "../../../public/img/devolucion.png";
 const ViewTransactions = () => {
 
   return (
@@ -20,13 +20,13 @@ const ViewTransactions = () => {
               {/* Primer recuadro interno */}
               <Link to="/asignaciones/responsibleSelect" className="flex-1 max-w-xs border rounded-md p-4 text-center hover:shadow-lg">
                 <h2 className="text-lg font-semibold mb-2">Asignaciones</h2>
-                <img src={imgAsignacion} alt="Artículos" className="mt-4 mx-auto h-332 w-332" />
+                <img src={imgAsignacion} alt="Artículos" className="mt-4 mx-auto h-32 w-auto" />
               </Link>
               
               {/* Segundo recuadro interno */}
               <Link to="/devoluciones/responsibleSelect" className="flex-1 max-w-xs border rounded-md p-4 text-center hover:shadow-lg">
                 <h2 className="text-lg font-semibold mb-2">Devolución</h2>
-                <img src={imgDevolucion} alt="Responsables" className="mt-4 mx-auto h-332 w-332" />
+                <img src={imgDebolucion} alt="Responsables" className="mt-4 mx-auto h-32 w-auto" />
               </Link>
             </div>
           </div>
