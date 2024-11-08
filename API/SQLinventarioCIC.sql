@@ -45,7 +45,7 @@ COLLATE = utf8mb4_spanish_ci;
 -- Crear tabla Articulos
 CREATE TABLE IF NOT EXISTS `inventariocic`.`Articulos` (
   `pk` INT NOT NULL AUTO_INCREMENT,
-  `no_inventario` VARCHAR(100) NOT NULL,
+  `no_inventario` VARCHAR(100) NOT NULL UNIQUE,
   `nombre` VARCHAR(100) NOT NULL,
   `costo` DECIMAL(10,2) NOT NULL,
   `descripcion` VARCHAR(250) NOT NULL,

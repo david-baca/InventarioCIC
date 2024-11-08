@@ -10,16 +10,17 @@ function App() {
           <Route path="/" element={<Page.Login />} />
           {/* Rutas que incluyen el menú */}
           <Route path="/articles" element={<Menu children={<Page.Articles.panel/>}/>}/>
-          <Route path="/articles/edit/:pk" element={<Menu children={<Page.Articles.edit />}/>}/>
+          <Route path="/articles/edit/:NoInventario" element={<Menu children={<Page.Articles.edit />}/>}/>
           <Route path="/articles/detalles/:no_inventario" element={<Menu children={<Page.Articles.information/>}/>}/>
           <Route path="/articles/cargar" element={<Menu children={<Page.Articles.load/>}/>}/>
-          <Route path="/articles/removal/:pk" element={<Menu children={<Page.Articles.removal/>}/>}/> 
+          <Route path="/articles/removal/:no_inventario" element={<Menu children={<Page.Articles.removal/>}/>}/> 
           <Route path="/groups" element={<Menu children={<Page.Groups.panel/>}/>}/>
+
           <Route path="/groups/edit/:pk" element={<Menu children={<Page.Groups.edit/>}/>}/>
           <Route path="/groups/information/:pk" element={<Menu children={<Page.Groups.information/>}/>}/> 
           <Route path="/groups/load" element={<Menu children={<Page.Groups.load/>}/>}/>
           <Route path="/groups/removal/:pk" element={<Menu children={<Page.Groups.removal/>}/>}/> 
-          <Route path="/almacen" element={<Page.Almacen.panel />} />
+          <Route path="/almacen" element={<Menu children={<Page.Almacen.panel />}/>}/>/{/* Rutas que incluyen el menú */}
           <Route path="/almacen/edit/:pk" element={<Page.Almacen.edit />} />
           <Route path="/almacen/information/:pk" element={<Page.Almacen.information />} />
           <Route path="/almacen/load" element={<Page.Almacen.load />} />
@@ -41,9 +42,9 @@ function App() {
           <Route path="/reportes/responsable/:pk" element={<Page.Reportes.responsable />} />
           <Route path="/reportes/responsables" element={<Page.Reportes.responsables />} />
           <Route path="/historial" element={<Page.Historial.panel />} />
-          <Route path="/coordinadores" element={<Page.Users.panel />} />
-          <Route path="/coordinadores/edit/:pk" element={<Page.Users.edit />} />
-          <Route path="/coordinadores/load" element={<Page.Users.load />} />
+          <Route path="/coordinadores" element={<Menu children={<Page.Users.panel/>} />} />
+          <Route path="/coordinadores/edit/:pk" element={<Menu children={<Page.Users.edit/>} />} />
+          <Route path="/coordinadores/load" element={<Menu children={<Page.Users.load />} />} />
         {/* Ruta no encontrada */}
         <Route path="*" element={<Page.notFund />} />
       </Routes>
