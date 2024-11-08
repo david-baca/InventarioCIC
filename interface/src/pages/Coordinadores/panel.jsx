@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Botones from '../../components/botones';
+import Componentes from '../../components/';
 import axios from 'axios';
 
 const ViewUser = () => {
@@ -11,7 +11,7 @@ const ViewUser = () => {
           <h2 className="text-2xl font-bold text-red-800 mb-2">Administración de permisos</h2>
           <p className="text-gray-600 mb-4">Estos son los permisos del Inventario. Los cambios se hacen en tiempo real.</p>
           <Link to="./load/">
-            <Botones.botonCrear/>
+            <Componentes.Botones.Crear/>
           </Link>
           
 

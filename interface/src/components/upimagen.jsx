@@ -1,6 +1,6 @@
 // Upimagen.js
-import Picturi from '../../public/picturi.svg';
-import XIcon from '../../public/X.svg';
+import Picturi from '../../public//img/picturi.svg';
+import XIcon from '../../public//img/X.svg';
 
 // Componente para subir nuevas imágenes
 const Upimagen = ({ images, ImageUpload, clikDelete }) => {

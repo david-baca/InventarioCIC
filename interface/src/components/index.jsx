@@ -1,15 +1,16 @@
 import Botones from "./botones";
 import Buscador from "./buscador"
-import Title from "./TarjetaSoloTitulo"
-import Information from "./TarjetaTituloContenido"
-import Upimagen from "./upimagen";
+import Inputs from "./inputs";
+//import labels from "./labels";
+import Menu from "./menu";
 import Modals from "./modal"
-const Componentes = {
+import Upimagen from "./upimagen"
+
+export default {
     Botones,
     Buscador,
-    Title,
-    Information,
-    Upimagen,
-    Modals
-}
-export default Componentes;
+    Inputs,
+    Menu,
+    Modals,
+    Upimagen
+};
