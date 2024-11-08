@@ -74,7 +74,7 @@ const ViewArticleLoad = () => {
   return (
     <>
       <h1>Carga de Artículo</h1>
-      <Componentes.Information titulo={"Datos de un articulo"} 
+      <Componentes.Inputs.TitleHeader text={"Datos de un articulo"} 
         contenido={"Rellene todos los campos para poder crear un articulo. "}/>
       <form onSubmit={handlePublish} className="flex flex-col space-y-4">
         <input
@@ -120,8 +120,8 @@ const ViewArticleLoad = () => {
         {/* Pass image delete handler to Upimagen */}
         <Componentes.Upimagen.Upimagen images={imagenes} ImageUpload={handleImageUpload} clikDelete={handImageDelete}/>
         <div className='flex flex-row w-[100%] gap-4'>
-          <Componentes.Botones.botonCancelar text={"Cancelar"} onClick={handleCancel}/>
-          <Componentes.Botones.botonConfirmarVerde text={"Confirmar"}/>
+          <Componentes.Botones.Cancelar text={"Cancelar"} onClick={handleCancel}/>
+          <Componentes.Botones.ConfirmarVerde text={"Confirmar"}/>
         </div>
       </form>
       {error && <div className="text-red-600">{error}</div>}
