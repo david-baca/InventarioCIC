@@ -17,11 +17,6 @@ const Areas = sequelize.define('Areas', {
     allowNull: false,
   },
 
-  motivo: { 
-    type: DataTypes.STRING(250),
-    allowNull: true, 
-  },
-
   disponible: {
     type: DataTypes.BOOLEAN,
     defaultValue: true,
