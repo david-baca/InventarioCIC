@@ -1,10 +1,9 @@
 import React from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import imgArticulos from "../../../public/articulos.svg";
-import imgResponsables from "../../../public/responsables.svg";
+import articulosImg from "../../../public/img/asignacion.png"
+import responsableImg from "../../../public/img/devolucion.png"
 const ViewReport = () => {
   const location = useLocation();
-
   return (
     <>
       {/* Contenedor del encabezado y recuadro */}
@@ -19,16 +18,16 @@ const ViewReport = () => {
               
               {/* Primer recuadro interno */}
               <Link to="/Reportes/articulos" className="flex-1 max-w-xs border rounded-md p-4 text-center hover:shadow-lg">
-                <h2 className="text-justify font-semibold mb-2">Artículos</h2>
-                <p className="text-justify">Daños y Asignaciones.</p>
-                <img src={imgArticulos} alt="Artículos" className="mt-4 mx-auto h-auto w-auto" />
+                <h2 className="text-lg font-semibold mb-2">Artículos</h2>
+                <p>Daños y Asignaciones.</p>
+                <img src={articulosImg} alt="Artículos" className="mt-4 mx-auto h-32 w-auto" />
               </Link>
               
               {/* Segundo recuadro interno */}
               <Link to="/Reportes/responsables" className="flex-1 max-w-xs border rounded-md p-4 text-center hover:shadow-lg">
-                <img src={imgResponsables} alt="Responsables" className="mt-4 mx-auto h-auto w-auto" />
-                <h2 className="text-justify font-semibold mb-2">Responsables</h2>
-                <p className="text-justify">Asignaciones actuales.</p>
+                <h2 className="text-lg font-semibold mb-2">Responsables</h2>
+                <p>Asignaciones actuales.</p>
+                <img src={responsableImg} alt="Responsables" className="mt-4 mx-auto h-32 w-auto" />
               </Link>
             </div>
           </div>
