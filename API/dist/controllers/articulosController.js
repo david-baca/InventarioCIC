@@ -1,5 +1,17 @@
 const { Articulos, Condiciones, Imagenes, Areas, Grupos, Asignaciones } = require('../model');
 const { Op } = require('sequelize');
+exports.buscarArticulosAll = async (req, res) => {
+    try {
+        const resultado = await Articulos.findAll({
+            where: {disponible: 1},
+            attributes: ['pk','nombre','no_inventario','costo']
+        });
+        res.json(resultado);
+    } catch (error) {
+        res.status(500).json({ error: 'Error en la búsqueda de artículos' });
+    }
+}; 
+
 
 exports.buscarArticulos = async (req, res) => {
     const { query } = req.params;
@@ -12,7 +24,7 @@ exports.buscarArticulos = async (req, res) => {
                 ],
                 disponible: 1
             },
-            attributes: ['pk','nombre','no_inventario']
+            attributes: ['pk','nombre','no_inventario','costo']
         });
         res.json(resultado);
     } catch (error) {
@@ -55,27 +67,53 @@ exports.editarArticulo = async (req, res) => {
     const { id } = req.params;
     const { no_inventario, nombre, descripcion, costo, consumible} = req.body;
     try {
+        //buscamos articulo
+        articulo = await Articulos.findByPk(id)
         // Actualizar los campos del artículo
-        await Articulos.update(
-            { no_inventario, nombre, descripcion, costo, consumible },
-            { where: { id } }
+        await articulo.update(
+            { no_inventario, nombre, descripcion, costo, consumible }
         );
-        // Desactivar condiciones antiguas
-        await Condiciones.update(
-            { disponible: 0 },
-            { where: { Articulos_pk: Articulo.pk, disponible: 1 } }
-        );
-        if (req.files && req.files.length > 0) {
-            const nuevaCondicion = await Condiciones.create(Condiciones);
-            const imagenesData = req.files.map(file => ({
-                imagen: file.path,
-                Condiciones_pk: nuevaCondicion.pk,
-            }));
-            await Imagenes.bulkCreate(imagenesData);
+        //verificamos si es necesario cambiar las condiciones
+        const { pathimg } = req.body;
+        if(req.files.length > 0 || pathimg.length > 0){
+            //desactivamos las consiciones actuales del articulo
+            const condicion = await Condiciones.findOne({ where: { Articulos_pk: articulo.pk, disponible: 1 } })
+            if(condicion) await condicion.update({ disponible: 0 });
+            //creamos una nueva condicion
+            const nuevaCondicion = await Condiciones.create({
+                Articulos_pk: articulo.pk,
+                fecha: new Date(),
+                disponible: 1,
+            });
+            // verificamos si es necesario agregar condiciones de files
+            if (req.files && req.files.length > 0) {
+                const imagenesData = req.files.map(file => ({
+                    imagen: file.path,
+                    Condiciones_pk: nuevaCondicion.pk,
+                }));
+                await Imagenes.bulkCreate(imagenesData);
+            }
+            if (Array.isArray(pathimg) && pathimg.length > 0) {
+                // Si es un arreglo con elementos, procesamos cada imagen
+                let imagenesAntiguas = [];
+                for (let i = 0; i < pathimg.length; i++) {
+                    imagenesAntiguas.push({
+                        imagen: pathimg[i],
+                        Condiciones_pk: nuevaCondicion.pk,
+                    });
+                }
+                await Imagenes.bulkCreate(imagenesAntiguas); // Insertamos múltiples imágenes
+            } else if (pathimg && typeof pathimg === 'string') {
+                // Si es una cadena de texto (solo una imagen)
+                await Imagenes.create({
+                    imagen: pathimg,
+                    Condiciones_pk: nuevaCondicion.pk,
+                });
+            }
         }
+        //cargar condiciones viejas que se mentionene en esta nueva concidion
         return res.status(200).json({ message: 'Artículo editado con éxito' });
     } catch (error) {
-        console.error(error);
         return res.status(500).json({ error: 'Error al editar el artículo' });
     }
 };
@@ -93,31 +131,36 @@ exports.darDeBajaArticulo = async (req, res) => {
 exports.detallesArticulo = async (req, res) => {
     const { no_inventario } = req.params;
     try {
-        const articulos = await Articulos.findAll({
+        const articulo = await Articulos.findOne({
             where: { no_inventario: no_inventario },
             include: [
                 {
+                    where: { disponible: 1 },
                     model: Condiciones,
-                    as: 'Condiciones'
+                    as: 'Condiciones',
+                    include:[{
+                        model:Imagenes,
+                        as: 'Imagenes',
+                    }]
+                },
+                {
+                    model: Grupos,
+                    as: 'Grupo'
                 },
                 {
                     model: Areas,
                     as: 'Area'
                 },
-                {
-                    model: Grupos,
-                    as: 'Grupo'
-                }
             ]
         });
         // Check if any articles were found
-        if (articulos.length === 0) {
+        if (articulo === null) {
             return res.status(404).json({ error: 'Artículo no encontrado' });
         }
-        const articulo = articulos[0]; // Get the first article
-        const responsable = await Asignaciones.findAll({
+        const responsable = await Asignaciones.findOne({
             where: { Articulos_pk: articulo.pk, disponible: 1 }
         });
+        if(responsable === null) {res.json({ articulo }); return;}
         const respuesta = { articulo, responsable };
         res.json({ respuesta });
     } catch (error) {

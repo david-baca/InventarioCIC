@@ -8,12 +8,12 @@ const userController = require('../controllers/usuariosController');
 usuariosRoutes.post('/',usuariosMiddlewares.createUsuario, userController.crearUsuario);
 
 // Endpoint para editar un usuario existente
-usuariosRoutes.put('/:id', userController.editarUsuario);
+usuariosRoutes.put('/:id',usuariosMiddlewares.editUsuario, userController.editarUsuario);
 
 // Endpoint para mostrar todos los usuarios
-usuariosRoutes.get('/all', userController.mostrarUsuarios);
+usuariosRoutes.get('/all',usuariosMiddlewares.searchUsuario, userController.mostrarUsuarios);
 
 // Endpoint para mostrar detalles de un usuario
-usuariosRoutes.get('/details/:correo', userController.detallesUsuario);
+usuariosRoutes.get('/details/:correo',/*usuariosMiddlewares.searchUsuario,*/ userController.detallesUsuario);
 
 module.exports = usuariosRoutes;

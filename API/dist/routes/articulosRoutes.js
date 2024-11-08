@@ -8,6 +8,8 @@ const { uploadImg } = require('../config/uploadings'); // Correcto
  
 // Endpoint para buscar artículos
 articulosRoutes.get('/search/:query', articleController.buscarArticulos);
+// Endpoint para buscar todos los artículos
+articulosRoutes.get('/search/', articleController.buscarArticulosAll);
 
 // Endpoint para crear un nuevo artículo con middleware
 articulosRoutes.post('/', uploadImg.array('imagenes', 5), articulosMiddlewares.createArticle, articleController.crearArticulo);
