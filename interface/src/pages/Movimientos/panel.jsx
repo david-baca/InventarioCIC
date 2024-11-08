@@ -9,7 +9,7 @@ const ViewTransactions = () => {
      {/* Contenedor del encabezado y recuadro */}
      <div className="p-5 w-full">
           {/* Encabezado unido al recuadro */}
-          <div className="bg-red-800 text-white text-lg font-bold p-4 rounded-t-md">
+          <div className="bg-UP-Secundario text-white text-lg font-bold p-4 rounded-t-md">
             ¿Qué desea hacer hoy?
           </div>
           

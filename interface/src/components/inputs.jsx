@@ -19,11 +19,11 @@ const TitleSubtitle = ({ titulo, contenido }) => {
     );
   };
 
-  const TitleHeader = () => {
+  const TitleHeader = ({text}) => {
     return (
-      <div className="w-full bg-red-900 py-2 flex justify-center">
-        <h1 className="text-white text-center text-sm sm:text-base md:text-lg lg:text-xl">
-          Title Head
+      <div className="w-full bg-UP-Secundario py-2 flex">
+        <h1 className="font-montserrat font-bold text-white px-5 text-xl sm:text-xl md:text-lg lg:text-2xl">
+          {text}
         </h1>
       </div>
     );
