@@ -28,19 +28,19 @@ function App() {
           <Route path="/responsable/edit/:pk" element={<Menu children={<Page.Responsable.edit/>}/>}/> 
           <Route path="/responsable/load" element={<Menu children={<Page.Responsable.load/>}/>}/>
           <Route path="/responsable/removal/:pk"  element={<Menu children={<Page.Responsable.removal/>}/>}/>
-          <Route path="/movimientos" element={<Menu children={<Page.Movimientos.panel />}/>} />
-          <Route path="/asignaciones/" element={<Menu children={<Page.Movimientos.Asignaciones.seleccionResponsable />}/>} />
-          <Route path="/asignaciones/:pkResponsable" element={<Menu children={<Page.Movimientos.Asignaciones.seleccionArticulos />}/>} />
-          <Route path="/asignaciones/:pkResponsable/:pkArticulo" element={<Menu children={<Page.Movimientos.Asignaciones.panel />}/>} />
-          <Route path="/devoluciones/" element={<Menu children={<Page.Movimientos.Devoluciones.seleccionResponsable />}/>} />
-          <Route path="/devoluciones/:pkResponsable" element={<Menu children={<Page.Movimientos.Devoluciones.seleccionArticulos />}/>} />
-          <Route path="/devoluciones/:pkResponsable/:pkArticulo" element={<Menu children={<Page.Movimientos.Devoluciones.panel />}/>} />
-          <Route path="/reportes/articulo/:pk" element={<Menu children={<Page.Reportes.articulo />}/>} />
-          <Route path="/reportes/articulos" element={<Menu children={<Page.Reportes.articulos />}/>} />
-          <Route path="/reportes" element={<Menu children={<Page.Reportes.panel />}/>} />
-          <Route path="/reportes/responsable/:pk" element={<Menu children={<Page.Reportes.responsable />}/>} />
-          <Route path="/reportes/responsables" element={<Menu children={<Page.Reportes.responsables />}/>} />
-          <Route path="/historial" element={<Menu children={<Page.Historial.panel />}/>} />
+          <Route path="/movimientos" element={<Page.Movimientos.panel />} />
+          <Route path="/asignaciones/" element={<Page.Movimientos.Asignaciones.seleccionResponsable />} />
+          <Route path="/asignaciones/:pkResponsable" element={<Page.Movimientos.Asignaciones.seleccionArticulos />} />
+          <Route path="/asignaciones/:pkResponsable/:pkArticulo" element={<Page.Movimientos.Asignaciones.panel />} />
+          <Route path="/devoluciones/" element={<Page.Movimientos.Devoluciones.seleccionResponsable />} />
+          <Route path="/devoluciones/:pkResponsable" element={<Page.Movimientos.Devoluciones.seleccionArticulos />} />
+          <Route path="/devoluciones/:pkResponsable/:pkArticulo" element={<Page.Movimientos.Devoluciones.panel />} />
+          <Route path="/reportes/articulo/:pk" element={<Page.Reportes.articulo />} />
+          <Route path="/reportes/articulos" element={<Page.Reportes.articulos />} />
+          <Route path="/reportes" element={<Page.Reportes.panel />} />
+          <Route path="/reportes/responsable/:pk" element={<Page.Reportes.responsable />} />
+          <Route path="/reportes/responsables" element={<Page.Reportes.responsables />} />
+          <Route path="/historial" element={<Page.Historial.panel />} />
           <Route path="/coordinadores" element={<Page.Users.panel />} />
           <Route path="/coordinadores/edit/:pk" element={<Page.Users.edit />} />
           <Route path="/coordinadores/load" element={<Page.Users.load />} />
