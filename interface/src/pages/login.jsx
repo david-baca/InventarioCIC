@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-// import Botones from '../components/botones';
-// import Buscador from '../components/Buscador';
-// import CajaDeTexto from '../components/cajasDeTexto';
+import Botones from '../components/botones';
+import Buscador from '../components/Buscador';
+import CajaDeTexto from '../components/cajasDeTexto';
 
 const ViewLogin = () => {
   return (
