@@ -1,10 +1,5 @@
-
-
-
 import React, { useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-// import { FaSearch } from 'react-icons/fa';
-// import logo from "../../public/upqroo.svg";
 
 // Componente principal de selección de responsable
 const ViewAssigned_ArticleSelect = () => {

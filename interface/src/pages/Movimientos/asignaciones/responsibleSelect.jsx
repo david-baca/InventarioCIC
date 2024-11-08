@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
-// import { FaSearch } from 'react-icons/fa';
 
 // Componente principal de selección de responsable
 const ViewAssigned_ResponsibleSelect = () => {
@@ -38,7 +37,7 @@ const ViewAssigned_ResponsibleSelect = () => {
 
   const handleNext = () => {
     // Redirige a la ruta especificada en index.js
-    navigate("/asignaciones/responsibleSelect");
+    navigate("/devoluciones/responsibleSelect");
   };
 
   return (

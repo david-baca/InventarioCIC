@@ -8,10 +8,12 @@ const asignacionMiddlewares = require('../middlewares/asignacionesMiddlewares');
 router.get('/search/:query', asignacionController.buscarAsignaciones);
 
 // Crear una nueva asignación con middleware
-router.post('/', asignacionMiddlewares.middleCreateAsignacion, asignacionController.crearAsignacion);
+// router.post('/crearAsignacion', asignacionMiddlewares.middleCreateAsignacion, asignacionController.crearAsignacion);
+router.post('/crearAsignacion', asignacionController.crearAsignacion);
+// Subir documento firmado para la asignación
+router.post('/subirDocumento', asignacionController.subirDocumentoAsignacion);
 
 // Dar de baja una asignación con middleware
-// router.patch('/:id/baja', asignacionMiddlewares.middleBajaAsignacion, asignacionController.darDeBajaAsignacion); Error
 router.patch('/:id/baja', asignacionController.darDeBajaAsignacion);
 
 // Obtener detalles de una asignación con middleware

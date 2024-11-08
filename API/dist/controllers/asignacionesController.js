@@ -1,7 +1,10 @@
 // src/controllers/asignacionController.js
 const asignacionView = require('../views/asignacionesView');
 const { Documentos, Asignaciones, Articulos, Responsables, Historial } = require('../model');
-
+const { PDFDocument } = require('pdf-lib');
+const { uploadPdf } = require('../config/uploadPdf');
+const fs = require('fs');
+const path = require('path');
 // const { Asignaciones } = require('../model')
 
 let asignaciones = []; // Simulación de base de datos en memoria
@@ -57,43 +60,15 @@ exports.buscarAsignaciones = async (req, res) => {
     }
 };
 
-// Crear una nueva asignación
+// Función para crear una asignación y generar el PDF
 exports.crearAsignacion = async (req, res) => {
     const { fk_Articulo, fk_Responsable, urlDoc } = req.body;
 
-    // Validar campos obligatorios
     if (!fk_Articulo || !fk_Responsable || !urlDoc) {
-        return res.status(400).json({
-            error: 'Todos los campos (fk_Articulo, fk_Responsable, urlDoc) son obligatorios.'
-        });
+        return res.status(400).json({ error: 'Todos los campos (fk_Articulo, fk_Responsable, urlDoc) son obligatorios.' });
     }
 
     try {
-        // Verificar si ya existe una asignación con el mismo artículo y responsable
-        const asignacionExistente = await Asignaciones.findOne({
-            where: {
-                Articulos_pk: fk_Articulo,
-                Responsables_pk: fk_Responsable
-            }
-        });
-
-        // Si ya existe una asignación, verificar si el documento también existe
-        if (asignacionExistente) {
-            const documentoExistente = await Documentos.findOne({
-                where: {
-                    doc_firma: urlDoc,
-                    Asignaciones_pk: asignacionExistente.pk
-                }
-            });
-
-            if (documentoExistente) {
-                return res.status(400).json({
-                    error: 'Este artículo ya está asignado a este responsable con el mismo documento. No se puede volver a asignar.'
-                });
-            }
-        }
-
-        // Crear la nueva asignación en la base de datos
         const nuevaAsignacion = await Asignaciones.create({
             Articulos_pk: fk_Articulo,
             Responsables_pk: fk_Responsable,
@@ -101,45 +76,79 @@ exports.crearAsignacion = async (req, res) => {
             fecha_recibido: new Date()
         });
 
-        // Crear el documento vinculado a la asignación
-        const nuevoDocumento = await Documentos.create({
-            doc_firma: urlDoc, // Guardar el URL del documento
-            fecha: new Date(),
-            Asignaciones_pk: nuevaAsignacion.pk
+        const responsable = await Responsables.findByPk(fk_Responsable, {
+            attributes: ['nombres', 'apellido_p', 'apellido_m']
+        });
+        const articulo = await Articulos.findByPk(fk_Articulo, {
+            attributes: ['no_inventario', 'nombre', 'descripcion', 'costo']
         });
 
-        // Obtener la asignación creada con los detalles del artículo, responsable y documento
-        const asignacionConDetalles = await Asignaciones.findOne({
-            where: { pk: nuevaAsignacion.pk },
-            include: [
-                {
-                    model: Articulos,
-                    attributes: ['nombre']
-                },
-                {
-                    model: Responsables,
-                    attributes: ['nombres', 'apellido_p', 'apellido_m']
-                },
-                {
-                    model: Documentos,
-                    as: 'Documentos', // Especifica el alias aquí
-                    attributes: ['doc_firma', 'fecha']
-                }
-            ]
-        });
+        const templatePath = path.resolve(__dirname, 'FORMATO DE ASIGNACION - MODULO DE REPORTES.pdf');
+        const pdfBytes = fs.readFileSync(templatePath);
+        const pdfDoc = await PDFDocument.load(pdfBytes);
 
-        // Devolver la respuesta con los datos de la nueva asignación y los detalles
+        const pages = pdfDoc.getPages();
+        const firstPage = pages[0];
+
+        // Agregar texto en posiciones específicas en el PDF
+        firstPage.drawText(`${responsable.nombres} ${responsable.apellido_p} ${responsable.apellido_m}`, { x: 150, y: 620, size: 12 });
+        firstPage.drawText(urlDoc, { x: 350, y: 600, size: 12 });
+        firstPage.drawText(articulo.no_inventario, { x: 150, y: 580, size: 12 });
+        firstPage.drawText(articulo.nombre, { x: 150, y: 560, size: 12 });
+        firstPage.drawText(articulo.descripcion, { x: 150, y: 540, size: 12 });
+        firstPage.drawText(`$${articulo.costo}`, { x: 150, y: 520, size: 12 });
+
+        const fecha = new Date();
+        const opcionesFecha = { year: 'numeric', month: 'long', day: 'numeric' };
+        const fechaFormateada = fecha.toLocaleDateString('es-MX', opcionesFecha);
+        firstPage.drawText(`Cancún, Quintana Roo, a ${fechaFormateada}`, { x: 150, y: 500, size: 12 });
+
+        // Ruta y creación de carpeta si no existe
+        const pdfOutputDir = path.join(__dirname, '../uploads/documents');
+        if (!fs.existsSync(pdfOutputDir)) {
+            fs.mkdirSync(pdfOutputDir, { recursive: true });
+        }
+        
+        const pdfOutputPath = path.join(pdfOutputDir, `Asignacion_${nuevaAsignacion.pk}.pdf`);
+        fs.writeFileSync(pdfOutputPath, await pdfDoc.save());
+
         return res.status(201).json({
             message: 'Asignación creada exitosamente.',
-            asignacion: asignacionConDetalles,
-            documento: nuevoDocumento
+            pdfUrl: `/uploads/documents/Asignacion_${nuevaAsignacion.pk}.pdf`
         });
     } catch (error) {
         console.error('Error al crear la asignación:', error);
-        return res.status(500).json({
-            error: `Error al crear la asignación: ${error.message}`
-        });
+        return res.status(500).json({ error: `Error al crear la asignación: ${error.message}` });
     }
+};
+
+// Función para subir el documento firmado usando Multer
+exports.subirDocumentoAsignacion = (req, res) => {
+    uploadPdf.single('documento')(req, res, async (err) => {
+        if (err) {
+            return res.status(400).json({ error: 'Error al subir el documento PDF. Asegúrate de que el archivo sea un PDF y no exceda los 15 MB.' });
+        }
+
+        try {
+            const { idAsignacion } = req.body;
+            const archivo = req.file;
+
+            // Guardar el documento subido en la base de datos
+            await Documentos.create({
+                doc_firma: archivo.filename,
+                fecha: new Date(),
+                Asignaciones_pk: idAsignacion
+            });
+
+            return res.status(200).json({
+                message: 'Documento subido exitosamente.',
+                archivo: archivo.filename
+            });
+        } catch (error) {
+            console.error('Error al guardar el documento en la base de datos:', error);
+            return res.status(500).json({ error: 'Error al guardar el documento en la base de datos.' });
+        }
+    });
 };
 
 // Dar de baja una asignación por ID
