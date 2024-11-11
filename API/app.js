@@ -41,7 +41,7 @@ sequelize.sync({ force: false })
     })
     .catch(async (error) => {
         console.error("Error al sincronizar la base de datos:\n"+
-        "Porfavor asegurese de que su gestor de base de datos este correndo o que exista la base de datos siupqroo ");
+        "Porfavor asegurese de que su gestor de base de datos este correndo o que exista la base de datos inventario_cic ");
         process.exit(1);
     });
 

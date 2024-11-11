@@ -1,7 +1,8 @@
 import React from 'react';
 import imgExcel from "../../public/img/dowloadExcel.svg"; 
 import imgDownload from "../../public/img/download.svg";
-
+import imgTrash from "../../public/img/trash.svg";
+import imgPencil from "../../public/img/pencil.svg";
 const Continuar = ({ text, onClick, isActive }) => {
   return (
     <button
@@ -141,15 +142,6 @@ const Hover = () => {
   );
 };
 
-const ToggleCheck = ({value, action}) => {
-  return (
-      <input type="checkbox"
-            checked={action}
-            className="p-2 accent-orange-500 focus:ring-orange-300">
-      </input>
-  );
-};
-
 const ToggleSwitch = () => {
   const [isSelected, setIsSelected] = useState(false);
 
@@ -175,6 +167,18 @@ const ToggleSwitch = () => {
   );
 };
 
+const iconPencil = ({Onclik}) =>{
+return(<button type='buttom' onClick={Onclik}>
+  <img src={imgPencil} className="h-6 w-6" /> 
+</button>)
+}
+
+const iconTrash = ({Onclik}) =>{
+return(<button type='buttom' onClick={Onclik}>
+  <img src={imgTrash} className="h-6 w-6" /> 
+</button>)
+}
+
 const Botones = {
   Continuar,
   ConfirmarVerde,
@@ -188,8 +192,9 @@ const Botones = {
   Edit,
   ExcelDownload,
   Hover,
-  ToggleCheck,
-  ToggleSwitch
+  ToggleSwitch,
+  iconPencil,
+  iconTrash
 }
 
 export default Botones;
