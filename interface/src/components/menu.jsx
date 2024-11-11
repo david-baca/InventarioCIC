@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import logo from "../../public/upqroo.svg";
-import menu from "../../public/menu.svg";
+import logo from "../../public/img/upqroo.png";
+import menu from "../../public/img/menu.svg";
 const options = [
   { name: "Inicio", path: "/" },
   { name: "Artículos", path: "/articles" },
@@ -74,10 +74,10 @@ const Menu = ({ children }) => {
                 <img src={menu} className="w-[1rem] h-[1rem]" alt="Logo" />
               </button>
             )}
-            <h1 className='font-semibold font-montserrat text-xl'>Bienvenido Fernando Castillo</h1>
+            <h1 className='font-semibold font-montserrat text-xl sm:text-base md:text-lg lg:text-xl'>Bienvenido Fernando Castillo</h1>
             <button className='bottom-3 font-roboto font-medium'>Cerrar sesión</button>
           </div>
-          <div className='p-5 min-w-[100%] max-w-[100%] h-[90%] overflow-scroll'>
+          <div className='p-5 min-w-[100%] max-w-[100%] h-[90%] overflow-scroll flex flex-col gap-4'>
             {children}
           </div>
         </div>

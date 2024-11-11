@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Upimagen from '../../components/upimagen';
-import TarjetaSoloTitulo from '../../components/TarjetaSoloTitulo';
-import TarjetaTituloContenido from '../../components/TarjetaTituloContenido';
+import Componentes from '../../components';
 
 const ViewStore = () => {
   const [titulo, setTitulo] = useState('');
@@ -11,8 +9,6 @@ const ViewStore = () => {
   return (
     <>
       <h1>Vista almacen 1</h1>
-      
-      
       <div>
         <input
           type="text"
@@ -29,12 +25,8 @@ const ViewStore = () => {
           className="p-2 border rounded ml-2"
         />
       </div>
-
-      <TarjetaSoloTitulo titulo={titulo} />
-      <TarjetaTituloContenido  contenido={contenido} />
-      
-      
-      <Upimagen />
+      <Componentes.Inputs.Title titulo={"hola"} />
+      <Componentes.Inputs.TitleSubtitle titulo={"hola"} contenido={"hola2"} />
     </>
   );
 };

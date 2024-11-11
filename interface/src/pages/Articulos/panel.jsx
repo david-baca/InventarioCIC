@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-//objeto que contiene las petciones de esta pagina
+import Componentes from "../../components/";
+// Objeto que contiene las peticiones de esta página
 const peticion = () => {
   const section = "articulos";
   const baseApi = import.meta.env.VITE_BASE_API;
@@ -12,29 +13,27 @@ const peticion = () => {
   const Buscar = async ({ query }) => {
     try {
       const response = await instance.get(`/${section}/search/${query}`);
-      return response.data; // Assumes response.data is the array expected
+      return response.data; // Suponiendo que response.data es el array esperado
     } catch (error) {
       console.error(error.response?.data?.error || error.message);
-      throw new Error(error.response?.data?.error || 'Error in API interaction');
+      throw new Error(error.response?.data?.error || 'Error en la interacción con la API');
     }
   };
 
   return { Buscar };
 };
-//pagina que gestiona los datos recuperados de las peticiones
+
 const ViewArticle = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [data, setData] = useState([]);
   const [error, setError] = useState(null);
   const [query, setQuery] = useState('');
 
-  //fuincion que se activa cada vez que se cambia y query
+  // Función que se activa cada vez que se cambia la query
   useEffect(() => {
     const cargarData = async () => {
-      if (!query) return; // Prevent API call if query is empty
-
       const Peticion = peticion();
-      setError(null); 
+      setError(null);
       setData([]);
 
       try {
@@ -46,36 +45,92 @@ const ViewArticle = () => {
     };
     cargarData();
   }, [query]);
-  const handlePublish = async () => {
-    navigate('./cargar'); 
+
+  const handlePublish = () => {
+    navigate('./cargar');
+  };
+
+  const handleEdit = (pk) => {
+    navigate(`/articles/edit/${pk}`);
+  };
+
+  const handleDelete = (pk) => {
+    navigate(`/articles/removal/${pk}`);
+  };
+
+  const handleTable = (pk) => {
+    navigate(`/articles/xd`);
+  };
+
+
+  const handleSearchChange = (value) => {
+    setQuery(value);
+
+    // Si hay un timeout previo, lo limpiamos
+    if (debounceTimeout) {
+      clearTimeout(debounceTimeout);
+    }
+
+    // Establecemos un nuevo timeout para la búsqueda después de 500ms
+    const newTimeout = setTimeout(() => {
+      cargarData(value); // Llamamos a cargarData después de 500ms
+    }, 500);
+
+    setDebounceTimeout(newTimeout);
   };
 
   return (
     <>
-    <div className="bg-blue-950 flex flex-col">
-      <button onClick={handlePublish}>
-        Crear
-      </button>
-    </div>
-    <div className="bg-gray-900 flex flex-col">
-      <input
-        type="text"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)} // Update query with input value
-        placeholder="Search articles..."
-        className="mb-4 p-2"
-      />
-      {error && <div className="text-red-600">{error}</div>}
-      {data.length > 0 ? (
-        data.map((element, index) => (
-          <h1 key={index} className="bg-blue-600">
-            {element.nombres || element.nombre} {/* Ensure properties exist */}
-          </h1>
-        ))
-      ) : (
-        <h1 className="text-gray-500">No hay datos disponibles</h1>
-      )}
-    </div>
+      <Componentes.Inputs.TitleHeader text={"Administración de Articulos"} />
+      <div className='flex items-center'>
+        <div className='flex items-center w-[100%]'>
+          <Componentes.Inputs.TitleSubtitle titulo={"Estos son los Articulos del inventario."}
+            contenido={"busque por token o nombre del articulo"} />
+        </div>
+        <div className='flex items-center w-[100%]'>
+          <Componentes.Buscador query={query} OnChange={handleSearchChange} />
+          <Componentes.Botones.Crear onClick={handlePublish} />
+        </div>
+      </div>
+        {error && <div className="text-red-600">{error}</div>}
+
+        {data.length > 0 ? (
+          <Componentes.Table.table>
+            <Componentes.Table.columna>
+              <Componentes.Table.encabezado>
+                No. Inventario:
+              </Componentes.Table.encabezado>
+              <Componentes.Table.encabezado>
+                Nombre:
+              </Componentes.Table.encabezado>
+              <Componentes.Table.encabezado>
+                Costo:
+              </Componentes.Table.encabezado>
+              <Componentes.Table.encabezado>
+                Acciones:
+              </Componentes.Table.encabezado>
+            </Componentes.Table.columna>
+            {data.map((element) => (
+              <Componentes.Table.columna key={element.pk} Onclik={handleTable}>
+                <Componentes.Table.fila>{element.no_inventario}</Componentes.Table.fila>
+                <Componentes.Table.fila>{element.nombre}</Componentes.Table.fila>
+                <Componentes.Table.fila>{element.costo}</Componentes.Table.fila>
+                <Componentes.Table.fila>
+                  <Componentes.Botones.iconPencil Onclik={() => handleEdit(element.no_inventario)} />
+                  <Componentes.Botones.iconTrash Onclik={() => handleDelete(element.pk)} />
+                </Componentes.Table.fila>
+              </Componentes.Table.columna>
+            ))}
+          </Componentes.Table.table>
+        ) : (
+          <div className='flex justify-center h-full items-center'>
+            <Componentes.Inputs.TitleSubtitle titulo={"No hay Articulos que mostrar"}
+            contenido={"no se encontraron resultados"}/>
+          </div>
+        )}
+      {/* Example view docs
+      <img src="http://localhost:3730/uploads/images/1730841801651-06.jfif" alt="Imagen del artículo" />
+      <iframe src="http://localhost:3730/uploads/01.pdf" type="application/pdf" width="100%" height="100%"></iframe> */}
     </>
   );
 };
