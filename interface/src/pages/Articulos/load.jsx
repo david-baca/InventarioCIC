@@ -33,16 +33,29 @@ const ViewArticleLoad = () => {
   const [costo, setCosto] = useState('');
   const [consumible, setConsumible] = useState(false);
   const [imagenes, setImagenes] = useState([]);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState();
+  const [showInfo, setShowInfo] = useState(); 
+  const [success, setSuccess] = useState(); 
+  
+  const handleActionInfo = () => {
+    setShowInfo(null); 
+  };
+  const handleActionEror = () => {
+    setError(null); 
+  };
+  const handleActionSuccess= () => {
+    setSuccess(null); 
+    navigate('/articles');
+  };
   const Peticion = peticion();
   // Handle image upload
   const handleImageUpload = (event) => {
     const files = Array.from(event.target.files);
     if (imagenes.length + files.length > 5) {
-      alert("No puedes cargar más de 5 imágenes.");
+      setShowInfo("No puedes cargar más de 5 imágenes.");
       return;
     }
-    setImagenes([...imagenes, ...files]);
+    setImagenes(prev => [...prev, ...files]);
   };
   // Handle deleting an image
   const handImageDelete = (index) => {
@@ -73,58 +86,37 @@ const ViewArticleLoad = () => {
   };
   return (
     <>
-      <h1>Carga de Artículo</h1>
-      <Componentes.Inputs.TitleHeader text={"Datos de un articulo"} 
+      <Componentes.Modals.success mensaje={success} action={handleActionSuccess}/>
+      <Componentes.Modals.info mensaje={showInfo} action={handleActionInfo}/>
+      <Componentes.Modals.error mensaje={error} action={handleActionEror}/>
+      <Componentes.Inputs.TitleHeader text={"Alta de Artículo"}/>
+      <Componentes.Inputs.TitleSubtitle titulo={"Datos de un articulo"} 
         contenido={"Rellene todos los campos para poder crear un articulo. "}/>
-      <form onSubmit={handlePublish} className="flex flex-col space-y-4">
-        <input
-          type="text"
-          placeholder="No. Inventario"
-          value={noInventario}
-          onChange={(e) => setNoInventario(e.target.value)}
-          required
-          className="p-2"
-        />
-        <input
-          type="text"
-          placeholder="Nombre"
-          value={nombre}
-          onChange={(e) => setNombre(e.target.value)}
-          required
-          className="p-2"
-        />
-        <textarea
-          placeholder="Descripción"
-          value={descripcion}
-          onChange={(e) => setDescripcion(e.target.value)}
-          required
-          className="p-2"
-        />
-        <input
-          type="number"
-          placeholder="Costo"
-          value={costo}
-          onChange={(e) => setCosto(e.target.value)}
-          required
-          className="p-2"
-        />
-        <div className='flex justify-between items-center'>
-          <h1>Consumible</h1>
-          <input
-            type="checkbox"
-            checked={consumible}
-            onChange={() => setConsumible(prev => !prev)}
-            className="p-2"
-          />
+      <form onSubmit={handlePublish} className="flex flex-col space-y-4 gap-3">
+        <Componentes.Labels.text Value={noInventario} Onchange={(value) => setNoInventario(value)} Placeholder={"No. Inventario"}/>
+        <Componentes.Labels.text Value={nombre} Onchange={(value) => setNombre(value)} Placeholder={"Nombre"}/>
+        <Componentes.Labels.number Value={costo} Onchange={(value) => setCosto(value)} Placeholder={"Costo"}/>
+        <Componentes.Labels.area Value={descripcion} Onchange={(value) => setDescripcion(value)} Placeholder={"Descripción"}/>
+        <div className="flex items-center p-5 gap-5">
+            <Componentes.Labels.checkbox Value={consumible}
+              Onchange={(value) =>setConsumible(value)}
+            />
+            <Componentes.Inputs.TitleSubtitle
+              titulo="Articulo consumible" 
+              contenido="Active este campo si el artículo puede dejar de servir con un uso apropiado."
+            />
         </div>
         {/* Pass image delete handler to Upimagen */}
-        <Componentes.Upimagen.Upimagen images={imagenes} ImageUpload={handleImageUpload} clikDelete={handImageDelete}/>
+        <Componentes.Labels.fileimg
+            object={imagenes}
+            ImageUpload={handleImageUpload}
+            clikObjectDelete={handImageDelete}
+        />
         <div className='flex flex-row w-[100%] gap-4'>
           <Componentes.Botones.Cancelar text={"Cancelar"} onClick={handleCancel}/>
           <Componentes.Botones.ConfirmarVerde text={"Confirmar"}/>
         </div>
       </form>
-      {error && <div className="text-red-600">{error}</div>}
     </>
   );
 };

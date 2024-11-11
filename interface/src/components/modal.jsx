@@ -4,7 +4,7 @@ const success= ({ mensaje, action }) => {
     // Si isview es true, mostramos la ventana emergente. Si no, no mostramos nada.
     return (
         mensaje && (
-        <div className="absolute top-0 left-0 w-[100vw] h-[100vh] bg-black bg-opacity-25 flex justify-center items-center">
+        <div className="absolute top-0 left-0 w-[100vw] h-[100vh] bg-black bg-opacity-25 flex justify-center items-center z-50">
             <div className="flex flex-col max-w-2xl max-h-full rounded-lg overflow-hidden w-[50%] pt-12 bg-UP-Exito">
             <div className="bg-UP-Blanco p-2 flex flex-col">
                 <h1 className="py-6 text-center">
@@ -23,7 +23,7 @@ const info = ({ mensaje, action }) => {
     // Si isview es true, mostramos la ventana emergente. Si no, no mostramos nada.
     return (
         mensaje && (
-        <div className="absolute top-0 left-0 w-[100vw] h-[100vh] bg-black bg-opacity-25 flex justify-center items-center">
+        <div className="absolute top-0 left-0 w-[100vw] h-[100vh] bg-black bg-opacity-25 flex justify-center items-center z-50">
             <div className="flex flex-col max-w-2xl max-h-full rounded-lg overflow-hidden w-[50%] pt-12 bg-UP-Informacion">
             <div className="bg-UP-Blanco p-2 flex flex-col">
                 <h1 className="py-6 text-center">
@@ -42,7 +42,7 @@ const alert= ({ mensaje, action }) => {
     // Si isview es true, mostramos la ventana emergente. Si no, no mostramos nada.
     return (
         mensaje && (
-        <div className="absolute top-0 left-0 w-[100vw] h-[100vh] bg-black bg-opacity-25 flex justify-center items-center">
+        <div className="absolute top-0 left-0 w-[100vw] h-[100vh] bg-black bg-opacity-25 flex justify-center items-center z-50">
             <div className="flex flex-col max-w-2xl max-h-full rounded-lg overflow-hidden w-[50%] pt-12 bg-UP-Advertancia">
             <div className="bg-UP-Blanco p-2 flex flex-col">
                 <h1 className="py-6 text-center">
@@ -61,7 +61,7 @@ const error= ({ mensaje, action }) => {
     // Si isview es true, mostramos la ventana emergente. Si no, no mostramos nada.
     return (
         mensaje && (
-        <div className="absolute top-0 left-0 w-[100vw] h-[100vh] bg-black bg-opacity-25 flex justify-center items-center">
+        <div className="absolute top-0 left-0 w-[100vw] h-[100vh] bg-black bg-opacity-25 flex justify-center items-center z-50">
             <div className="flex flex-col max-w-2xl max-h-full rounded-lg overflow-hidden w-[50%] pt-12 bg-UP-Error">
             <div className="bg-UP-Blanco p-2 flex flex-col">
                 <h1 className="py-6 text-center">
