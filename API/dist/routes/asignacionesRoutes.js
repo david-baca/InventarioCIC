@@ -11,7 +11,7 @@ router.get('/search/:query', asignacionController.buscarAsignaciones);
 // router.post('/crearAsignacion', asignacionMiddlewares.middleCreateAsignacion, asignacionController.crearAsignacion);
 router.post('/crearAsignacion', asignacionController.crearAsignacion);
 // Subir documento firmado para la asignación
-router.post('/subirDocumento', asignacionController.subirDocumentoAsignacion);
+// router.post('/subirDocumento', asignacionController.subirDocumentoAsignacion);
 
 // Dar de baja una asignación con middleware
 router.patch('/:id/baja', asignacionController.darDeBajaAsignacion);

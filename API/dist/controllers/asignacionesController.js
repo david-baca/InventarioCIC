@@ -1,7 +1,7 @@
 // src/controllers/asignacionController.js
 const asignacionView = require('../views/asignacionesView');
 const { Documentos, Asignaciones, Articulos, Responsables, Historial } = require('../model');
-const { PDFDocument } = require('pdf-lib');
+// const { PDFDocument } = require('pdf-lib');
 const { uploadPdf } = require('../config/uploadPdf');
 const fs = require('fs');
 const path = require('path');
@@ -122,34 +122,7 @@ exports.crearAsignacion = async (req, res) => {
     }
 };
 
-// Función para subir el documento firmado usando Multer
-exports.subirDocumentoAsignacion = (req, res) => {
-    uploadPdf.single('documento')(req, res, async (err) => {
-        if (err) {
-            return res.status(400).json({ error: 'Error al subir el documento PDF. Asegúrate de que el archivo sea un PDF y no exceda los 15 MB.' });
-        }
 
-        try {
-            const { idAsignacion } = req.body;
-            const archivo = req.file;
-
-            // Guardar el documento subido en la base de datos
-            await Documentos.create({
-                doc_firma: archivo.filename,
-                fecha: new Date(),
-                Asignaciones_pk: idAsignacion
-            });
-
-            return res.status(200).json({
-                message: 'Documento subido exitosamente.',
-                archivo: archivo.filename
-            });
-        } catch (error) {
-            console.error('Error al guardar el documento en la base de datos:', error);
-            return res.status(500).json({ error: 'Error al guardar el documento en la base de datos.' });
-        }
-    });
-};
 
 // Dar de baja una asignación por ID
 exports.darDeBajaAsignacion = async (req, res) => {
