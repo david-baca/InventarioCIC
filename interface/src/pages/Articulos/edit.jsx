@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Component } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import Componentes from '../../components';
@@ -35,13 +35,14 @@ const peticion = () => {
 
 const ViewArticleEdit = () => {
   const navigate = useNavigate();
-  const { NoInventario } = useParams();
+  const { pk } = useParams();
   const Peticion = peticion();
   const [articulo, setArticulo] = useState(null);
   const [error, setError] = useState();
   const [no_inventario, setNo_inventario] = useState('');
   const [nombre, setNombre] = useState('');
   const [descripcion, setDescripcion] = useState('');
+  const [motivo, setMotivo] = useState('');
   const [costo, setCosto] = useState('');
   const [consumible, setConsumible] = useState(false);
   const [imagenes, setImagenes] = useState([]); // Para las imágenes actuales
@@ -57,25 +58,27 @@ const ViewArticleEdit = () => {
   };
   const handleActionSuccess= () => {
     setSuccess(null); 
+    navigate('/articles');
   };
   
   useEffect(() => {
     const cargarArticulo = async () => {
       try {
-        const result = await Peticion.ObtenerDetalles(NoInventario);
+        const result = await Peticion.ObtenerDetalles(pk);
         setArticulo(result.articulo);
         setNo_inventario(result.articulo.no_inventario);
         setNombre(result.articulo.nombre);
         setDescripcion(result.articulo.descripcion);
         setCosto(result.articulo.costo);
         setConsumible(result.articulo.consumible);
-        setImagenes(result.articulo.Condiciones[0].Imagenes || []); // Guardamos las imágenes procesadas
+        if(result.articulo.Condiciones.length > 0){
+        setImagenes(result.articulo.Condiciones[0].Imagenes || []);}
       } catch (err) {
         setError(err.message);
       }
     };
     cargarArticulo();
-  }, [NoInventario]);
+  }, [pk]);
 
   // Manejo de imágenes nuevas (cargadas localmente)
   const handleImageUpload = (event) => {
@@ -109,6 +112,7 @@ const ViewArticleEdit = () => {
     formData.append('descripcion', descripcion);
     formData.append('costo', parseFloat(costo));
     formData.append('consumible', consumible ? 1 : 0);
+    formData.append('motivo', motivo);
     for (let i = 0; i < nuevasImagenes.length; i++) {
       formData.append('imagenes', nuevasImagenes[i]);
     }
@@ -117,8 +121,7 @@ const ViewArticleEdit = () => {
     }
     try {
       const success = await Peticion.EditarArticulo(formData, articulo.pk); // Actualiza el artículo en la base de datos
-      setSuccess(success)
-      //navigate('/articles'); // Redirige a la lista de artículos
+      setSuccess(success.message)
     } catch (err) {
       setError(err.message);
     }
@@ -129,70 +132,46 @@ const ViewArticleEdit = () => {
     <Componentes.Modals.success mensaje={success} action={handleActionSuccess}/>
     <Componentes.Modals.info mensaje={showInfo} action={handleActionInfo}/>
     <Componentes.Modals.error mensaje={error} action={handleActionEror}/>
-      <h1>Editar Artículo</h1>
-      <Componentes.Information 
+      
+      <Componentes.Inputs.TitleHeader text={"Edicion de un Articulo."}/>
+      <Componentes.Inputs.TitleSubtitle
         titulo="Datos del artículo" 
         contenido="Edita los campos para actualizar el artículo."
       />
       {articulo ? (
-        <form onSubmit={handleEdit} className="flex flex-col space-y-4">
-          <input
-            type="text"
-            placeholder="Nomero de inventario"
-            value={no_inventario}
-            onChange={(e) => setNo_inventario(e.target.value)}
-            required
-            className="p-2"
-          />
-          <input
-            type="text"
-            placeholder="Nombre"
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
-            required
-            className="p-2"
-          />
-          <textarea
-            placeholder="Descripción"
-            value={descripcion}
-            onChange={(e) => setDescripcion(e.target.value)}
-            required
-            className="p-2"
-          />
-          <input
-            type="number"
-            placeholder="Costo"
-            value={costo}
-            onChange={(e) => setCosto(e.target.value)}
-            required
-            className="p-2"
-          />
-          <div className="flex justify-between items-center">
-            <h1>Consumible</h1>
-            <input
-              type="checkbox"
-              checked={consumible}
-              onChange={() => setConsumible(prev => !prev)}
-              className="p-2"
+        <form onSubmit={handleEdit} className="flex flex-col space-y-4 gap-3">
+          <Componentes.Labels.text Onchange={(value) =>setNo_inventario(value)} Value={no_inventario} Placeholder={"Numero de inventario"}/>
+          <Componentes.Labels.text Onchange={(value) =>setNombre(value)} Value={nombre} Placeholder={"Nombre"}/>
+          <Componentes.Labels.number Onchange={(value) =>setCosto(value)} Value={costo} Placeholder={"Costo"}/>
+          <Componentes.Labels.area Onchange={(value) =>setDescripcion(value)} Value={descripcion} Placeholder={"Descripción"}/>
+          <div className="flex items-center p-5 gap-5">
+            <Componentes.Labels.checkbox Value={consumible}
+              Onchange={(value) =>setConsumible(value)}
+            />
+            <Componentes.Inputs.TitleSubtitle
+              titulo="Articulo consumible" 
+              contenido="Active este campo si el artículo puede dejar de servir con un uso apropiado."
             />
           </div>
-
-          {/* Muestra las imágenes actuales y permite agregar nuevas */}
-          <Componentes.Upimagen.EditUpimagen
+          <Componentes.Labels.fileimg
             object={nuevasImagenes}
             request={imagenes}
             ImageUpload={handleImageUpload}
             clikObjectDelete={handleImageDelete}
             clikRequestDelete={handleRequestImageDelete}
           />
-
+          <Componentes.Inputs.TitleSubtitle
+            titulo="Nota de edicion" 
+            contenido="Las notas de edicion son campos para comentar el porque se edita un registro"
+          />
+          <Componentes.Labels.area Onchange={(value) =>setMotivo(value)} Value={motivo} Placeholder={"Motivo"}/>
           {/* Botones para cancelar o confirmar */}
           <div className="flex flex-row w-[100%] gap-4">
-            <Componentes.Botones.botonCancelar 
+            <Componentes.Botones.Cancelar
               text="Cancelar" 
-              onClick={() => navigate('/articulos')} 
+              onClick={() => navigate('/articles')} 
             />
-            <Componentes.Botones.botonConfirmarVerde 
+            <Componentes.Botones.ConfirmarVerde
               text="Confirmar" 
             />
           </div>

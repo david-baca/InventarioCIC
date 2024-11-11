@@ -2,17 +2,16 @@ const fila = ({ children }) => {
     return (
         <th className="border border-UP-Opaco
          text-UP-Opaco font-roboto font-medium">
-            <div className="flex">
-
+            <div className="flex justify-center gap-2">
             {children}
             </div>
         </th>
     );
 };
 
-const columna = ({ children }) => {
+const columna = ({ children, Onclik }) => {
     return (
-        <tr className="border border-UP-Opaco">
+        <tr className="border border-UP-Opaco" onClick={Onclik}>
             {children}
         </tr>
     );

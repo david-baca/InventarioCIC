@@ -1,10 +1,9 @@
 import Botones from "./botones";
 import Buscador from "./buscador"
 import Inputs from "./inputs";
-//import labels from "./labels";
+import Labels from "./label";
 import Menu from "./menu";
 import Modals from "./modal"
-import Upimagen from "./upimagen"
 import Table from "./table"
 
 export default {
@@ -13,6 +12,6 @@ export default {
     Inputs,
     Menu,
     Modals,
-    Upimagen,
-    Table
+    Table,
+    Labels
 };

@@ -34,7 +34,7 @@ const peticion = () => {
 
 const ViewArticleRenoval = () => {
   const navigate = useNavigate();
-  const { no_inventario } = useParams();
+  const { pk } = useParams();
   const Peticion = peticion();
   
   const [articulo, setArticulo] = useState(null);
@@ -43,7 +43,7 @@ const ViewArticleRenoval = () => {
   useEffect(() => {
     const cargarArticulo = async () => {
       try {
-        const result = await Peticion.ObtenerDetalles(no_inventario);
+        const result = await Peticion.ObtenerDetalles(pk);
         setArticulo(result.articulo); // Assumes response contains 'articulo'
       } catch (err) {
         setError(err.message);
@@ -51,7 +51,7 @@ const ViewArticleRenoval = () => {
     };
     
     cargarArticulo();
-  }, [no_inventario]);
+  }, [pk]);
 
   const handleDelete = async () => {
     if (articulo.responsable) {
