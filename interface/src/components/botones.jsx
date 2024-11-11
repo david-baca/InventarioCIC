@@ -1,5 +1,6 @@
 import React from 'react';
 import imgExcel from "../../public/img/dowloadExcel.svg"; 
+import imgDownload from "../../public/img/download.svg";
 
 const Continuar = ({ text, onClick, isActive }) => {
   return (
@@ -104,7 +105,7 @@ const Download = () => {
   return (
     <>
     <button className="w-full bg-orange-600 text-white py-2 flex items-center justify-center gap-2 rounded-full hover:bg-orange-700 transition duration-300">
-      <img src={imgDownload} alt="Descargar" className="h-6 w-6" /> 
+      <img src={imgDownload} className="h-6 w-6" /> 
     </button>
     </>
   );
@@ -140,23 +141,12 @@ const Hover = () => {
   );
 };
 
-const ToggleCheck = () => {
-  const [isSelected, setIsSelected] = useState(false);
-
-  const handleClick = () => {
-    setIsSelected(!isSelected);
-  };
-
+const ToggleCheck = ({value, action}) => {
   return (
-    <div className="w-full flex justify-center items-center">
-      <div
-        onClick={handleClick}
-        className={`w-10 h-10 border border-gray-300 flex items-center justify-center cursor-pointer transition duration-300 ease-in-out 
-          ${isSelected ? 'bg-orange-600' : 'bg-white'}`}
-      >
-        {isSelected && <span className="text-white text-lg font-bold">✓</span>}
-      </div>
-    </div>
+      <input type="checkbox"
+            checked={action}
+            className="p-2 accent-orange-500 focus:ring-orange-300">
+      </input>
   );
 };
 

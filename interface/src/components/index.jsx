@@ -5,6 +5,7 @@ import Inputs from "./inputs";
 import Menu from "./menu";
 import Modals from "./modal"
 import Upimagen from "./upimagen"
+import Table from "./table"
 
 export default {
     Botones,
@@ -12,5 +13,6 @@ export default {
     Inputs,
     Menu,
     Modals,
-    Upimagen
+    Upimagen,
+    Table
 };
