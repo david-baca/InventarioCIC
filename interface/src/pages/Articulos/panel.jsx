@@ -58,6 +58,11 @@ const ViewArticle = () => {
     navigate(`/articles/removal/${pk}`);
   };
 
+  const handleTable = (pk) => {
+    navigate(`/articles/xd`);
+  };
+
+
   const handleSearchChange = (value) => {
     setQuery(value);
 
@@ -87,7 +92,6 @@ const ViewArticle = () => {
           <Componentes.Botones.Crear onClick={handlePublish} />
         </div>
       </div>
-      <div className="bg-gray-900 flex flex-col flex-wrap">
         {error && <div className="text-red-600">{error}</div>}
 
         {data.length > 0 ? (
@@ -107,23 +111,23 @@ const ViewArticle = () => {
               </Componentes.Table.encabezado>
             </Componentes.Table.columna>
             {data.map((element) => (
-              <Componentes.Table.columna key={element.pk}>
+              <Componentes.Table.columna key={element.pk} Onclik={handleTable}>
                 <Componentes.Table.fila>{element.no_inventario}</Componentes.Table.fila>
                 <Componentes.Table.fila>{element.nombre}</Componentes.Table.fila>
                 <Componentes.Table.fila>{element.costo}</Componentes.Table.fila>
                 <Componentes.Table.fila>
-                  <Componentes.Botones.Cancelar text={"hola"}/>
-                  <Componentes.Botones.ConfirmarRojo text={"hola"}/>
-                  <button onClick={() => handleEdit(element.no_inventario)}>Editar</button>
-                  <button onClick={() => handleDelete(element.pk)}>Eliminar</button>
+                  <Componentes.Botones.iconPencil Onclik={() => handleEdit(element.no_inventario)} />
+                  <Componentes.Botones.iconTrash Onclik={() => handleDelete(element.pk)} />
                 </Componentes.Table.fila>
               </Componentes.Table.columna>
             ))}
           </Componentes.Table.table>
         ) : (
-          <h1 className="text-gray-500">No hay datos disponibles</h1>
+          <div className='flex justify-center h-full items-center'>
+            <Componentes.Inputs.TitleSubtitle titulo={"No hay Articulos que mostrar"}
+            contenido={"no se encontraron resultados"}/>
+          </div>
         )}
-      </div>
       {/* Example view docs
       <img src="http://localhost:3730/uploads/images/1730841801651-06.jfif" alt="Imagen del artículo" />
       <iframe src="http://localhost:3730/uploads/01.pdf" type="application/pdf" width="100%" height="100%"></iframe> */}

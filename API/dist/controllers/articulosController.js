@@ -75,7 +75,7 @@ exports.editarArticulo = async (req, res) => {
         );
         //verificamos si es necesario cambiar las condiciones
         const { pathimg } = req.body;
-        if(req.files.length > 0 || pathimg.length > 0){
+        if(req.files.length > 0 || pathimg !== null){
             //desactivamos las consiciones actuales del articulo
             const condicion = await Condiciones.findOne({ where: { Articulos_pk: articulo.pk, disponible: 1 } })
             if(condicion) await condicion.update({ disponible: 0 });
@@ -136,6 +136,7 @@ exports.detallesArticulo = async (req, res) => {
             include: [
                 {
                     where: { disponible: 1 },
+                    required: false,
                     model: Condiciones,
                     as: 'Condiciones',
                     include:[{
