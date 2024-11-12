@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+// import Botones from '../components/botones';
+
 const ViewUserLoad = () => {
 
   const [formData, setFormData] = useState({
     nombre: '',
-    apellidoPaterno: '',
-    apellidoMaterno: '',
+    apellidoP: '',
+    apellidoM: '',
     correo: '',
   });
 
