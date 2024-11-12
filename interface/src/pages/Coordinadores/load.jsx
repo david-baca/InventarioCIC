@@ -1,24 +1,38 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-// import Botones from '../components/botones';
+import Componentes from "../../components/";
+
+const handleCancel = () => {
+  navigate('/coordinadores');
+}
 
 const ViewUserLoad = () => {
-
   const [formData, setFormData] = useState({
     nombre: '',
-    apellidoP: '',
-    apellidoM: '',
+    apellidoPaterno: '',
+    apellidoMaterno: '',
     correo: '',
   });
 
+  // Lista de permisos con IDs numéricos
   const [permissions, setPermissions] = useState({
-    Articulo: { visualizacion: false, creacion: false, editar: false },
-    Grupos: { visualizacion: false, creacion: false, editar: false },
-    Responsable: { visualizacion: false, creacion: false, editar: false },
-    Movimientos: { visualizacion: false, creacion: false, editar: false },
-    Reporte: { visualizacion: false, creacion: false, editar: false },
-    Historial: { visualizacion: false, creacion: false, editar: false },
+    Articulo: [1, 2, 3],
+    Grupos: [4, 5, 6],
+    Responsable: [7, 8, 9],
+    Movimientos: [10, 11, 12],
+    Reporte: [13, 14, 15],
+    Historial: [16],
+  });
+
+  // Estado de selección para cada permiso
+  const [selectedPermissions, setSelectedPermissions] = useState({
+    Articulo: [],
+    Grupos: [],
+    Responsable: [],
+    Movimientos: [],
+    Reporte: [],
+    Historial: [],
   });
 
   const handleInputChange = (e) => {
@@ -29,20 +43,21 @@ const ViewUserLoad = () => {
     });
   };
 
-  const handlePermissionChange = (category, type) => {
-    setPermissions({
-      ...permissions,
-      [category]: {
-        ...permissions[category],
-        [type]: !permissions[category][type],
-      },
+  const handleCheckboxChange = (category, permissionId) => {
+    setSelectedPermissions((prevSelected) => {
+      const isSelected = prevSelected[category].includes(permissionId);
+      return {
+        ...prevSelected,
+        [category]: isSelected
+          ? prevSelected[category].filter((id) => id !== permissionId) // Elimina si ya está seleccionado
+          : [...prevSelected[category], permissionId], // Agrega si no está seleccionado
+      };
     });
   };
 
   return (
     <>
       <div className="min-h-screen bg-gray-100 flex flex-col items-center p-4">
-        
         <main className="w-full max-w-4xl bg-white rounded-lg shadow-lg mt-6 p-6">
           <h2 className="text-2xl font-bold text-red-800 mb-4">Administración de Responsables</h2>
           <p className="text-gray-600 mb-6">Llena todos los campos para continuar</p>
@@ -85,35 +100,31 @@ const ViewUserLoad = () => {
                 name="correo"
                 value={formData.correo}
                 onChange={handleInputChange}
-                className="border rounded px-3 py-2 text-gray-800"
+                className="border rounded px-3 py-2 text-UP-Opaco"
               />
             </div>
           </div>
 
-          <h3 className="text-xl font-semibold text-gray-700 mb-4">Selecciona los permisos del administrador</h3>
+          <h3 className="text-xl font-semibold text-UP-Opaco mb-4">Selecciona los permisos del administrador</h3>
 
           <div className="overflow-x-auto">
             <table className="min-w-full rounded-md">
               <thead>
                 <tr className="bg-UP-Secundario text-UP-Blanco">
                   <th className="py-2 px-4 border">Permiso</th>
-                  <th className="py-2 px-4 border">Visualización</th>
-                  <th className="py-2 px-4 border">Creación</th>
-                  <th className="py-2 px-4 border">Editar</th>
+                  {['Visualización', 'Creación', 'Editar'].map((header) => (
+                    <th key={header} className="py-2 px-4 border">{header}</th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
                 {Object.keys(permissions).map((category) => (
-                  <tr key={category} className="text-center border-b hover:bg-gray-100">
+                  <tr key={category} className="text-center">
                     <td className="py-2 px-4 border">{category}</td>
-                    {['visualizacion', 'creacion', 'editar'].map((type) => (
-                      <td key={type} className="py-2 px-4 border">
-                        <input
-                          type="checkbox"
-                          checked={permissions[category][type]}
-                          onChange={() => handlePermissionChange(category, type)}
-                          className="accent-orange-500 w-5 h-5"
-                        />
+                    {permissions[category].map((permissionId) => (                                     
+                      <td key={permissionId} className="py-2 px-4 border" >
+                        <Componentes.Labels.checkbox Value={selectedPermissions[category].includes(permissionId)}
+                        Onchange={() => handleCheckboxChange(category, permissionId)}/>                      
                       </td>
                     ))}
                   </tr>
@@ -122,17 +133,16 @@ const ViewUserLoad = () => {
             </table>
           </div>
 
-          <div className="flex justify-between mt-6">
-            <button className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-4 rounded">
-              Cancelar
-            </button>
-            <button className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
-              Confirmar
-            </button>
+          <div className="flex justify-between ">
+            <Componentes.Botones.Cancelar text={"Cancelar" } onClick={handleCancel}/>
+          {/* <Componentes.Botones.Cancelar text={"Cancelar"} onClick={handleCancel}/> */}
+            <Componentes.Botones.ConfirmarVerde text={"Confirmar"} className="  "/>
           </div>
+
         </main>
       </div>
     </>
   );
 };
+
 export default ViewUserLoad;
