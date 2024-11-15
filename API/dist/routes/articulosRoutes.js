@@ -18,7 +18,7 @@ articulosRoutes.post('/', uploadImg.array('imagenes', 5), articulosMiddlewares.c
 articulosRoutes.put('/:id', uploadImg.array('imagenes', 5), articulosMiddlewares.editArticle,  articleController.editarArticulo);
 
 // Endpoint para dar de baja un artículo con middleware
-articulosRoutes.patch('/:id/baja', articulosMiddlewares.bajaArticle, articleController.darDeBajaArticulo);
+articulosRoutes.patch('/baja/:id', uploadImg.array('imagenes', 5), articulosMiddlewares.bajaArticle, articleController.darDeBajaArticulo);
 
 // Endpoint para obtener detalles de un artículo
 articulosRoutes.get('/details/:no_inventario', articleController.detallesArticulo);

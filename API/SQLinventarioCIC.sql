@@ -11,6 +11,7 @@ SET @OLD_SQL_MODE = @@SQL_MODE, SQL_MODE = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABL
 -- Crear tabla Responsables
 CREATE TABLE IF NOT EXISTS `inventariocic`.`Responsables` (
   `pk` INT NOT NULL AUTO_INCREMENT,
+  `correo` VARCHAR(100) NOT NULL,
   `nombres` VARCHAR(100) NOT NULL,
   `apellido_p` VARCHAR(50) NOT NULL,
   `apellido_m` VARCHAR(50) NOT NULL,
