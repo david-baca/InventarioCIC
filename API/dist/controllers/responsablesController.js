@@ -34,7 +34,7 @@ exports.editarResponsable = async (req, res) => {
 };
 
 exports.buscarResponsables = async (req, res) => {
-    const { query } = req.params;
+    const query = req.params.query || ''; // Usa un query vacío si no se proporciona
     try {
         const resultado = await Responsables.findAll({
             where: {

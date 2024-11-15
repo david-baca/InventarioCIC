@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import Componentes from "../../../components";
 import axios from 'axios';
 
-// Configuración de instancia de axios
 const baseApi = import.meta.env.VITE_BASE_API;
 const instance = axios.create({
   baseURL: baseApi,
@@ -26,9 +25,10 @@ const ArticleSelect = () => {
   const [query, setQuery] = useState('');
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedArticle, setSelectedArticle] = useState(null); // Estado para el artículo seleccionado
   const itemsPerPage = 3;
 
-  // Función para cargar los artículos al cambiar la query
+  // Cargar los artículos al cambiar la query
   useEffect(() => {
     const loadArticles = async () => {
       setError(null);
@@ -47,7 +47,7 @@ const ArticleSelect = () => {
     setQuery(value);
   };
 
-  // Función para paginación
+  // Paginación
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = articles.slice(indexOfFirstItem, indexOfLastItem);
@@ -61,94 +61,109 @@ const ArticleSelect = () => {
     }
   };
 
+  // Función para seleccionar y resaltar la fila
+  const handleRowClick = (article) => {
+    setSelectedArticle(article); // Guardar el artículo completo seleccionado
+
+    
+  };
+
+  // Función para manejar el clic en "Siguiente"
   const handleNext = () => {
-    navigate("/asignaciones/assign");
+    const selectedArticle = localStorage.getItem('selectedArticle');
+    if (selectedArticle) {
+      // Pasar a la siguiente ruta con la información del artículo seleccionado
+      navigate(`/asignaciones/assign`);
+    } else {
+      alert("Por favor, selecciona un artículo antes de continuar.");
+    }
   };
 
   return (
     <>
-     
-     <Componentes.Inputs.TitleHeader text={"Selección de artículo - (asignación)"} />
-     <div className=" p-4 rounded-b-md mb-0">
-     <div className='flex justify-between items-center mb-4'>
-        <div className='flex items-center w-[100%]'>
-          <Componentes.Inputs.TitleSubtitle titulo={"Estos son los Articulos del inventario."}
-            contenido={"busque por token o nombre del articulo"} />
-        </div>
-        <div className="w-1/3">
-            <Componentes.Buscador 
-              query={query} 
-              OnChange={handleSearchChange} 
-              className="border border-gray-300 rounded-full px-3 py-2 w-full" 
+      <Componentes.Inputs.TitleHeader text={"Selección de artículo - (asignación)"} />
+      <div className=" p-4 rounded-b-md mb-0">
+        <div className='flex justify-between items-center mb-4'>
+          <div className='flex items-center w-[100%]'>
+            <Componentes.Inputs.TitleSubtitle titulo={"Estos son los Articulos del inventario."}
+              contenido={"busque por token o nombre del articulo"} />
+          </div>
+          <div className="w-1/3">
+            <Componentes.Buscador
+              query={query}
+              OnChange={handleSearchChange}
+              className="border border-gray-300 rounded-full px-3 py-2 w-full"
             />
           </div>
-      </div>
-      </div>
-
-        {/* Tabla de artículos */}
-        <div className="bg-gray-900 flex flex-col flex-wrap">
-          {error ? (
-            <div className="text-red-600">{error}</div>
-          ) : currentItems.length > 0 ? (
-            <Componentes.Table.table className="w-full border border-gray-300">
-              <Componentes.Table.columna>
-                <Componentes.Table.encabezado className="bg-red-800 text-white text-center py-2">
-                  Token
-                </Componentes.Table.encabezado>
-                <Componentes.Table.encabezado className="bg-red-800 text-white text-center py-2">
-                  Artículo
-                </Componentes.Table.encabezado>
-              </Componentes.Table.columna>
-              {currentItems.map((article) => (
-                <Componentes.Table.columna key={article.pk} className="border-t border-gray-300">
-                  <Componentes.Table.fila className="text-center py-2 text-gray-600">
-                    {article.no_inventario}
-                  </Componentes.Table.fila>
-                  <Componentes.Table.fila className="text-center py-2 text-gray-600">
-                    {article.nombre}
-                  </Componentes.Table.fila>
-                </Componentes.Table.columna>
-              ))}
-            </Componentes.Table.table>
-          ) : (
-            <h1 className="text-gray-500">No hay datos disponibles</h1>
-          )}
         </div>
+      </div>
 
-        {/* Paginación */}
-        <div className="p-4 rounded-b-md mb-0 flex flex-col sm:flex-row justify-between items-center mt-4 text-sm">
-          <span className="text-gray-600">
-            Mostrando {indexOfFirstItem + 1} a {Math.min(indexOfLastItem, articles.length)} de {articles.length}
-          </span>
-          <div className="flex space-x-4 mt-2 sm:mt-0">
-            <button
-              onClick={() => handlePageChange("prev")}
-              className={`text-gray-600 hover:text-gray-800 ${currentPage === 1 && "opacity-50 cursor-not-allowed"}`}
-              disabled={currentPage === 1}
-            >
-              Anterior
-            </button>
-            <button
-              onClick={() => handlePageChange("next")}
-              className={`text-gray-600 hover:text-gray-800 ${currentPage === totalPages && "opacity-50 cursor-not-allowed"}`}
-              disabled={currentPage === totalPages}>
-              Siguiente
-            </button>
-          </div>
-        </div>
+      {/* Tabla de artículos */}
+      <div className="bg-gray-900 flex flex-col flex-wrap">
+        {error ? (
+          <div className="text-red-600">{error}</div>
+        ) : currentItems.length > 0 ? (
+          <Componentes.Table.table className="w-full border border-gray-300">
+            <Componentes.Table.columna>
+              <Componentes.Table.encabezado className="bg-red-800 text-white text-center py-2">
+                Token
+              </Componentes.Table.encabezado>
+              <Componentes.Table.encabezado className="bg-red-800 text-white text-center py-2">
+                Artículo
+              </Componentes.Table.encabezado>
+            </Componentes.Table.columna>
+            {currentItems.map((article) => (
+              <tr
+                key={article.pk}
+                onClick={() => handleRowClick(article)}
+                className={`border-t border-gray-300 cursor-pointer ${selectedArticle?.pk === article.pk ? 'bg-orange-300' : ''
+                  }`}
+              >
+                <Componentes.Table.fila className="text-center py-2 text-gray-600">
+                  {article.no_inventario}
+                </Componentes.Table.fila>
+                <Componentes.Table.fila className="text-center py-2 text-gray-600">
+                  {article.nombre}
+                </Componentes.Table.fila>
+              </tr>
+            ))}
+          </Componentes.Table.table>
+        ) : (
+          <h1 className="text-gray-500">No hay datos disponibles</h1>
+        )}
+      </div>
 
-        {/* Botón siguiente */}
-        <div className="mb-0 mt-1 flex justify-center">
+      {/* Paginación */}
+      <div className="p-4 rounded-b-md mb-0 flex flex-col sm:flex-row justify-between items-center mt-4 text-sm">
+        <span className="text-gray-600">
+          Mostrando {indexOfFirstItem + 1} a {Math.min(indexOfLastItem, articles.length)} de {articles.length}
+        </span>
+        <div className="flex space-x-4 mt-2 sm:mt-0">
           <button
-            onClick={handleNext}
-            className="flex items-center px-6 py-2 bg-gray-200 text-gray-700 rounded-md shadow hover:bg-gray-300"
+            onClick={() => handlePageChange("prev")}
+            className={`text-gray-600 hover:text-gray-800 ${currentPage === 1 && "opacity-50 cursor-not-allowed"}`}
+            disabled={currentPage === 1}
           >
+            Anterior
+          </button>
+          <button
+            onClick={() => handlePageChange("next")}
+            className={`text-gray-600 hover:text-gray-800 ${currentPage === totalPages && "opacity-50 cursor-not-allowed"}`}
+            disabled={currentPage === totalPages}>
             Siguiente
           </button>
         </div>
-      
-   
-    
+      </div>
+
+      {/* Botón siguiente */}
+      <div className="mb-0 mt-1 flex justify-center">
+        <button
+          onClick={handleNext}
+          className="flex items-center px-6 py-2 bg-gray-200 text-gray-700 rounded-md shadow hover:bg-gray-300"
+        >
+          Siguiente
+        </button>
+      </div>
     </>
   );
 };

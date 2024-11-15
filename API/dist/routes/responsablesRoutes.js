@@ -12,7 +12,7 @@ router.post('/',responsablesMiddlewares.crearResponsable, responsableController.
 router.put('/:id',responsablesMiddlewares.editarResponsable, responsableController.editarResponsable);
 
 // Endpoint para buscar responsables con middleware
-router.get('/search/:query', responsableController.buscarResponsables);
+router.get('/search/:query?', responsableController.buscarResponsables);
 
 // Endpoint para dar de baja un responsable
 router.delete('/:id/baja',responsablesMiddlewares.darDeBajaResponsable, responsableController.darDeBajaResponsable);
