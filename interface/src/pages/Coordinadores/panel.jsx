@@ -11,7 +11,7 @@ export const peticionUsuarios = () => {
   const obtenerUsuarios = async () => {
     try {
       const response = await instance.get(`/usuarios/all`);  //Ajusta el endpoint si es necesario
-      return response.data.usuarios;  //Ajusta según la estructura de respuesta
+      return response.data;  //Ajusta según la estructura de respuesta
     } catch (error) {
       console.error(error.response?.data?.error || error.message);
       throw new Error(error.response?.data?.error || 'Error al cargar usuarios');
@@ -72,7 +72,7 @@ const ViewUser = () => {
             <tbody>
               {usuarios.map((usuario) => (
                 <tr key={usuario.id}>
-                  <td className="border px-4 py-2">{usuario.nombre}</td>
+                  <td className="border px-4 py-2">{`${usuario.nombres} ${usuario.apellido_p} ${usuario.apellido_m}`}</td>
                   <td className="border px-4 py-2">{usuario.correo}</td>
                   <td className="border px-4 py-2">{usuario.estado ? 'Activo' : 'Inactivo'}</td>
                   <td className="border px-4 py-2">

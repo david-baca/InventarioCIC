@@ -1,4 +1,3 @@
-// src/controllers/userController.js
 const userView = require('../views/usuariosView');
 const {Usuarios,Funciones,Permisos} = require('../model/')
 
@@ -37,31 +36,34 @@ exports.crearUsuario = async (req, res) =>
 
 exports.editarUsuario = async(req, res) => 
 {
-    try{
+    const { id } = req.params;
+    const { disponible, permisos } = req.body;
 
-        const { pk } = req.params;
-        const { permisos } = req.body;
-    
-        const usuario = await usuarios.findByPk(pk);
-        if (!usuario) 
+    try{
+        const usuario = await Usuarios.findByPk(id);
+        if (!usuario)
         {
             return res.status(404).json(usuarioView.errorUsuario('Usuario no encontrado'));
         }
-    
-        await Permisos.destroy({ where: { Usuarios_pk: pk } }); // Elimina los permisos actuales del usuario
+            
+            usuario.disponible = disponible !== undefined ? disponible : usuario.disponible;
+            await usuario.save();
 
-        // Añade los nuevos permisos
-        for (const permiso of permisos) {
-            await Permisos.create({
-                Usuarios_pk: pk,
-                Funciones_pk: permiso.pk,
+            await Permisos.destroy({
+                where: { Usuarios_pk: id }
             });
-        }
 
-        res.json(userView.confirmacionActualizacion(`Permisos actualizados para el usuario con pk: ${pk}`))
-    }catch (error) 
+            for (const permiso of permisos) {
+                await Permisos.create({
+                    Usuarios_pk: id,
+                    Funciones_pk: permiso
+                });
+            }
+
+        res.json(userView.confirmacionActualizacion(usuario));
+    }catch (error)
     {
-        res.status(500).json(responsableView.errorResponsable('Error al editar el responsable'));
+        res.status(500).json(usuarioView.errorUsuario('Error al editar el responsable'+ error));
     }
 };
 
@@ -71,7 +73,11 @@ exports.mostrarUsuarios = async(req, res) => {
 
     try {
         const usuarios = await Usuarios.findAll({
-            attributes: ['nombres', 'apellido_p', 'apellido_m', 'correo']
+            attributes: ['nombres', 'apellido_p', 'apellido_m', 'correo'],
+            include: {
+                model: Permisos,
+                attributes: ['Funciones_pk'],
+            }
         });
 
         res.json(usuarios);

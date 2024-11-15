@@ -3,56 +3,69 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Componentes from "../../components/";
 
-const handleCancel = () => {
-  navigate('/coordinadores');
-}
-
 const ViewUserLoad = () => {
   const [formData, setFormData] = useState({
     nombre: '',
-    apellidoPaterno: '',
-    apellidoMaterno: '',
+    apellidoP: '',
+    apellidoM: '',
     correo: '',
+    permisos: [],
   });
 
   // Lista de permisos con IDs numéricos
-  const [permissions, setPermissions] = useState({
+  const permissions = {
     Articulo: [1, 2, 3],
     Grupos: [4, 5, 6],
     Responsable: [7, 8, 9],
     Movimientos: [10, 11, 12],
-    Reporte: [13, 14, 15],
-    Historial: [16],
-  });
+    Reporte: [13, 14],
+    Historial: [15],
+  };
 
-  // Estado de selección para cada permiso
-  const [selectedPermissions, setSelectedPermissions] = useState({
-    Articulo: [],
-    Grupos: [],
-    Responsable: [],
-    Movimientos: [],
-    Reporte: [],
-    Historial: [],
-  });
-
-  const handleInputChange = (e) => {
+  // Manejador de cambios para los campos de texto
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
+    setFormData((prevData) => ({
+      ...prevData,
       [name]: value,
+    }));
+  };
+
+  // Manejador de cambios para los checkboxes de permisos
+  const handleCheckboxChange = (permiso) => {
+    setFormData((prevData) => {
+      const permisosActuales = prevData.permisos;
+      const existePermiso = permisosActuales.includes(permiso);
+
+      return {
+        ...prevData,
+        permisos: existePermiso
+          ? permisosActuales.filter((p) => p !== permiso)
+          : [...permisosActuales, permiso],
+      };
     });
   };
 
-  const handleCheckboxChange = (category, permissionId) => {
-    setSelectedPermissions((prevSelected) => {
-      const isSelected = prevSelected[category].includes(permissionId);
-      return {
-        ...prevSelected,
-        [category]: isSelected
-          ? prevSelected[category].filter((id) => id !== permissionId) // Elimina si ya está seleccionado
-          : [...prevSelected[category], permissionId], // Agrega si no está seleccionado
-      };
-    });
+  // Envío de los datos al backend
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post('/api/usuarios', {
+        ...formData,
+        master: 0,  // Definido por defecto
+        disponible: 1,  // Definido por defecto
+      });
+      alert('Usuario registrado exitosamente');
+      setFormData({ nombre: '', apellidoP: '', apellidoM: '', correo: '', permisos: [] });
+    } catch (error) {
+      console.error('Error al registrar el usuario:', error);
+      alert('Hubo un error al registrar el usuario');
+    }
+  };
+
+  // Función para manejar el botón de "Cancelar"
+  const handleCancel = () => {
+    navigate('./coordinadores'); 
   };
 
   return (
@@ -62,46 +75,48 @@ const ViewUserLoad = () => {
           <h2 className="text-2xl font-bold text-red-800 mb-4">Administración de Responsables</h2>
           <p className="text-gray-600 mb-6">Llena todos los campos para continuar</p>
 
+          
+
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+
             <div className="flex flex-col">
-              <label className="text-gray-600 font-semibold">Nombre</label>
-              <input
+              <Componentes.Labels.text 
                 type="text"
                 name="nombre"
                 value={formData.nombre}
-                onChange={handleInputChange}
-                className="border rounded px-3 py-2 text-gray-800"
-              />
+                onChange={handleChange} 
+                Placeholder={"Nombre"}
+              />              
             </div>
+
             <div className="flex flex-col">
-              <label className="text-gray-600 font-semibold">Apellido Paterno</label>
-              <input
+              <Componentes.Labels.text 
                 type="text"
                 name="apellidoPaterno"
-                value={formData.apellidoPaterno}
-                onChange={handleInputChange}
-                className="border rounded px-3 py-2 text-gray-800"
-              />
+                value={formData.apellidoP}
+                onChange={handleChange}
+                Placeholder={"Apellido Paterno"}               
+              />             
             </div>
+
             <div className="flex flex-col">
-              <label className="text-gray-600 font-semibold">Apellido Materno</label>
-              <input
+              <Componentes.Labels.text 
                 type="text"
                 name="apellidoMaterno"
-                value={formData.apellidoMaterno}
-                onChange={handleInputChange}
-                className="border rounded px-3 py-2 text-gray-800"
-              />
+                value={formData.apellidoM}
+                onChange={handleChange}
+                Placeholder={"Apellido Materno"}               
+              /> 
             </div>
+
             <div className="flex flex-col">
-              <label className="text-gray-600 font-semibold">Correo Electrónico</label>
-              <input
-                type="email"
-                name="correo"
-                value={formData.correo}
-                onChange={handleInputChange}
-                className="border rounded px-3 py-2 text-UP-Opaco"
-              />
+              <Componentes.Labels.text 
+                  type="email"
+                  name="correo"
+                  value={formData.correo}
+                  onChange={handleChange}
+                  Placeholder={"Correo electronico"}               
+              /> 
             </div>
           </div>
 
@@ -117,26 +132,32 @@ const ViewUserLoad = () => {
                   ))}
                 </tr>
               </thead>
-              <tbody>
-                {Object.keys(permissions).map((category) => (
-                  <tr key={category} className="text-center">
-                    <td className="py-2 px-4 border">{category}</td>
-                    {permissions[category].map((permissionId) => (                                     
-                      <td key={permissionId} className="py-2 px-4 border" >
-                        <Componentes.Labels.checkbox Value={selectedPermissions[category].includes(permissionId)}
-                        Onchange={() => handleCheckboxChange(category, permissionId)}/>                      
-                      </td>
+
+                        {/* Checkboxes de permisos */}
+              <div className="mb-4">
+                {Object.entries(permissions).map(([categoria, permisos]) => (
+                  <div key={categoria} className="mb-2">
+                      <h4 className="font-semibold">{categoria}</h4>
+                      {permisos.map((permiso) => (
+                      <label key={permiso} className="inline-flex items-center mr-4">
+                        <Componentes.Labels.checkbox                 
+                          value={permiso}
+                          checked={formData.permisos.includes(permiso)}
+                          onChange={() => handleCheckboxChange(permiso)}
+                          className="form-checkbox"
+                        />                    
+                        <span className="ml-2"> {permiso}</span>
+                      </label>
                     ))}
-                  </tr>
+                  </div>
                 ))}
-              </tbody>
+              </div> 
             </table>
-          </div>
+          </div> 
 
           <div className="flex justify-between ">
-            <Componentes.Botones.Cancelar text={"Cancelar" } onClick={handleCancel}/>
-          {/* <Componentes.Botones.Cancelar text={"Cancelar"} onClick={handleCancel}/> */}
-            <Componentes.Botones.ConfirmarVerde text={"Confirmar"} className="  "/>
+            <Componentes.Botones.Cancelar onClick={handleCancel} text={"Cancelar" } />
+            <Componentes.Botones.ConfirmarVerde type="submit" text={"Confirmar"} />
           </div>
 
         </main>
