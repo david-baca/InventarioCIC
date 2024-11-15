@@ -65,7 +65,13 @@ const ArticleSelect = () => {
   const handleRowClick = (article) => {
     setSelectedArticle(article); // Guardar el artículo completo seleccionado
 
-    
+    // Guardar la información en localStorage
+    localStorage.setItem('selectedArticle', JSON.stringify(article));
+
+    // Actualizar la URL con el nombre y token del artículo seleccionado
+    const tokenArticulo = article.no_inventario;
+    const nombreResponsable = JSON.parse(localStorage.getItem('selectedResponsable')).nombres.replace(/\s+/g, '-');
+    window.history.pushState({}, '', `/asignaciones/${nombreResponsable}/articleSelect/${tokenArticulo}`);
   };
 
   // Función para manejar el clic en "Siguiente"
@@ -116,8 +122,9 @@ const ArticleSelect = () => {
               <tr
                 key={article.pk}
                 onClick={() => handleRowClick(article)}
-                className={`border-t border-gray-300 cursor-pointer ${selectedArticle?.pk === article.pk ? 'bg-orange-300' : ''
-                  }`}
+                className={`border-t border-gray-300 cursor-pointer ${
+                  selectedArticle?.pk === article.pk ? 'bg-orange-300' : ''
+                }`}
               >
                 <Componentes.Table.fila className="text-center py-2 text-gray-600">
                   {article.no_inventario}

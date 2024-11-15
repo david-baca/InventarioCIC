@@ -58,7 +58,6 @@ const ViewAssigned_ResponsibleSelect = () => {
   const handlePageChange = (direction) => {
     if (direction === 'next' && currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
-      console.log(currentPage);
     } else if (direction === 'prev' && currentPage > 1) {
       setCurrentPage(currentPage - 1);
     }
