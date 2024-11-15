@@ -107,6 +107,10 @@ const ViewArticleLoad = () => {
             />
         </div>
         {/* Pass image delete handler to Upimagen */}
+        <Componentes.Inputs.TitleSubtitle 
+          titulo="Evidencias (opcional)" 
+          contenido="Nos ayuda a registrar las condiciones actuales del articulo" 
+        />
         <Componentes.Labels.fileimg
             object={imagenes}
             ImageUpload={handleImageUpload}

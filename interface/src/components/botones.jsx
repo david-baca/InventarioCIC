@@ -21,7 +21,7 @@ const ConfirmarVerde = ({ text, onClick }) => {
   return (
     <>
     <button onClick={onClick} className="bg-UP-Exito w-[100%]
-    hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg">
+    hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg" type='bottom'>
     {text}
     </button>
     </>
@@ -65,7 +65,7 @@ const Crear = ({ text, onClick }) => {
 const Imprimir = ({ text, onClick }) => {
   return (
       <>
-      <button onClick={onClick} className="bg-UP-Primario hover:bg-UP-Secundario text-white font-bold py-2 px-4 rounded-lg">
+      <button onClick={onClick} className="bg-UP-Primario hover:bg-UP-Secundario text-white font-bold py-2 px-4 rounded-lg w-[100%]">
       Imprimir
       </button>
       </>
