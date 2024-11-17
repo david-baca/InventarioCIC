@@ -49,8 +49,8 @@ const ViewUserEdit = () => {
     Grupos: [4, 5, 6],
     Responsable: [7, 8, 9],
     Movimientos: [10, 11, 12],
-    Reporte: [13, 14],
-    Historial: [15],
+    Reporte: [13, 14, 0],
+    Historial: [15, 0, 0],
   };
 
   useEffect(() => {
@@ -106,35 +106,45 @@ const ViewUserEdit = () => {
     <div className="min-h-screen bg-gray-100 flex flex-col items-center p-4">
       {success && <Components.Modals.success mensaje={success} />}
       {error && <Components.Modals.error mensaje={error} />}
-      <main className="w-full max-w-4xl bg-white rounded-lg shadow-lg mt-6 p-6">
-        <h2 className="text-2xl font-bold text-UP-Secundario mb-4">Administración de Permisos</h2>
-        <p className="text-UP-Opaco mb-6">Llena todos los campos para continuar</p>
+      <main className="w-full bg-white rounded-lg shadow-lg mt-6 p-6">
+        <h2 className="flex items-center text-2xl font-bold bg-UP-Secundario text-UP-Blanco mb-4 pl-8 h-20 w-38 ">Administración de Permisos</h2>
+        
+        <div className='flex w-full '>
+          <p className="text-UP-Opaco mb-6 pr-32">Llena todos los campos para continuar</p>
+          
+          <div className="">
+            <label className="block text-gray-700 font-bold">Estado:</label>
+            <button
+              type="button"
+              onClick={handleEstadoChange}
+              className={`px-4 py-2 rounded ${estado === 1 ? 'bg-UP-Exito' : 'bg-UP-Error'} text-white`}
+            >
+              {estado === 1 ? 'Activo' : 'Inactivo'}
+            </button>
+          </div>
+        </div>
+        
 
-        <table className="table-auto mb-6 w-full">
-          <tbody>
-            <tr>
-              <th className="text-left px-4 py-2">Nombre:</th>
-              <td className="border px-4 py-2">{usuario.nombres}</td>
-            </tr>
-            <tr>
-              <th className="text-left px-4 py-2">Apellido Paterno:</th>
-              <td className="border px-4 py-2">{usuario.apellido_p}</td>
-            </tr>
-            <tr>
-              <th className="text-left px-4 py-2">Apellido Materno:</th>
-              <td className="border px-4 py-2">{usuario.apellido_m}</td>
-            </tr>
-            <tr>
-              <th className="text-left px-4 py-2">Correo:</th>
-              <td className="border px-4 py-2">{usuario.correo}</td>
-            </tr>
-          </tbody>
+        <table className="table-auto mb-6 w-full ">
+          <div>            
+          <th className="text-left px-4 py-2">Nombre:</th>
+          <th className="text-left px-4 py-2">Apellido Paterno:</th>
+          <th className="text-left px-4 py-2">Apellido Materno:</th>
+          <th className="text-left px-4 py-2">Correo:</th>
+          </div>
+
+          <div className='max-w-4xl'>
+            <td className="border px-4 py-2 ">{usuario.nombres}</td>
+            <td className="border px-4 py-2 " w-full>{usuario.apellido_p}</td>
+            <td className="border px-4 py-2 ">{usuario.apellido_m}</td>
+            <td className="border px-4 py-2 ">{usuario.correo}</td>
+          </div>
         </table>
 
         <div className="mb-4">
           <h3 className="text-lg font-bold mb-2">Editar Permisos:</h3>
           {Object.entries(permisosDisponibles).map(([categoria, listaPermisos]) => (
-            <div key={categoria} className="mb-2">
+            <div key={categoria} className="justify-around mb-2 table-auto w-full text-UP-Opaco flex grid-flow-col gap-4">
               <h4 className="font-semibold">{categoria}</h4>
               {listaPermisos.map((permiso) => (
                 <label key={permiso} className="inline-flex items-center mr-4">
@@ -145,23 +155,14 @@ const ViewUserEdit = () => {
                     onChange={() => handleCheckboxChange(permiso)}
                     className="form-checkbox"
                   />
-                  <span className="ml-2">Permiso {permiso}</span>
+                  
                 </label>
               ))}
             </div>
           ))}
         </div>
 
-        <div className="mb-4">
-          <label className="block text-gray-700 font-bold">Estado:</label>
-          <button
-            type="button"
-            onClick={handleEstadoChange}
-            className={`px-4 py-2 rounded ${estado === 1 ? 'bg-green-500' : 'bg-red-500'} text-white`}
-          >
-            {estado === 1 ? 'Activo' : 'Inactivo'}
-          </button>
-        </div>
+        
 
         <div className="flex justify-between mt-6">
           <Components.Botones.Cancelar type="button" onClick={handleCancel} text="Cancelar" />

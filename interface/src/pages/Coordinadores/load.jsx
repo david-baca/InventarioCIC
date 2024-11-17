@@ -43,8 +43,8 @@ const ViewUserLoad = () => {
     Grupos: [4, 5, 6],
     Responsable: [7, 8, 9],
     Movimientos: [10, 11, 12],
-    Reporte: [13, 14],
-    Historial: [15],
+    Reporte: [13, 14, 0],
+    Historial: [15, 0, 0],
   };
 
   const handleCheckboxChange = (newNumber) => {
@@ -104,13 +104,13 @@ const ViewUserLoad = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center p-4">
+    <div className="min-h-screen bg-UP-Blanco flex flex-col items-center p-4 justify-between">
       <Componentes.Modals.success mensaje={success} action={handleActionSuccess}/>
       <Componentes.Modals.info mensaje={showInfo} action={handleActionInfo}/>
       <Componentes.Modals.error mensaje={error} action={handleActionEror}/>
-      <form onSubmit={handlePublish} className="w-full max-w-4xl bg-white rounded-lg shadow-lg mt-6 p-6">
-        <h2 className="text-2xl font-bold text-red-800 mb-4">Administración de Responsables</h2>
-        <p className="text-gray-600 mb-6">Llena todos los campos para continuar</p>
+      <form onSubmit={handlePublish} className="w-full bg-UP-Blanco mt-6 p-6">
+        <h2 className="flex items-center text-2xl font-bold bg-UP-Secundario text-UP-Blanco mb-4 pl-8 h-20 w-38 ">Administración de Responsables</h2>
+        <p className="text-UP-Negro mb-6 text-2 font-bold">Llena todos los campos para continuar</p>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <Componentes.Labels.text
@@ -136,11 +136,19 @@ const ViewUserLoad = () => {
           />
         </div>
 
-        <h3 className="text-xl font-semibold text-UP-Opaco mb-4">Selecciona los permisos del administrador</h3>
+        <h3 className="text-UP-Negro mb-6 text-2 font-bold">Selecciona los permisos del administrador</h3>
+        <div className="flex items-center justify-around bg-UP-Secundario text-UP-Blanco mb-4  h-10  ">
+        <h2>Permiso</h2>
+        <h2>Visualisacion</h2>
+        <h2>Creacion</h2>
+        <h2>Edicion</h2>
+        </div>
         <div className="overflow-x-auto mb-4">
           {Object.entries(permissions).map(([categoria, permisos]) => (
-            <div key={categoria} className="mb-2">
-              <h4 className="font-semibold">{categoria}</h4>
+            <div key={categoria} className="justify-around mb-2 table-auto w-full text-UP-Opaco flex grid-flow-col gap-4">
+              
+              <h4 className="font-semibold ">{categoria}</h4>
+              
               {permisos.map((permiso) => (
                 
                   <Componentes.Labels.checkbox
@@ -153,10 +161,11 @@ const ViewUserLoad = () => {
                 
               ))}
             </div>
+            
           ))}
         </div>
 
-        <div className="flex justify-between">
+        <div className="flex  space-x-16 ">
           <Componentes.Botones.Cancelar onClick={handleCancel} text="Cancelar" />
           <Componentes.Botones.ConfirmarVerde type="submit" text="Confirmar" />
         </div>
