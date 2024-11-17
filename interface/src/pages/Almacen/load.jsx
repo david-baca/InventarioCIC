@@ -3,19 +3,26 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import TarjetaSoloTitulo from "../../components/TarjetaSoloTitulo";
 import TarjetaTituloContenido from "../../components/TarjetaTituloContenido";
+import Buscador from "../../components/Buscador"; 
 
 const ViewStoreLoad = () => {
-  // Estado para el nombre del área y la descripción
+ 
   const [nombreArea, setNombreArea] = useState('');
   const [descripcionArea, setDescripcionArea] = useState('');
+  const [query, setQuery] = useState(''); 
+
   
-  // Función para manejar el cambio en los campos de texto
   const handleNombreAreaChange = (e) => {
     setNombreArea(e.target.value);
   };
 
   const handleDescripcionAreaChange = (e) => {
     setDescripcionArea(e.target.value);
+  };
+
+  
+  const handleSearchChange = (newQuery) => {
+    setQuery(newQuery); 
   };
 
   // Función para guardar los datos
@@ -26,7 +33,7 @@ const ViewStoreLoad = () => {
     }
 
     try {
-      // Ejemplo de llamada a un backend con axios (debes configurar la URL de tu API)
+      
       await axios.post('/api/guardar-area', {
         nombre: nombreArea,
         descripcion: descripcionArea
@@ -62,31 +69,32 @@ const ViewStoreLoad = () => {
             </div>
           </div>
 
-          {/* Componente para el nombre del área */}
+          
           <TarjetaSoloTitulo 
             titulo={nombreArea}
             onChange={handleNombreAreaChange}
           />
 
-          {/* Componente para la descripción del área */}
           <TarjetaTituloContenido 
             titulo="Descripción del Área" 
             contenido={descripcionArea}
             onChange={handleDescripcionAreaChange}
           />
 
-          {/* Otros campos y componentes */}
+
+          
           <div className="self-stretch h-[201px] justify-center items-center gap-9 inline-flex">
             <div className="grow shrink basis-0 flex-col justify-start items-start gap-4 inline-flex">
               <div className="self-stretch text-[#030303] text-3xl font-semibold font-['Montserrat']">Articulos del inventario</div>
               <div className="self-stretch text-[#030303] text-[25px] font-normal font-['Roboto']">Selecciona por lo menos 2 articulos para asignarlos a el area</div>
             </div>
             <div className="grow shrink basis-0 self-stretch p-4 justify-end items-center gap-4 flex">
-              <div className="h-[55px] p-4 bg-white rounded-2xl border border-[#9a9a9a] justify-between items-center flex">
-                <div className="h-[23px] justify-start items-center gap-2.5 flex">
-                  <div className="text-[#030303] text-xl font-normal font-['Roboto']">Buscar</div>
-                </div>
-              </div>
+             
+            <div className="h-[55px] p-4 bg-white rounded-2xl border border-[#9a9a9a] justify-between items-center flex">
+             <Buscador query={query} OnChange={handleSearchChange} />
+             </div>
+
+
             </div>
           </div>
         </div>
