@@ -5,7 +5,8 @@ import XIcon from '../../public/X.svg';
 const Upimagen = () => {
   const [images, setImages] = useState([]);
 
-  const handleImageUpload = (event) => {
+  const handleImageUpload = (event) => {  // smandarle el elemnto que evalua y el que genera
+    
     const files = Array.from(event.target.files);
 
     // Verificar si el total de imágenes más las nuevas exceden 5
