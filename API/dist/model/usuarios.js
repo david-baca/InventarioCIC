@@ -35,6 +35,7 @@ const Usuarios = sequelize.define('Usuarios', {
   correo: {
     type: DataTypes.STRING(250),
     allowNull: false,
+    unique: true,
   },
   master: {
     type: DataTypes.BOOLEAN,

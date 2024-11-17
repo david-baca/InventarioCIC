@@ -12,6 +12,7 @@ const ViewLogin = () => {
         <h1 className="text-2xl font-bold mb-4">Iniciar sesión</h1>
         <p className="text-gray-500 mb-6">Con cuenta institucional (@upqroo.edu.mx)</p>
         
+        
         <button className="flex items-center justify-center w-full border border-gray-400 py-2 rounded-full hover:bg-gray-100 transition">
           <img
             src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Google_%22G%22_logo.svg/768px-Google_%22G%22_logo.svg.png"
@@ -19,6 +20,7 @@ const ViewLogin = () => {
           />
           <span className="text-gray-700 font-medium">Google</span>
         </button>
+
 
         <Link to="./coordinadores">
           <button className="flex items-center justify-center w-full border border-gray-400 py-2 rounded-full hover:bg-gray-100 transition">

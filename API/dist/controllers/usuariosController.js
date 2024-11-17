@@ -1,26 +1,28 @@
 const userView = require('../views/usuariosView');
-const {Usuarios,Funciones,Permisos} = require('../model/')
+const {Usuarios,Funciones,Permisos} = require('../model/index')
 
 
 exports.crearUsuario = async (req, res) => 
 {
     try{
-        const { nombre, apellidoP, apellidoM, correo, permisos} = req.body; //removi (rol) pero puede que los ocupe
+        const { nombre, apellido_p, apellido_m, correo, permisos} = req.body; //removi (rol) pero puede que los ocupe
 
         const nuevoUsuario = await Usuarios.create(
         { 
             nombres: nombre, 
-            apellido_p: apellidoP, 
-            apellido_m: apellidoM, 
+            apellido_p: apellido_p, 
+            apellido_m: apellido_m, 
             correo: correo,
             master: 0,
             disponible: 1
         });
-    
+    console.log(permisos)
         for (const permiso of permisos) {
+            console.log(permiso)
+            
             await Permisos.create({
                 Usuarios_pk: nuevoUsuario.pk,
-                Funciones_pk: permiso.pk,
+                Funciones_pk: permiso,
             });
         }           
 
@@ -73,9 +75,10 @@ exports.mostrarUsuarios = async(req, res) => {
 
     try {
         const usuarios = await Usuarios.findAll({
-            attributes: ['nombres', 'apellido_p', 'apellido_m', 'correo'],
+            attributes: ['pk', 'nombres', 'apellido_p', 'apellido_m', 'correo'],
             include: {
                 model: Permisos,
+                as: "Permisos",
                 attributes: ['Funciones_pk'],
             }
         });
@@ -89,13 +92,17 @@ exports.mostrarUsuarios = async(req, res) => {
 
 
 exports.detallesUsuario = async(req, res) => {
+    const {correo} = req.params
 
     try {
-        const usuarios = await Usuarios.findAll({
-            attributes: ['correo']
+        const usuario = await Usuarios.findOne({
+            where:{correo: correo}
         });
+        const permisos = await Permisos.findAll({
+            where:{Usuarios_pk: usuario.pk}
+        })
 
-        res.json(usuarios);
+        res.json({usuario, permisos});
     } catch (error) {
         res.status(500).json(userView.errorUsuario('Error al obtener los usuarios: ' + error));
     }

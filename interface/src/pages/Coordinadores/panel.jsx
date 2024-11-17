@@ -27,11 +27,12 @@ const ViewUser = () => {
   const navigate = useNavigate();
   const [usuarios, setUsuarios] = useState([]);
   const [error, setError] = useState(null);
+  const p = peticionUsuarios()
 
   useEffect(() => {
     const cargarUsuarios = async () => {
       try {
-        const data = await peticionUsuarios().obtenerUsuarios();
+        const data = await p.obtenerUsuarios();
         setUsuarios(data);
       } catch (err) {
         setError(err.message);
@@ -41,7 +42,7 @@ const ViewUser = () => {
   }, []);
 
   const handleEdit = (id) => {
-    navigate(`/usuarios/edit/${id}`);
+    navigate(`/coordinadores/edit/${id}`);
   };
 
   return (
@@ -71,14 +72,14 @@ const ViewUser = () => {
             </thead>
             <tbody>
               {usuarios.map((usuario) => (
-                <tr key={usuario.id}>
+                <tr key={usuario.pk}>
                   <td className="border px-4 py-2">{`${usuario.nombres} ${usuario.apellido_p} ${usuario.apellido_m}`}</td>
                   <td className="border px-4 py-2">{usuario.correo}</td>
                   <td className="border px-4 py-2">{usuario.estado ? 'Activo' : 'Inactivo'}</td>
                   <td className="border px-4 py-2">
                     <button
                       className="bg-blue-500 text-white px-2 py-1 rounded"
-                      onClick={() => handleEdit(usuario.id)}
+                      onClick={() => handleEdit(usuario.correo)}
                     >
                       Editar
                     </button>

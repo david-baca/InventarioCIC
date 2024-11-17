@@ -145,7 +145,7 @@ CREATE TABLE IF NOT EXISTS `inventariocic`.`Usuarios` (
   `nombres` VARCHAR(100) NOT NULL,
   `apellido_p` VARCHAR(50) NOT NULL,
   `apellido_m` VARCHAR(50) NOT NULL,
-  `correo` VARCHAR(250) NOT NULL,
+  `correo` VARCHAR(250) NOT NULL UNIQUE,
   `master` TINYINT(1) NOT NULL,
   `disponible` TINYINT(1) NOT NULL,
   PRIMARY KEY (`pk`)
