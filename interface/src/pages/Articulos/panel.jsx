@@ -111,7 +111,7 @@ const ViewArticle = () => {
               </Componentes.Table.encabezado>
             </Componentes.Table.columna>
             {data.map((element) => (
-              <Componentes.Table.columna key={element.pk} Onclik={handleTable}>
+              <Componentes.Table.columna key={element.pk}>
                 <Componentes.Table.fila>{element.no_inventario}</Componentes.Table.fila>
                 <Componentes.Table.fila>{element.nombre}</Componentes.Table.fila>
                 <Componentes.Table.fila>{element.costo}</Componentes.Table.fila>
