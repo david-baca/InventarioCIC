@@ -1,7 +1,7 @@
-const fila = ({ children }) => {
+const fila = ({ children, Onclik }) => {
     return (
         <th className="border border-UP-Opaco
-         text-UP-Opaco font-roboto font-medium">
+         text-UP-Opaco font-roboto font-medium" onClick={Onclik}>
             <div className="flex justify-center gap-2">
             {children}
             </div>
