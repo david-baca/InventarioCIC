@@ -143,6 +143,12 @@ const ViewUserEdit = () => {
 
         <div className="mb-4">
           <h3 className="text-lg font-bold mb-2">Editar Permisos:</h3>
+          <div className="flex items-center justify-around bg-UP-Secundario text-UP-Blanco mb-4  h-10  ">
+            <h2>Permiso</h2>
+            <h2>Visualisacion</h2>
+            <h2>Creacion</h2>
+            <h2>Edicion</h2>
+          </div>
           {Object.entries(permisosDisponibles).map(([categoria, listaPermisos]) => (
             <div key={categoria} className="justify-around mb-2 table-auto w-full text-UP-Opaco flex grid-flow-col gap-4">
               <h4 className="font-semibold">{categoria}</h4>
@@ -164,7 +170,7 @@ const ViewUserEdit = () => {
 
         
 
-        <div className="flex justify-between mt-6">
+        <div className="flex  space-x-16 ">
           <Components.Botones.Cancelar type="button" onClick={handleCancel} text="Cancelar" />
           <Components.Botones.ConfirmarVerde type="submit" onClick={handleSubmit} text="Confirmar" />
         </div>
