@@ -47,12 +47,6 @@ const ViewStoreLoad = () => {
 
   return (
     <div className="h-[1266px] flex-col justify-start items-start inline-flex">
-      <div className="self-stretch h-[62px] p-5 bg-[#590100] shadow justify-between items-center inline-flex">
-        <div className="text-white text-3xl font-semibold font-['Montserrat']">
-          Bienvenido Fernando Castillo
-        </div>
-        <div className="text-white text-[25px] font-medium font-['Roboto']">Cerrar Sesion</div>
-      </div>
       <div className="self-stretch grow shrink basis-0 px-[50px] pt-[50px] flex-col justify-start items-center gap-[35px] flex">
         <div className="self-stretch h-[91px] justify-start items-start gap-9 flex">
           <div className="self-stretch px-[50px] py-6 bg-[#590100] justify-center items-center gap-2.5 inline-flex">
