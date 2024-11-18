@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import TarjetaSoloTitulo from "../../components/TarjetaSoloTitulo";
 import TarjetaTituloContenido from "../../components/TarjetaTituloContenido";
-import Buscador from "../../components/Buscador"; 
+import Buscador from "../../components/buscador"; 
 
 const ViewStoreLoad = () => {
  
@@ -104,13 +104,18 @@ const ViewStoreLoad = () => {
             <div 
               className="h-[54px] w-[410px] p-4 bg-[#590100] rounded-[100px] justify-center items-center inline-flex"
               onClick={handleSave}
-            >
+            >             
               <div className="text-white text-[20px] font-medium font-['Roboto']">Guardar</div>
             </div>
           </div>
         </div>
       </div>
     </div>
+
+
+
+
+
   );
 };
 
