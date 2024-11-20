@@ -95,7 +95,7 @@ const ViewUserEdit = () => {
   };
 
   const handleCancel = () => {
-    navigate('/panel');
+    navigate('../coordinadores');
   };
 
   if (!usuario) {
@@ -103,47 +103,55 @@ const ViewUserEdit = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center p-4">
+    <div className="min-h-screen  flex flex-col items-center p-4">
       {success && <Components.Modals.success mensaje={success} />}
       {error && <Components.Modals.error mensaje={error} />}
-      <main className="w-full bg-white rounded-lg shadow-lg mt-6 p-6">
+      <main className="w-full rounded-lg mt-6 p-6">
         <h2 className="flex items-center text-2xl font-bold bg-UP-Secundario text-UP-Blanco mb-4 pl-8 h-20 w-38 ">Administración de Permisos</h2>
         
         <div className='flex w-full '>
-          <p className="text-UP-Opaco mb-6 pr-32">Llena todos los campos para continuar</p>
+          <p className="text-UP-Negro mb-6 w-full font-bold">Estos son los permisos del Inventario.</p>
           
-          <div className="">
-            <label className="block text-gray-700 font-bold">Estado:</label>
+          <div className="flex items-center">
+            <label className="ml-auto text-UP-Opaco font-bold">Estado:</label>
             <button
               type="button"
               onClick={handleEstadoChange}
-              className={`px-4 py-2 rounded ${estado === 1 ? 'bg-UP-Exito' : 'bg-UP-Error'} text-white`}
+              className={`ml-auto px-1 py-1 rounded-lg ${estado === 1 ? 'bg-UP-Exito' : 'bg-UP-Error'} text-white`}
             >
               {estado === 1 ? 'Activo' : 'Inactivo'}
             </button>
           </div>
         </div>
+
+        <div className="overflow-x-auto mb-6 w-full ">
+
+          <div className="flex items-center justify-around bg-UP-Secundario text-UP-Blanco mb-4  h-10">
+            <th >Correo</th>
+            <th>Usuario</th>
+          </div>
+
+          <div className="flex items-center justify-around">
+
+            <div >
+              <td >{usuario.correo}</td>
+            </div>
+
+            <div>
+              <td >{usuario.nombres}</td>
+              <td>{usuario.apellido_p}</td>
+              <td>{usuario.apellido_m}</td>
+            </div>
+
+          </div>
+
+        </div>
         
 
-        <table className="table-auto mb-6 w-full ">
-          <div>            
-          <th className="text-left px-4 py-2">Nombre:</th>
-          <th className="text-left px-4 py-2">Apellido Paterno:</th>
-          <th className="text-left px-4 py-2">Apellido Materno:</th>
-          <th className="text-left px-4 py-2">Correo:</th>
-          </div>
-
-          <div className='max-w-4xl'>
-            <td className="border px-4 py-2 ">{usuario.nombres}</td>
-            <td className="border px-4 py-2 " w-full>{usuario.apellido_p}</td>
-            <td className="border px-4 py-2 ">{usuario.apellido_m}</td>
-            <td className="border px-4 py-2 ">{usuario.correo}</td>
-          </div>
-        </table>
 
         <div className="mb-4">
           <h3 className="text-lg font-bold mb-2">Editar Permisos:</h3>
-          <div className="flex items-center justify-around bg-UP-Secundario text-UP-Blanco mb-4  h-10  ">
+          <div className="flex items-center justify-around bg-UP-Secundario text-UP-Blanco mb-4  h-10">
             <h2>Permiso</h2>
             <h2>Visualisacion</h2>
             <h2>Creacion</h2>
@@ -154,13 +162,13 @@ const ViewUserEdit = () => {
               <h4 className="font-semibold">{categoria}</h4>
               {listaPermisos.map((permiso) => (
                 <label key={permiso} className="inline-flex items-center mr-4">
-                  <input
+                  <Components.Labels.checkbox
                     type="checkbox"
                     value={permiso}
                     checked={permisos.includes(permiso)}
                     onChange={() => handleCheckboxChange(permiso)}
-                    className="form-checkbox"
-                  />
+                    className="form-checkbox">
+                  </Components.Labels.checkbox>
                   
                 </label>
               ))}

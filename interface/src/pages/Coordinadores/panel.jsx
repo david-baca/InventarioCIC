@@ -47,15 +47,22 @@ const ViewUser = () => {
 
   return (
     <div className="min-h-screen bg-UP-Blanco flex flex-col items-center p-4 justify-between">
-      <main >
-            <div className="flex justify-between mt-6">
+      <main className="w-full rounded-lg mt-6 p-6">
+            <div className="justify-between mt-6">
               <div>
-                <h2 className="text-2xl font-bold text-UP-Secundario mb-2">Administración de permisos</h2>
-                <p className="text-gray-600 mb-4">Estos son los permisos del Inventario. Los cambios se hacen en tiempo real.</p>
+                <h2 className="flex items-center text-2xl font-bold bg-UP-Secundario text-UP-Blanco mb-4 pl-8 h-20 w-38 ">Administración de permisos</h2>
+                <div className='flex'>
+                  <div>
+                    <p className="text-UP-Opaco mb-4">Estos son los permisos del Inventario. </p>
+                    <p className="text-UP-Opaco mb-4">Los cambios se hacen en tiempo real.</p>
+                  </div>
+
+                  <Link to="./load/" className="inline-block font-bold w-24 py-5 ml-auto" >
+                    <Componentes.Botones.Crear/>
+                  </Link>
+                  
+                </div>
               </div>
-            <Link to="./load/" className="inline-block font-bold w-24 py-5" >
-              <Componentes.Botones.Crear/>
-            </Link>
             </div>
             
         <div className="bg-UP-Blanco ">
@@ -77,13 +84,13 @@ const ViewUser = () => {
                     <td className="border px-4 py-2">{usuario.correo}</td>
                     <td className="border px-4 py-2">{usuario.estado ? 'Activo' : 'Inactivo'}</td>
                     <td className="border px-4 py-2">
-                      
-                      <button
-                        className="bg-UP-Primario text-white py-1 px-4 rounded-full text-sm hover:bg-UP-Auxiliar transition duration-300"
-                        onClick={() => handleEdit(usuario.correo)}
-                      >
-                        Editar
-                      </button>
+
+                      <div className='flex place-items-center w-full'>
+                        <button className="bg-UP-Primario text-UP-Blanco py-1 px-4 rounded-lg text-sm hover:bg-UP-Auxiliar transition duration-300 place-items-center"
+                          onClick={() => handleEdit(usuario.correo)}>
+                          Editar
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
