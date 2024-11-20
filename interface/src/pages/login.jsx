@@ -4,30 +4,12 @@ import axios from 'axios';
 //import { signInWithPopup, auth, provider } from './firebase';
 import { Link } from 'react-router-dom';
 import Logo from "../../public/img/upqroo.png"
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "./firebase"; // Importa la configuración
 
 const ViewLogin = () => {
 
-  // const handleGoogleLogin = async () => {
-  //   try {
-  //     const result = await signInWithPopup(auth, provider);
-  //     const user = result.user;
-  //     const email = user.email;
-
-  //     // Verifica el correo en la base de datos (esta mal, hay que ajustarlo a la api)
-  //     const response = await axios.post('/api/verificarCorreo', { email });
-
-  //     if (response.data.registrado) {
-  //       alert('Inicio de sesión exitoso');
-  //       // Redirige al usuario a la página principal o panel
-  //     } else {
-  //       alert('Correo no registrado en el sistema');
-  //       // Opcional: Redirige a una página de registro o muestra un mensaje
-  //     }
-  //   } catch (error) {
-  //     console.error('Error en la autenticación con Google:', error);
-  //     alert('Hubo un error al iniciar sesión');
-  //   }
-  // };
+  
 
   return (
     <>
