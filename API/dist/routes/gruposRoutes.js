@@ -5,7 +5,8 @@ const gruposMiddlewares = require('../middlewares/gruposMiddlewares');
 const grupoController = require('../controllers/gruposController');
 
 // Endpoint para buscar grupos
-router.get('/search/:query', grupoController.buscarGrupos);
+router.get('/', grupoController.buscarGrupos);
+router.get('/:query', grupoController.buscarGrupos);
 
 // Endpoint para buscar grupos
 router.get('/details/:pk', grupoController.detallesGrupo);

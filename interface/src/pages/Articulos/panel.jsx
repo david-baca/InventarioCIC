@@ -75,6 +75,7 @@ const ViewArticle = () => {
     navigate(`/articles/detalles/${encodeURIComponent(pk)}`);
   };
 
+  
   const handleSearchChange = (value) => {
     setQuery(value);
 

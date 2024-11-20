@@ -211,22 +211,41 @@ exports.detallesArticulo = async (req, res) => {
         res.status(500).json({ error: 'Error al obtener los detalles del artículo: ' + error.message });
     }
 };
-
 exports.articulosSinGrupo = async (req, res) => {
-    const { fk_Grupo_execpcion } = req.params;
-
+    const { fk_execpcion, query } = req.params; // Extraemos la excepción y el query
     try {
+        const whereConditions = {
+            disponible: 1,
+            Grupos_pk: { [Op.is]: null },
+        };
+
+        if (query && query !== null) {
+            whereConditions[Op.or] = [
+                { nombre: { [Op.like]: `%${query}%` } },
+                { no_inventario: { [Op.like]: `%${query}%` } }
+            ];
+        }
+
+        // Realizamos la consulta con las condiciones correspondientes
         const resultado = await Articulos.findAll({
-            where: {
-                Grupos_pk: { [Op.ne]: fk_Grupo_execpcion },
-                disponible: 1
-            }
+            where: whereConditions
         });
+        // Si fk_execpcion tiene un valor válido, excluimos los artículos de ese grupo
+        if (fk_execpcion && fk_execpcion !== 'null') {
+            const exeptionres = await Articulos.findAll({
+                where: {
+                    disponible: 1,
+                    Grupos_pk: fk_execpcion,
+                }
+            });
+            return res.json({articulos:[...resultado, ...exeptionres]});
+        }
         res.json({ articulos: resultado });
     } catch (error) {
         res.status(500).json({ error: 'Error al obtener artículos sin grupo' });
     }
 };
+
 
 exports.articulosSinArea = async (req, res) => {
     const { fk_Area_execpcion } = req.params;

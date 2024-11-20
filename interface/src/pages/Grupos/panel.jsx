@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Componentes from "../../components";
 
 // Función de petición para buscar grupos
 export const peticion = () => {
@@ -9,7 +10,7 @@ export const peticion = () => {
 
   const Buscar = async (query) => {
     try {
-      const response = await instance.get(`/grupos/search/${query}`);
+      const response = await instance.get(`/grupos/${query}`);
       return response.data.grupos; // Ajusta según la respuesta esperada
     } catch (error) {
       console.error(error.response?.data?.error || error.message);
@@ -28,9 +29,9 @@ const ViewGrup = () => {
   const [query, setQuery] = useState('');
   const Peticion = peticion();
 
+  // Cargar datos de los grupos cada vez que cambia la query
   useEffect(() => {
     const cargarData = async () => {
-      if (!query) return; // Evitar llamada a la API si la query está vacía
       setError(null);
       setData([]);
 
@@ -44,49 +45,89 @@ const ViewGrup = () => {
     cargarData();
   }, [query]);
 
+  // Funciones para manejar las acciones de los botones
   const handleCreate = () => {
-    navigate('./cargar');
+    navigate('/grups/load');
   };
 
   const handleEdit = (pk) => {
-    navigate(`/grupos/edit/${pk}`);
+    navigate("/grups/edit/"+pk);
   };
 
   const handleDelete = (pk) => {
-    navigate(`/grupos/baja/${pk}`);
+    navigate(`/grups/baja/${pk}`);
+  };
+
+  const handleSearchChange = (value) => {
+    setQuery(value);
+
+    // Si hay un timeout previo, lo limpiamos
+    if (debounceTimeout) {
+      clearTimeout(debounceTimeout);
+    }
+
+    // Establecemos un nuevo timeout para la búsqueda después de 500ms
+    const newTimeout = setTimeout(() => {
+      cargarData(value); // Llamamos a cargarData después de 500ms
+    }, 500);
+
+    setDebounceTimeout(newTimeout);
   };
 
   return (
     <>
-      <div className="bg-blue-950 flex flex-col">
-        <button onClick={handleCreate}>Crear</button>
+      <Componentes.Modals.success mensaje={null} />
+      <Componentes.Modals.info mensaje={null} />
+      <Componentes.Modals.error mensaje={error} action={() => setError(null)} />
+
+      <Componentes.Inputs.TitleHeader text={"Administración de Grupos"} />
+
+      <div className='flex items-center'>
+        <div className='flex items-center w-[100%]'>
+          <Componentes.Inputs.TitleSubtitle 
+            titulo={"Estos son los grupos disponibles."}
+            contenido={"busque por nombre o descripción del grupo"} 
+          />
+        </div>
+        <div className='flex items-center w-[100%]'>
+          <Componentes.Buscador query={query} OnChange={handleSearchChange} />
+          
+          <Componentes.Botones.Crear onClick={handleCreate} />
+        </div>
       </div>
-      <div className="bg-gray-900 flex flex-col">
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Buscar grupos..."
-          className="mb-4 p-2"
-        />
-        {error && <div className="text-red-600">{error}</div>}
-        {data.length > 0 ? (
-          data.map((element) => (
-            <div key={element.pk} className="bg-blue-600 p-2 flex justify-between">
-              <div>
-                <h1>{element.nombre}</h1>
-                <p>Descripción: {element.descripcion}</p>
-              </div>
-              <div>
-                <button onClick={() => handleEdit(element.pk)}>Editar</button>
-                <button onClick={() => handleDelete(element.pk)}>Eliminar</button>
-              </div>
-            </div>
-          ))
-        ) : (
-          <h1 className="text-gray-500">No hay datos disponibles</h1>
-        )}
-      </div>
+
+      {/* Mostrar los grupos si existen */}
+      {data.length > 0 ? (
+        <Componentes.Table.table>
+          <Componentes.Table.columna>
+            <Componentes.Table.encabezado>Nombre</Componentes.Table.encabezado>
+            <Componentes.Table.encabezado>Descripción</Componentes.Table.encabezado>
+            <Componentes.Table.encabezado>Acciones</Componentes.Table.encabezado>
+          </Componentes.Table.columna>
+
+          {data.map((element) => (
+            <Componentes.Table.columna key={element.pk}>
+              <Componentes.Table.fila children={element.nombre}/>
+              <Componentes.Table.fila children={element.descripcion}/>
+              <Componentes.Table.fila>
+                  <Componentes.Botones.iconPencil 
+                    Onclik={() => handleEdit(element.pk)} 
+                  />
+                  <Componentes.Botones.iconTrash 
+                    Onclik={() => handleDelete(element.pk)} 
+                  />
+              </Componentes.Table.fila>
+            </Componentes.Table.columna>
+          ))}
+        </Componentes.Table.table>
+      ) : (
+        <div className='flex justify-center h-full items-center'>
+          <Componentes.Inputs.TitleSubtitle 
+            titulo={"No hay Grupos que mostrar"} 
+            contenido={"no se encontraron resultados"} 
+          />
+        </div>
+      )}
     </>
   );
 };

@@ -1,4 +1,5 @@
 const { Articulos } = require("../model");
+const { Op } = require('sequelize');
 // Middleware para validar los datos de creación de un nuevo grupo
 exports.createGrupo = async (req, res, next) => {
     try {
@@ -9,22 +10,30 @@ exports.createGrupo = async (req, res, next) => {
         if (!descripcion) errores.push('Es necesario definir la (descripcion) del grupo.');
         else if (descripcion.length > 250) errores.push('La (descripcion) del grupo no debe exceder los 250 caracteres.');
         if (articulos && articulos.length > 0) {
-            const idsArticulos = articulos.map(articulo => articulo.pk);
-            const articulosAsociados = await Articulos.findAll({
-                where: {
-                    pk: idsArticulos,
-                    Grupos_pk: { [Op.ne]: null }
+            let articulosAsociados = []; // Usamos un arreglo para almacenar los artículos asociados
+        
+            // Iteramos sobre los artículos para verificar si ya están asociados a otro grupo
+            for (let i = 0; i < articulos.length; i++) {
+                const articulo = await Articulos.findAll({
+                    where: {
+                        pk: articulos[i].pk,
+                        Grupos_pk: { [Op.ne]: null }  // Verifica que no esté asociado a ningún grupo
+                    }
+                });
+        
+                // Si se encuentran artículos asociados, los agregamos al arreglo
+                if (articulo && articulo.length > 0) {
+                    articulosAsociados.push(articulo[0]);  // Suponiendo que 'articulo' es un arreglo
                 }
-            });
+            }
+        
+            // Si encontramos artículos ya asociados, agregamos el mensaje de error
             if (articulosAsociados.length > 0) {
                 errores.push('Algunos artículos ya están asociados a otro grupo.');
             }
         }
-        if (errores.length > 0) {
-            return res.status(400).json({ error: errores.join(' ') });
-        }
     } catch (error) {
-        return res.status(500).json({ error: 'Error en la validación del grupo' });
+        return res.status(500).json({ error: 'Error en la validación del grupo'+error });
     }
     next();
 };
