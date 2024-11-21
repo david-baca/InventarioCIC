@@ -1,6 +1,6 @@
 const grupoView = require('../views/gruposView');
 const { Grupos, Articulos } = require('../model'); // Asegúrate de tener el modelo Grupos importado
-const { Op } = require('sequelize');
+const { Op, where } = require('sequelize');
 // Buscar grupos
 exports.buscarGrupos = async (req, res) => {
     const { query } = req.params; // Extraemos el query
@@ -63,44 +63,35 @@ exports.editarGrupo = async (req, res) => {
     const { nombre, descripcion, articulos } = req.body; // Captura la lista de artículos (pks)
     
     try {
-        console.log("Paso 0");
         const grupo = await Grupos.findByPk(id);
         if (!grupo) {
             return res.status(404).json(grupoView.errorGrupo('Grupo no encontrado'));
         }
-        
-        console.log("Paso 1");
-        // Actualiza los detalles del grupo
         await grupo.update({ nombre, descripcion });
-        
-        // Elimina los artículos previamente asignados a este grupo
-        
-            // Primero, desasociamos los artículos del grupo actual (eliminamos el valor de Grupos_pk)
-            await Articulos.update(
-                { Grupos_pk: null },  // Establece el campo Grupos_pk a null
-                { where: { Grupos_pk: grupo.pk } }  // Solo actualizamos los artículos que están actualmente asignados a este grupo
-            );
-        
-        
-        console.log("Paso 2");
-        console.log(articulos)
+        await Articulos.update(
+            { Grupos_pk: null },  // Establece el campo Grupos_pk a null
+            { where: { Grupos_pk: grupo.pk } }  // Solo actualizamos los artículos que están actualmente asignados a este grupo
+        );
         // Ahora, asociamos los artículos seleccionados al grupo editado
         if (articulos && articulos.length > 0) {
-            console.log("Asociando artículos con los PKs:", articulos);
-
-            // Actualizamos los artículos seleccionados con el grupo actual
-            await Articulos.update(
-                { Grupos_pk: grupo.pk },  // Establece el grupo al que están asociados los artículos
-                { where: { pk: articulos } }  // Filtramos por los pks de los artículos seleccionados
-            );
+            for (let i = 0; i < articulos.length; i++) {
+                const x = await Articulos.findByPk(articulos[i]);  // Encuentra el artículo por su PK
+                console.log(x);
+                if (x) {
+                    x.Grupos_pk = grupo.pk
+                    await x.save();  // Guarda los cambios
+                    console.log('Artículo actualizado: ', x);
+                } else {
+                    console.log(`No se encontró el artículo con PK ${articulos[i]}`);
+                }
+            }
         }
 
         console.log("Paso 3");
         // Retorna la respuesta con el grupo actualizado
         res.json(grupoView.confirmacionEdicion(grupo));
     } catch (error) {
-        console.error("Error en la edición del grupo:", error);
-        res.status(500).json({ error: 'Error al editar el grupo' });
+        res.status(500).json({ error: 'Error al editar el grupo'+ error });
     }
 };
 

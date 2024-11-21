@@ -91,7 +91,7 @@ const ViewGrupEdit = () => {
     setSelectedArticulos((prevSelected) => {
       if (prevSelected.includes(articulo.pk)) {
         // Si ya está seleccionado, lo eliminamos
-        return prevSelected.filter((pk) => pk !== articulo.pk);
+        return prevSelected.filter((item) => item !== articulo.pk);
       } else {
         // Si no está seleccionado, lo añadimos
         return [...prevSelected, articulo.pk];
@@ -115,7 +115,7 @@ const ViewGrupEdit = () => {
     e.preventDefault();
     try {
     await Peticion.Editar(pk, 
-      { nombre, descripcion, articulos: {...selectedArticulos} })
+      { nombre, descripcion, articulos: [...selectedArticulos] })
       setSuccess(success.message)
     } catch (err) {
       setError(err.message);
@@ -147,7 +147,7 @@ const ViewGrupEdit = () => {
               <Componentes.Table.encabezado children={"Acciones"}/>
           </Componentes.Table.columna>
           {articulos.map((articulo) => (
-            <Componentes.Table.columna key={articulo.id}>
+            <Componentes.Table.columna key={articulo.pk}>
               <Componentes.Table.fila children={articulo.no_inventario}/>
               <Componentes.Table.fila children={articulo.nombre}/>
               <Componentes.Table.fila children={articulo.costo}/>

@@ -70,7 +70,7 @@ const ViewGrupLoad = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Create group with selected articles
+      // Create group with selected articles 
       await Peticion.Crear({ nombre, descripcion, articulos: selectedArticulos });
       setSuccess("Grupo correctanente guardado")
     } catch (error) {

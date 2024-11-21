@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
-// Función de petición para obtener detalles de un grupo
+// Función de petición para obtener detalles de un grupo 
 export const peticionDetallesGrupo = () => {
   const baseApi = import.meta.env.VITE_BASE_API;
   const instance = axios.create({ baseURL: baseApi });
