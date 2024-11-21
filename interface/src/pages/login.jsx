@@ -1,11 +1,10 @@
-import React, { useState } from "react";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Link } from 'react-router-dom';
 import Logo from "../../public/img/upqroo.png"
 import { useAuth } from '../context/AuthContext';
-import {saveToLocalStorage,getFromLocalStorage} from '../context/Credentials';
+import {saveToLocalStorage, getFromLocalStorage} from '../context/Credentials';
 
 const peticionUsuarios = () => {
   const section = 'usuarios';
@@ -32,31 +31,27 @@ const peticionUsuarios = () => {
 const ViewLogin = () => {
   const auth = useAuth();
   const Peticiones = peticionUsuarios()
-  
-
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState(null);
+  const local = getFromLocalStorage();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    console.log(local)
+    if (local != null ) {
+      navigate('/articles');
+    }
+  }, [local, navigate]);
 
   const handleGoogle = async (e) => {
     e.preventDefault();
-
     if (!auth) {
       console.error('Auth context is not available');
       return;
     }
-
     try {
       const credential = await auth.loginWithGoogle();
-      const { email } = credential.user;
+      const email = credential.user.email;
       const response = Peticiones.obtenerUsuario(email)
-      
-
-      if (response.status === 200) {
-        saveToLocalStorage(response);
-      console.log(response)
-      }
+      saveToLocalStorage(response);
     } catch (e) {
       console.log('Error al leer el email de la base de datos', e);
       auth.logout();
