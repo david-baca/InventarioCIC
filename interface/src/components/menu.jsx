@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import logo from "../../public/img/upqroo.png";
 import menu from "../../public/img/menu.svg";
+import { clearFromLocalStorage } from '../context/Credentials';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+
 const options = [
   { name: "Inicio", path: "/" },
   { name: "Artículos", path: "/articles" },
@@ -29,6 +33,14 @@ const Menu = ({ children }) => {
   const location = useLocation();
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768); // Cambia el tamaño según tus necesidades
+
+  const navigate = useNavigate();
+  const auth = useAuth();
+  const exit = () => {
+    clearFromLocalStorage();
+    auth?.logout();
+    navigate(0);
+  };
 
   const toggleMenu = () => {
     setIsMenuVisible((prev) => !prev);
@@ -75,7 +87,7 @@ const Menu = ({ children }) => {
               </button>
             )}
             <h1 className='font-semibold font-montserrat text-xl sm:text-base md:text-lg lg:text-xl'>Bienvenido Fernando Castillo</h1>
-            <button className='bottom-3 font-roboto font-medium'>Cerrar sesión</button>
+            <button className='bottom-3 font-roboto font-medium' onClick={exit} >Cerrar sesión</button>
           </div>
           <div className='p-5 min-w-[100%] max-w-[100%] h-[90%] overflow-scroll flex flex-col gap-4'>
             {children}

@@ -108,3 +108,22 @@ exports.detallesUsuario = async(req, res) => {
     }
     
 };
+
+// exports.verificarCorreo = async (req, res) => {
+//     try {
+//       const { correo } = req.params;
+  
+//       const usuario = await Usuarios.findOne({
+//         where: { correo },
+//         attributes: ["pk", "nombres", "apellido_p", "apellido_m", "correo"],
+//       });
+  
+//       if (!usuario) {
+//         return res.status(404).json({ error: "Correo no encontrado" });
+//       }
+  
+//       res.json(usuario);
+//     } catch (error) {
+//       res.status(500).json({ error: "Error al verificar el correo: " + error });
+//     }
+//   };
