@@ -1,4 +1,4 @@
-const KEY_CREDENTIAL = import.meta.env.VITE_BASE_API
+const KEY_CREDENTIAL = import.meta.env.VITE_KEY_CREDENTIAL
 // Función para guardar las credenciales en localStorage
 export const saveToLocalStorage = (credencial) => {
   console.log(credencial)
