@@ -11,14 +11,14 @@ function App() {
           {/* Rutas que incluyen el menú */}
           <Route path="/articles" element={<Menu children={<Page.Articles.panel />} />} />
           <Route path="/articles/edit/:pk" element={<Menu children={<Page.Articles.edit />} />} />
-          <Route path="/articles/detalles/:no_inventario" element={<Menu children={<Page.Articles.information />} />} />
+          <Route path="/articles/detalles/:pk" element={<Menu children={<Page.Articles.information />} />} />
           <Route path="/articles/cargar" element={<Menu children={<Page.Articles.load />} />} />
           <Route path="/articles/removal/:pk" element={<Menu children={<Page.Articles.removal />} />} />
-          <Route path="/groups" element={<Menu children={<Page.Groups.panel />} />} />
-          <Route path="/groups/edit/:pk" element={<Menu children={<Page.Groups.edit />} />} />
-          <Route path="/groups/information/:pk" element={<Menu children={<Page.Groups.information />} />} />
-          <Route path="/groups/load" element={<Menu children={<Page.Groups.load />} />} />
-          <Route path="/groups/removal/:pk" element={<Menu children={<Page.Groups.removal />} />} />
+          <Route path="/grups" element={<Menu children={<Page.Groups.panel />} />} />
+          <Route path="/grups/edit/:pk" element={<Menu children={<Page.Groups.edit />} />} />
+          <Route path="/grups/information/:pk" element={<Menu children={<Page.Groups.information />} />} />
+          <Route path="/grups/load" element={<Menu children={<Page.Groups.load />} />} />
+          <Route path="/grups/removal/:pk" element={<Menu children={<Page.Groups.removal />} />} />
           <Route path="/almacen" element={<Menu children={<Page.Almacen.panel />} />} />
           <Route path="/almacen/edit/:pk" element={<Menu children={<Page.Almacen.edit />} />} />
           <Route path="/almacen/information/:pk" element={<Menu children={<Page.Almacen.information />} />} />
