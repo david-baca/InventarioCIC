@@ -28,13 +28,10 @@ const ViewArea = () => {  // Cambié el nombre de "ViewGrup" a "ViewArea"
   const [error, setError] = useState(null);
   const [query, setQuery] = useState('');
   const Peticion = peticion();
-
-  // Cargar datos de las áreas cada vez que cambia la query
   useEffect(() => {
     const cargarData = async () => {
       setError(null);
       setData([]);
-
       try {
         const result = await Peticion.Buscar(query);
         setData(result);
@@ -44,7 +41,6 @@ const ViewArea = () => {  // Cambié el nombre de "ViewGrup" a "ViewArea"
     };
     cargarData();
   }, [query]);
-
   // Funciones para manejar las acciones de los botones
   const handleCreate = () => {
     navigate('/almacen/load');  // Ruta para crear una nueva área
@@ -128,5 +124,4 @@ const ViewArea = () => {  // Cambié el nombre de "ViewGrup" a "ViewArea"
     </>
   );
 };
-
 export default ViewArea;
