@@ -11,9 +11,7 @@ const areasRoutes = require('./dist/routes/areasRoutes');
 const asignacionesRoutes = require('./dist/routes/asignacionesRoutes');
 const sequelize = require('./dist/config/database');
 const app = express();
-require('dotenv').config();
 const port_front = process.env.ORIGIN_PORT_FRONT || 3720;
-
 // Configuración básica de CORS para permitir todas las solicitudes
 app.use(cors({
     origin: `*`, // Permitir solicitudes solo desde este dominio

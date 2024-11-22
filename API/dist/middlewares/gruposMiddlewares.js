@@ -77,9 +77,9 @@ exports.bajaGrupo = async (req, res, next) => {
         if (asociado.length > 0) errores.push('Asegúrese que ningún artículo esté asociado a este grupo.');
         if (!motivo) errores.push('Es necesario definir el (motivo) para dar de baja el grupo.');
         else if (motivo.length > 250) errores.push('El (motivo) no debe exceder los 250 caracteres.');
-        if (errores.length > 0) return res.status(400).json({ error: errores.join(' ') });
+        if (errores.length > 0) return res.status(400).json({ message: errores.join(' ') });
     } catch (error) {
-        return res.status(500).json({ error: 'Error en la validación de la baja del grupo' });
+        return res.status(500).json({ message: 'Error en la validación de la baja del grupo' });
     }
     next();
 };

@@ -25,9 +25,23 @@ export const peticion = () => {
 const ViewGrup = () => {
   const navigate = useNavigate();
   const [data, setData] = useState([]);
-  const [error, setError] = useState(null);
   const [query, setQuery] = useState('');
   const Peticion = peticion();
+  const [error, setError] = useState();
+  const [showInfo, setShowInfo] = useState(); 
+  const [success, setSuccess] = useState(); 
+
+  
+  const handleActionInfo = () => {
+    setShowInfo(null); 
+  };
+  const handleActionError = () => {
+    setError(null); 
+  };
+  const handleActionSuccess= () => {
+    setSuccess(null); 
+    navigate('/grups');
+  };
 
   // Cargar datos de los grupos cada vez que cambia la query
   useEffect(() => {
@@ -55,7 +69,7 @@ const ViewGrup = () => {
   };
 
   const handleDelete = (pk) => {
-    navigate(`/grups/baja/${pk}`);
+    navigate(`/grups/removal/${pk}`);
   };
 
   const handleSearchChange = (value) => {
@@ -76,9 +90,9 @@ const ViewGrup = () => {
 
   return (
     <>
-      <Componentes.Modals.success mensaje={null} />
-      <Componentes.Modals.info mensaje={null} />
-      <Componentes.Modals.error mensaje={error} action={() => setError(null)} />
+      <Componentes.Modals.success mensaje={success} action={handleActionSuccess} />
+      <Componentes.Modals.info mensaje={showInfo} action={handleActionInfo} />
+      <Componentes.Modals.error mensaje={error} action={handleActionError} />
 
       <Componentes.Inputs.TitleHeader text={"Administración de Grupos"} />
 

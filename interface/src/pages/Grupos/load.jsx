@@ -46,12 +46,12 @@ const ViewGrupLoad = () => {
   const handleActionInfo = () => {
     setShowInfo(null); 
   };
-  const handleActionEror = () => {
+  const handleActionError = () => { 
     setError(null); 
   };
   const handleActionSuccess= () => {
     setSuccess(null); 
-    navigate('/grup');
+    navigate('/grups');
   };
 
   useEffect(() => {
@@ -104,7 +104,7 @@ const ViewGrupLoad = () => {
     <>
     <Componentes.Modals.success mensaje={success} action={handleActionSuccess}/>
       <Componentes.Modals.info mensaje={showInfo} action={handleActionInfo}/>
-      <Componentes.Modals.error mensaje={error} action={handleActionEror}/>
+      <Componentes.Modals.error mensaje={error} action={handleActionError}/>
     <form onSubmit={handleSubmit} className="space-y-4">
       <Componentes.Inputs.TitleHeader text={"Carga de Grupo"} />
       <Componentes.Inputs.TitleSubtitle titulo={"Información del Grupo"} contenido={"Ingrese los detalles del nuevo grupo."} />

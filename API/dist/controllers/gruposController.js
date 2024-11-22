@@ -36,7 +36,7 @@ exports.detallesGrupo = async (req, res) => {
         res.status(500).json({ error: 'Error al obtener los detalles del artículo: ' + error.message });
     }
 };
-// Crear un nuevo grupo
+// Crear un nuevo grupo 
 exports.crearGrupo = async (req, res) => {
     const { nombre, descripcion, articulos } = req.body; // Captura la lista de artículos
     try {
@@ -50,7 +50,7 @@ exports.crearGrupo = async (req, res) => {
             );
         }
 
-        res.json(grupoView.datosGrupoCreado(nuevoGrupo));
+        res.json(grupoView.datosGrupoCreado({message:"grupo exitosamente creado", grupo:nuevoGrupo}));
     } catch (error) {
         res.status(500).json({ error: 'Error al crear el grupo' });
     }
@@ -89,7 +89,8 @@ exports.editarGrupo = async (req, res) => {
 
         console.log("Paso 3");
         // Retorna la respuesta con el grupo actualizado
-        res.json(grupoView.confirmacionEdicion(grupo));
+        res.json(grupoView.confirmacionEdicion({message:"grupo exitosamente editado", grupo:grupo}));
+
     } catch (error) {
         res.status(500).json({ error: 'Error al editar el grupo'+ error });
     }

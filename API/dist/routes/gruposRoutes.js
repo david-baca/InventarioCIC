@@ -18,6 +18,6 @@ router.post('/', gruposMiddlewares.createGrupo, grupoController.crearGrupo);
 router.put('/:id', gruposMiddlewares.editGrupo, grupoController.editarGrupo);
 
 // Endpoint para dar de baja un grupo
-router.delete('/:id/baja', gruposMiddlewares.bajaGrupo, grupoController.darDeBajaGrupo);
+router.patch('/:id/baja', gruposMiddlewares.bajaGrupo, grupoController.darDeBajaGrupo);
 
 module.exports = router;

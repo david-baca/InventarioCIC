@@ -4,11 +4,11 @@ const { Op } = require('sequelize');
 // Middleware para validar los datos de creación de un nuevo área
 exports.createArea = async (req, res, next) => {
     try {
-        const { nombre, descripcion, articulos } = req.body;
+        const { codigo, descripcion, articulos } = req.body;
         let errores = [];
         
-        if (!nombre) errores.push('Es necesario definir el (nombre) del área.');
-        else if (nombre.length > 50) errores.push('El (nombre) del área no debe exceder los 50 caracteres.');
+        if (!codigo) errores.push('Es necesario definir el (codigo) del área.');
+        else if (codigo.length > 50) errores.push('El (codigo) del área no debe exceder los 50 caracteres.');
         
         if (!descripcion) errores.push('Es necesario definir la (descripcion) del área.');
         else if (descripcion.length > 250) errores.push('La (descripcion) del área no debe exceder los 250 caracteres.');
@@ -21,7 +21,7 @@ exports.createArea = async (req, res, next) => {
                 const articulo = await Articulos.findAll({
                     where: {
                         pk: articulos[i].pk,
-                        Areas_pk: { [Op.ne]: null }  // Verifica que no esté asociado a ningún área
+                        Area_pk: { [Op.ne]: null }  // Verifica que no esté asociado a ningún área
                     }
                 });
         
@@ -46,12 +46,12 @@ exports.createArea = async (req, res, next) => {
 
 exports.editArea = async (req, res, next) => {
     try {
-        const { nombre, descripcion, articulos } = req.body;
+        const { codigo, descripcion, articulos } = req.body;
         const { id } = req.params;
         let errores = [];
         
-        if (!nombre) errores.push('Es necesario definir el (nombre) del área.');
-        else if (nombre.length > 50) errores.push('El (nombre) del área no debe exceder los 50 caracteres.');
+        if (!codigo) errores.push('Es necesario definir el (codigo) del área.');
+        else if (codigo.length > 50) errores.push('El (codigo) del área no debe exceder los 50 caracteres.');
         
         if (!descripcion) errores.push('Es necesario definir la (descripcion) del área.');
         else if (descripcion.length > 250) errores.push('La (descripcion) del área no debe exceder los 250 caracteres.');
@@ -61,7 +61,7 @@ exports.editArea = async (req, res, next) => {
             const articulosAsociados = await Articulos.findAll({
                 where: {
                     pk: idsArticulos,
-                    Areas_pk: { [Op.ne]: null },
+                    Area_pk: { [Op.ne]: null },
                     // Excluir el área actual de la búsqueda
                     [Op.and]: [{ pk: { [Op.ne]: id } }]
                 }
@@ -84,15 +84,15 @@ exports.bajaArea = async (req, res, next) => {
         const { motivo } = req.body;
         let errores = [];
         
-        const asociado = await Articulos.findAll({ where: { Areas_pk: id } });
+        const asociado = await Articulos.findAll({ where: { Area_pk: id } });
         if (asociado.length > 0) errores.push('Asegúrese que ningún artículo esté asociado a esta área.');
         
         if (!motivo) errores.push('Es necesario definir el (motivo) para dar de baja el área.');
         else if (motivo.length > 250) errores.push('El (motivo) no debe exceder los 250 caracteres.');
         
-        if (errores.length > 0) return res.status(400).json({ error: errores.join(' ') });
+        if (errores.length > 0) return res.status(400).json({ message: errores.join(' ') });
     } catch (error) {
-        return res.status(500).json({ error: 'Error en la validación de la baja del área: ' + error });
+        return res.status(500).json({ message: 'Error en la validación de la baja del área: ' + error });
     }
     next();
 };

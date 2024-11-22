@@ -52,8 +52,23 @@ const ViewGrupEdit = () => {
   const [selectedArticulos, setSelectedArticulos] = useState([]);  // Artículos seleccionados para el grupo
   const [query, setQuery] = useState('');
   const [debounceTimeout, setDebounceTimeout] = useState(null); // Para el debounce de búsqueda
-  const [error, setError] = useState(null);
   const Peticion = peticionDetalles();
+
+  const [error, setError] = useState();
+  const [showInfo, setShowInfo] = useState(); 
+  const [success, setSuccess] = useState(); 
+
+  
+  const handleActionInfo = () => {
+    setShowInfo(null); 
+  };
+  const handleActionError = () => { 
+    setError(null); 
+  };
+  const handleActionSuccess= () => {
+    setSuccess(null); 
+    navigate('/grups');
+  };
 
   // Cargar detalles del grupo
   useEffect(() => {
@@ -114,9 +129,9 @@ const ViewGrupEdit = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-    await Peticion.Editar(pk, 
+      const response =await Peticion.Editar(pk, 
       { nombre, descripcion, articulos: [...selectedArticulos] })
-      setSuccess(success.message)
+      setSuccess(response.message)
     } catch (err) {
       setError(err.message);
     }
@@ -125,6 +140,11 @@ const ViewGrupEdit = () => {
   if (!grupo) return <div>Cargando...</div>;  // Muestra un mensaje mientras carga el grupo
 
   return (
+    <>
+    <Componentes.Modals.success mensaje={success} action={handleActionSuccess} />
+      <Componentes.Modals.info mensaje={showInfo} action={handleActionInfo} />
+      <Componentes.Modals.error mensaje={error} action={handleActionError} />
+
     <form onSubmit={handleSubmit} className="space-y-4">
       <Componentes.Inputs.TitleHeader text={"Edición de Grupo"} />
       <Componentes.Inputs.TitleSubtitle titulo={"Información del Grupo"} contenido={"Actualiza los detalles del grupo."} />
@@ -172,10 +192,11 @@ const ViewGrupEdit = () => {
       {error && <Componentes.Modals.error mensaje={error} action={() => setError(null)} />}
 
       <div className="flex flex-row w-[100%] gap-4">
-        <Componentes.Botones.Cancelar text={"Cancelar"} onClick={() => navigate('/grupos')} />
+        <Componentes.Botones.Cancelar text={"Cancelar"} onClick={() => navigate('/grups')} />
         <Componentes.Botones.ConfirmarVerde text={"Guardar Cambios"} />
       </div>
     </form>
+    </>
   );
 };
 

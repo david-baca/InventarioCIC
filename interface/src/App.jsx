@@ -18,7 +18,7 @@ function App() {
           <Route path="/grups/edit/:pk" element={<Menu children={<Page.Groups.edit />} />} />
           <Route path="/grups/information/:pk" element={<Menu children={<Page.Groups.information />} />} />
           <Route path="/grups/load" element={<Menu children={<Page.Groups.load />} />} />
-          <Route path="/groups/removal/:pk" element={<Menu children={<Page.Groups.removal />} />} />
+          <Route path="/grups/removal/:pk" element={<Menu children={<Page.Groups.removal />} />} />
           <Route path="/almacen" element={<Menu children={<Page.Almacen.panel />} />} />
           <Route path="/almacen/edit/:pk" element={<Menu children={<Page.Almacen.edit />} />} />
           <Route path="/almacen/information/:pk" element={<Menu children={<Page.Almacen.information />} />} />

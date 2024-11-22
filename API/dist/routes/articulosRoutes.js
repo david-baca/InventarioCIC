@@ -29,6 +29,8 @@ articulosRoutes.get('/sin/grupo/:query', articleController.articulosSinGrupo);
 articulosRoutes.get('/sin/grupo/execption/:fk_execpcion', articleController.articulosSinGrupo);
 articulosRoutes.get('/sin/grupo/execption/:fk_execpcion/:query', articleController.articulosSinGrupo);
 
-articulosRoutes.get('/sin/area/:fk_Area_execpcion', articleController.articulosSinArea);
-
+articulosRoutes.get('/sin/area/', articleController.articulosSinArea);
+articulosRoutes.get('/sin/area/:query', articleController.articulosSinArea);
+articulosRoutes.get('/sin/area/execption/:fk_execpcion', articleController.articulosSinArea);
+articulosRoutes.get('/sin/area/execption/:fk_execpcion/:query', articleController.articulosSinArea);
 module.exports = articulosRoutes;
