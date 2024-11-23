@@ -16,7 +16,7 @@ const peticionUsuarios = () => {
   const obtenerUsuario = async (id) => {
     try {
       const response = await instance.get(`/${section}/details/${id}`);
-      return response.data;
+      return{...response.data} ;
     } catch (error) {
       console.error(error.response?.data?.error || error.message);
       throw new Error('Error al obtener los datos del usuario');
@@ -50,8 +50,9 @@ const ViewLogin = () => {
     try {
       const credential = await auth.loginWithGoogle();
       const email = credential.user.email;
-      const response = Peticiones.obtenerUsuario(email)
+      const response = await Peticiones.obtenerUsuario(email)
       saveToLocalStorage(response);
+      navigate('/');
     } catch (e) {
       console.log('Error al leer el email de la base de datos', e);
       auth.logout();

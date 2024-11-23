@@ -30,7 +30,7 @@ exports.crearUsuario = async (req, res) =>
         
     } catch (error) 
     {
-        res.status(500).json(userView.errorUsuario('Error al crear el usuario ' + error));
+        res.status(500).json(userView.errorUsuario('A fallado ' + error));
     }
     
 };

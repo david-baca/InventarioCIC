@@ -160,11 +160,9 @@ CREATE TABLE IF NOT EXISTS `inventariocic`.`Permisos` (
   INDEX `fk_Permisos_Usuarios_idx` (`Usuarios_pk`),
   INDEX `fk_Permisos_Funciones_idx` (`Funciones_pk`),
   CONSTRAINT `fk_Permisos_Usuarios`
-    FOREIGN KEY (`Usuarios_pk`) REFERENCES `inventariocic`.`Usuarios` (`pk`)
-    ON DELETE NO ACTION ON UPDATE NO ACTION,
+    FOREIGN KEY (`Usuarios_pk`) REFERENCES `inventariocic`.`Usuarios` (`pk`),
   CONSTRAINT `fk_Permisos_Funciones`
     FOREIGN KEY (`Funciones_pk`) REFERENCES `inventariocic`.`Funciones` (`pk`)
-    ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE = InnoDB
 DEFAULT CHARSET = utf8mb4
 COLLATE = utf8mb4_spanish_ci;

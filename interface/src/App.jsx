@@ -65,7 +65,6 @@ const Aut = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log(local)
     if (local == null ) {
       navigate('/');
     }

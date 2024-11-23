@@ -13,7 +13,6 @@ const Usuarios = sequelize.define('Usuarios', {
     allowNull: false,
     validate: {
       len: [3, 100],  // longitud minima.
-      isAlpha: true,   // solo letras.
     },
   },
   apellido_p: {
