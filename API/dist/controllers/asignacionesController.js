@@ -120,7 +120,7 @@ exports.crearAsignacion = async (req, res) => {
         console.error('Error al crear la asignación:', error);
         return res.status(500).json({ error: `Error al crear la asignación: ${error.message}` });
     }
-};
+}; //corregir no es pdf directo es primero de word a pdf
 
 
 

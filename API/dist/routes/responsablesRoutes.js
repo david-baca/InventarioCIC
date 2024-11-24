@@ -15,6 +15,7 @@ router.put('/:id',responsablesMiddlewares.editarResponsable, responsableControll
 router.get('/search/', responsableController.buscarResponsablesAll);
 // Endpoint para buscar responsables con middleware
 router.get('/search/:query', responsableController.buscarResponsables);
+
 // Endpoint para buscar todos los artículos
 router.get('/details/:pk', responsableController.buscarResponsable);
 // Endpoint para dar de baja un responsable
