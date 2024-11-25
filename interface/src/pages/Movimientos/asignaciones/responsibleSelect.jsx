@@ -77,9 +77,7 @@ const ViewAssigned_ResponsibleSelect = () => {
 
   // Función para manejar el clic en "Siguiente"
   const handleNext = () => {
-    const selectedResponsable = localStorage.getItem('selectedResponsable');
     if (selectedResponsable) {
-      // Pasar a la siguiente ruta con la información del responsable
       navigate("/asignaciones/articleSelect");
     } else {
       alert("Por favor, selecciona un responsable antes de continuar.");
@@ -115,10 +113,10 @@ const ViewAssigned_ResponsibleSelect = () => {
               <thead>
                 <Componentes.Table.columna>
                   <Componentes.Table.encabezado className="bg-red-800 text-white text-center py-2">
-                    Nombres
+                    Correo
                   </Componentes.Table.encabezado>
                   <Componentes.Table.encabezado className="bg-red-800 text-white text-center py-2">
-                    Apellidos
+                    Nombre Completo
                   </Componentes.Table.encabezado>
                 </Componentes.Table.columna>
               </thead>
@@ -128,14 +126,14 @@ const ViewAssigned_ResponsibleSelect = () => {
                     key={responsable.pk}
                     onClick={() => handleRowClick(responsable)}
                     className={`border-t border-gray-300 cursor-pointer ${
-                      selectedResponsable?.pk === responsable.pk ? 'bg-orange-300' : ''
+                      selectedResponsable?.pk === responsable.pk ? 'bg-orange-500 text-white' : 'text-gray-600'
                     }`}
                   >
-                    <Componentes.Table.fila className="text-center py-2 text-gray-600">
-                      {responsable.nombres}
+                    <Componentes.Table.fila className="text-center py-2">
+                      {responsable.correo}
                     </Componentes.Table.fila>
-                    <Componentes.Table.fila className="text-center py-2 text-gray-600">
-                      {responsable.apellido_p} {responsable.apellido_m}
+                    <Componentes.Table.fila className="text-center py-2">
+                      {`${responsable.nombres} ${responsable.apellido_p} ${responsable.apellido_m}`}
                     </Componentes.Table.fila>
                   </tr>
                 ))}
@@ -173,7 +171,12 @@ const ViewAssigned_ResponsibleSelect = () => {
         <div className="flex justify-center mt-4">
           <button
             onClick={handleNext}
-            className="px-6 py-2 bg-gray-200 text-gray-700 rounded-md shadow hover:bg-gray-300"
+            disabled={!selectedResponsable} // Deshabilitar si no hay selección
+            className={`w-full px-6 py-2 rounded-md shadow ${
+              selectedResponsable
+                ? "bg-orange-500 border-orange-500 text-white hover:bg-orange-600"
+                : "bg-white border-gray-300 text-gray-600"
+            } border`}
           >
             Siguiente
           </button>

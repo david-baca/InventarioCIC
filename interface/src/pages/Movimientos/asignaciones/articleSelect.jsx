@@ -12,14 +12,13 @@ const instance = axios.create({
 const fetchArticles = async (query) => {
   try {
     const response = await instance.get(`/articulos/search/${query}`);
-    console.log("Artículos obtenidos:", response.data); // Verifica los datos aquí
+    console.log("Artículos obtenidos:", response.data);
     return response.data;
   } catch (error) {
     console.error("Error al buscar artículos:", error);
     return [];
   }
 };
-
 
 const ArticleSelect = () => {
   const navigate = useNavigate();
@@ -67,6 +66,7 @@ const ArticleSelect = () => {
   const handleRowClick = (article) => {
     setSelectedArticle(article); // Guardar el artículo completo seleccionado
     console.log("Artículo seleccionado:", article);
+
     // Guardar la información en localStorage
     localStorage.setItem('selectedArticle', JSON.stringify(article));
 
@@ -78,29 +78,26 @@ const ArticleSelect = () => {
 
   // Función para manejar el clic en "Siguiente"
   const handleNext = () => {
-    const selectedArticle = localStorage.getItem('selectedArticle');
-    const selectedResponsable = JSON.parse(localStorage.getItem('selectedResponsable'));
-
-    if (selectedArticle && selectedResponsable) {
+    if (selectedArticle) {
+      const selectedResponsable = JSON.parse(localStorage.getItem('selectedResponsable'));
       const pkResponsable = selectedResponsable.pk;
-      const pkArticulo = JSON.parse(selectedArticle).pk;
+      const pkArticulo = selectedArticle.pk;
 
       // Redirigir a ViewAssigned con los parámetros en la URL
       navigate(`/asignaciones/${pkResponsable}/${pkArticulo}`);
-    } else {
-      alert("Por favor, selecciona un artículo antes de continuar.");
     }
   };
-
 
   return (
     <>
       <Componentes.Inputs.TitleHeader text={"Selección de artículo - (asignación)"} />
-      <div className=" p-4 rounded-b-md mb-0">
-        <div className='flex justify-between items-center mb-4'>
-          <div className='flex items-center w-[100%]'>
-            <Componentes.Inputs.TitleSubtitle titulo={"Estos son los Articulos del inventario."}
-              contenido={"busque por token o nombre del articulo"} />
+      <div className="p-4 rounded-b-md mb-0">
+        <div className="flex justify-between items-center mb-4">
+          <div className="flex items-center w-full">
+            <Componentes.Inputs.TitleSubtitle
+              titulo={"Estos son los Artículos del inventario."}
+              contenido={"Busque por token o nombre del artículo"}
+            />
           </div>
           <div className="w-1/3">
             <Componentes.Buscador
@@ -133,13 +130,14 @@ const ArticleSelect = () => {
                 <tr
                   key={article.pk}
                   onClick={() => handleRowClick(article)}
-                  className={`border-t border-gray-300 cursor-pointer ${selectedArticle?.pk === article.pk ? 'bg-orange-300' : ''
-                    }`}
+                  className={`border-t border-gray-300 cursor-pointer ${
+                    selectedArticle?.pk === article.pk ? 'bg-orange-500 text-white' : 'text-gray-600'
+                  }`}
                 >
-                  <Componentes.Table.fila className="text-center py-2 text-gray-600">
+                  <Componentes.Table.fila className="text-center py-2">
                     {article.no_inventario}
                   </Componentes.Table.fila>
-                  <Componentes.Table.fila className="text-center py-2 text-gray-600">
+                  <Componentes.Table.fila className="text-center py-2">
                     {article.nombre}
                   </Componentes.Table.fila>
                 </tr>
@@ -167,7 +165,8 @@ const ArticleSelect = () => {
           <button
             onClick={() => handlePageChange("next")}
             className={`text-gray-600 hover:text-gray-800 ${currentPage === totalPages && "opacity-50 cursor-not-allowed"}`}
-            disabled={currentPage === totalPages}>
+            disabled={currentPage === totalPages}
+          >
             Siguiente
           </button>
         </div>
@@ -177,7 +176,12 @@ const ArticleSelect = () => {
       <div className="mb-0 mt-1 flex justify-center">
         <button
           onClick={handleNext}
-          className="flex items-center px-6 py-2 bg-gray-200 text-gray-700 rounded-md shadow hover:bg-gray-300"
+          disabled={!selectedArticle} // Deshabilitar si no hay selección
+          className={`w-full px-6 py-2 rounded-md shadow ${
+            selectedArticle
+              ? "bg-orange-500 border-orange-500 text-white hover:bg-orange-600"
+              : "bg-white border-gray-300 text-gray-600"
+          } border`}
         >
           Siguiente
         </button>
