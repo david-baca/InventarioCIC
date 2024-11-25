@@ -11,7 +11,7 @@ usuariosRoutes.post('/',usuariosMiddlewares.createUsuario, userController.crearU
 usuariosRoutes.put('/:id',usuariosMiddlewares.editUsuario, userController.editarUsuario);
 
 // Endpoint para mostrar todos los usuarios
-usuariosRoutes.get('/all',usuariosMiddlewares.searchUsuario, userController.mostrarUsuarios);
+usuariosRoutes.get('/all', userController.mostrarUsuarios);
 
 // Endpoint para mostrar detalles de un usuario
 usuariosRoutes.get('/details/:correo',/*usuariosMiddlewares.searchUsuario,*/ userController.detallesUsuario);
