@@ -127,9 +127,9 @@ const number = ({ Value, Onchange, Placeholder }) => {
 const checkbox = ({ Value, Onchange }) => {
   return (
       <input
-        type="checkbox"
+        type="checkbox"  
         checked={Value}  
-        onChange={(e) => Onchange(e)}  
+        onChange={() => Onchange(prev => !prev)}  
         className="p-5 accent-UP-Primario focus:ring-orange-300
         md:w-6 md:h-6 w-12 h-12" 
       />

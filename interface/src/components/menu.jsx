@@ -22,11 +22,11 @@ const options = [
   {
     name: "Grupos",
     routes: [
-      { path: "/groups", codePermiso: 4 },
-      { path: "/groups/edit/:pk", codePermiso: 5 },
-      { path: "/groups/information/:pk", codePermiso: 5 },
-      { path: "/groups/load", codePermiso: 5 },
-      { path: "/groups/removal/:pk", codePermiso: 6 }
+      { path: "/grups", codePermiso: 4 },
+      { path: "/grups/edit/:pk", codePermiso: 5 },
+      { path: "/grups/information/:pk", codePermiso: 5 },
+      { path: "/grups/load", codePermiso: 5 },
+      { path: "/grups/removal/:pk", codePermiso: 6 }
     ]
   },
   {

@@ -31,7 +31,7 @@ const encabezado = ({ children }) => {
 
 const table = ({ children }) => {
     return (
-        <table className="bg-UP-Blanco w-full">
+        <table className="bg-UP-Blanco">
             {children}
         </table>
     );

@@ -62,10 +62,10 @@ const Crear = ({ text, onClick }) => {
   );
 }
 
-const Imprimir = ({ text, Onclick }) => {
+const Imprimir = ({ text, onClick }) => {
   return (
       <>
-      <button onClick={Onclick} className="bg-UP-Primario hover:bg-UP-Secundario text-white font-bold py-2 px-4 rounded-lg w-[100%]">
+      <button onClick={onClick} className="bg-UP-Primario hover:bg-UP-Secundario text-white font-bold py-2 px-4 rounded-lg w-[100%]">
       Imprimir
       </button>
       </>
