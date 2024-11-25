@@ -163,7 +163,7 @@ const ViewAreaEdit = () => {
         <div className="flex justify-center h-full items-center">
           <Componentes.Inputs.TitleSubtitle 
             titulo={"No hay Artículos que mostrar"}
-            contenido={"No se encontraron resultados"}
+            contenido={"No se encontraron resultados."}
           />
         </div>
       )}
