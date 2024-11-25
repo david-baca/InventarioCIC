@@ -1,6 +1,6 @@
 const responsableView = require('../views/responsablesView');
 const { Responsables, Asignaciones, Articulos, Documentos } = require('../model'); // Asegúrate de tener el modelo Responsables importado
-const { Op } = require('sequelize');
+const { Op, Sequelize } = require('sequelize');
 
 exports.buscarResponsable=async(req,res)=>{
     const { pk } = req.params;
@@ -78,8 +78,22 @@ exports.buscarResponsables = async (req, res) => {
                     { correo: { [Op.like]: `%${query}%` } }
                 ],
                 disponible: 1 // Solo buscar responsables disponibles
-            },
-            attributes: ['pk','nombres','apellido_p','apellido_m', 'correo']
+            },include: [
+                {
+                    where: { disponible: 1 },
+                    required: false,
+                    model: Asignaciones,
+                    as: 'Asignaciones',
+                    include:[{
+                        model:Articulos,
+                        as: 'Articulo',
+                    }],
+                    include:[{
+                        model:Documentos,
+                        as: 'Documentos',
+                    }]
+                },
+            ]
         });
         res.json(resultado);
     } catch (error) {
@@ -91,7 +105,22 @@ exports.buscarResponsablesAll = async (req, res) => {
 try {
     const resultado = await Responsables.findAll({
         where: {disponible: 1},
-        attributes: ['pk','nombres','apellido_p','apellido_m', 'correo']
+        include: [
+            {
+                where: { disponible: 1 },
+                required: false,
+                model: Asignaciones,
+                as: 'Asignaciones',
+                include:[{
+                    model:Articulos,
+                    as: 'Articulo',
+                }],
+                include:[{
+                    model:Documentos,
+                    as: 'Documentos',
+                }]
+            }
+        ]
     });
     res.json(resultado);
 } catch (error) {
