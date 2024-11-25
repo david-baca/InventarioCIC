@@ -108,8 +108,8 @@ const ViewAreaLoad = () => {  // Cambié el nombre de "ViewGrupLoad" a "ViewArea
       <Componentes.Modals.error mensaje={error} action={handleActionEror} />
       <form onSubmit={handleSubmit} className="space-y-4">
         <Componentes.Inputs.TitleHeader text={"Carga de Área"} />
-        <Componentes.Inputs.TitleSubtitle titulo={"Información del Área"} contenido={"Ingrese los detalles del nuevo área."} />
-        <Componentes.Labels.text Value={codigo} Onchange={setCodigo} Placeholder={"Codigo del Área"} />
+        <Componentes.Inputs.TitleSubtitle titulo={"Información del Área"} contenido={"Ingrese los detalles correspondientes al alta de la nueva área."} />
+        <Componentes.Labels.text Value={codigo} Onchange={setCodigo} Placeholder={"Nombre del Área"} />
         <Componentes.Labels.area Value={descripcion} Onchange={setDescripcion} Placeholder={"Descripción del Área"} />
         <div className='flex items-center w-[100%]'>
           <Componentes.Inputs.TitleSubtitle titulo={"Seleccionar Artículos"} contenido={"Seleccione los artículos que desea asociar a este área."} />
@@ -140,21 +140,19 @@ const ViewAreaLoad = () => {  // Cambié el nombre de "ViewGrupLoad" a "ViewArea
             ))}
           </Componentes.Table.table>
         ) : (
-          <div className="flex justify-center h-full items-center">
+          <div className="flex flex-col items-center mt-4">
             <Componentes.Inputs.TitleSubtitle 
-              titulo={"No hay Artículos que mostrar"}
-              contenido={"No se encontraron resultados"}
+              titulo={"No hay Artículos que mostrar"} 
+              contenido={"No se encontraron resultados"} 
             />
           </div>
         )}
-
         {error && <Componentes.Modals.error mensaje={error} action={() => setError(null)} />}
-
-        <div className="flex flex-row w-[100%] gap-4">
+        <div className="flex flex-row w-[100%] justify-center mt-4 gap-3">
           <Componentes.Botones.Cancelar text={"Cancelar"} onClick={() => navigate('/almacen')} />
           <Componentes.Botones.ConfirmarVerde text={"Crear Área"} />
         </div>
-      </form>
+      </form>   
     </>
   );
 };

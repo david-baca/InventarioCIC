@@ -124,10 +124,10 @@ const ViewArticleEdit = () => {
     <Componentes.Modals.info mensaje={showInfo} action={handleActionInfo}/>
     <Componentes.Modals.error mensaje={error} action={handleActionEror}/>
       
-      <Componentes.Inputs.TitleHeader text={"Edicion de un Articulo."}/>
+      <Componentes.Inputs.TitleHeader text={"Edición de un Artículo."}/>
       <Componentes.Inputs.TitleSubtitle
-        titulo="Datos del artículo" 
-        contenido="Edita los campos para actualizar el artículo."
+        titulo="Datos del Artículo" 
+        contenido="Edita los campos para actualizar el Artículo."
       />
       {articulo ? (
         <form onSubmit={handleEdit} className="flex flex-col space-y-4 gap-3">
@@ -140,13 +140,13 @@ const ViewArticleEdit = () => {
               Onchange={(value) =>setConsumible(value)}
             />
             <Componentes.Inputs.TitleSubtitle
-              titulo="Articulo consumible" 
-              contenido="Active este campo si el artículo puede dejar de servir con un uso apropiado."
+              titulo="Artículo consumible" 
+              contenido="Active este campo si el Artículo puede dejar de servir con un uso apropiado."
             />
           </div>
           <Componentes.Inputs.TitleSubtitle 
             titulo="Evidencias (opcional)" 
-            contenido="Nos ayuda a registrar las condiciones actuales del articulo" 
+            contenido="Nos ayuda a registrar las condiciones actuales del Artículo" 
           />
           <Componentes.Labels.fileimg
             object={nuevasImagenes}
@@ -156,8 +156,8 @@ const ViewArticleEdit = () => {
             clikRequestDelete={handleRequestImageDelete}
           />
           <Componentes.Inputs.TitleSubtitle
-            titulo="Nota de edicion" 
-            contenido="Las notas de edicion son campos para comentar el porque se edita un registro"
+            titulo="Nota de Edición" 
+            contenido="Las notas sirven para justificar el porqué se editó el artículo."
           />
           <Componentes.Labels.area Onchange={(value) =>setMotivo(value)} Value={motivo} Placeholder={"Motivo"}/>
           {/* Botones para cancelar o confirmar */}

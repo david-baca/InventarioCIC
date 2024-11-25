@@ -160,8 +160,8 @@ const ViewAreaEdit = () => {
           ))}
         </Componentes.Table.table>
       ) : (
-        <div className="flex justify-center h-full items-center">
-          <Componentes.Inputs.TitleSubtitle 
+        <div className="flex flex-col items-center mt-4">
+          <Componentes.Inputs.TitleSubtitle
             titulo={"No hay Artículos que mostrar"}
             contenido={"No se encontraron resultados"}
           />
@@ -170,7 +170,8 @@ const ViewAreaEdit = () => {
 
       {error && <Componentes.Modals.error mensaje={error} action={() => setError(null)} />}
 
-      <div className="flex flex-row w-[100%] gap-4">
+      {/* Botones siempre presentes */}
+      <div className="flex flex-row w-[100%] justify-center mt-4 gap-4">
         <Componentes.Botones.Cancelar text={"Cancelar"} onClick={() => navigate('/almacen')} />
         <Componentes.Botones.ConfirmarVerde text={"Guardar Cambios"} />
       </div>

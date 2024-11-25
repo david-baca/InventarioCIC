@@ -80,7 +80,7 @@ const ViewArea = () => {  // Cambié el nombre de "ViewGrup" a "ViewArea"
         <div className='flex items-center w-[100%]'>
           <Componentes.Inputs.TitleSubtitle 
             titulo={"Estas son las áreas disponibles."}  // Mensaje actualizado para áreas
-            contenido={"busque por nombre o descripción del área"}  // Mensaje actualizado
+            contenido={"Busque por nombre o descripción del área"}  // Mensaje actualizado
           />
         </div>
         <div className='flex items-center w-[100%]'>

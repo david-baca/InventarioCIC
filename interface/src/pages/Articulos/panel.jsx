@@ -98,11 +98,11 @@ const ViewArticle = () => {
     <Componentes.Modals.info mensaje={showInfo} action={handleActionInfo}/>
     <Componentes.Modals.error mensaje={error} action={handleActionEror}/>
       
-      <Componentes.Inputs.TitleHeader text={"Administración de Articulos"} />
+      <Componentes.Inputs.TitleHeader text={"Administración de Artículos"} />
       <div className='flex items-center'>
         <div className='flex items-center w-[100%]'>
-          <Componentes.Inputs.TitleSubtitle titulo={"Estos son los Articulos del inventario."}
-            contenido={"busque por token o nombre del articulo"} />
+          <Componentes.Inputs.TitleSubtitle titulo={"Estos son los Artículos del inventario."}
+            contenido={"Busque por token o nombre del Artículo"} />
         </div>
         <div className='flex items-center w-[100%]'>
           <Componentes.Buscador query={query} OnChange={handleSearchChange} />
@@ -142,8 +142,8 @@ const ViewArticle = () => {
           </Componentes.Table.table>
         ) : (
           <div className='flex justify-center h-full items-center'>
-            <Componentes.Inputs.TitleSubtitle titulo={"No hay Articulos que mostrar"}
-            contenido={"no se encontraron resultados"}/>
+            <Componentes.Inputs.TitleSubtitle titulo={"No hay Artículos que mostrar"}
+            contenido={"No se encontraron resultados"}/>
           </div>
         )}
       {/* Example view docs
