@@ -2,8 +2,14 @@ import "../public/styles/index.css"
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Page from './pages';
 import Menu from './components/menu'; // Asegúrate de que la importación sea correcta
+import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from 'react';
+import { AuthProvider } from './context/AuthContext';
+import { getFromLocalStorage } from './context/Credentials';
+
 function App() {
   return (
+    <AuthProvider>
     <Router>
       <Routes>
           {/* Ruta de inicio de sesión sin menú */}
@@ -48,17 +54,26 @@ function App() {
         <Route path="*" element={<Page.notFund />} />
       </Routes>
     </Router>
+    </AuthProvider>
   );
 }
 // Componente Layout que incluye el menú
-const Layout = ({ children }) => {
+const Aut = ({ children }) => {
+  const local = getFromLocalStorage();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (local == null ) {
+      navigate('/');
+    }
+  }, [local, navigate]);
   return (
-    <div className="flex">
-      <Menu />
-      <div className="flex-grow">
-        {children}
-      </div>
-    </div>
+    <Menu>
+       {children}
+      
+    </Menu>
+  
+       
   );
 }
 export default App;
