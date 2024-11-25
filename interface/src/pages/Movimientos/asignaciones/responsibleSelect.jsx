@@ -2,13 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Componentes from "../../../components";
 import axios from 'axios';
-
+const Peticion =()=>{
 // Configuración de instancia de axios
 const baseApi = import.meta.env.VITE_BASE_API;
 const instance = axios.create({
   baseURL: baseApi,
 });
-
 // Función para obtener los responsables desde la API
 const fetchResponsables = async (query = '') => {
   try {
@@ -20,7 +19,8 @@ const fetchResponsables = async (query = '') => {
     return [];
   }
 };
-
+return {fetchResponsables}
+}
 const ViewAssigned_ResponsibleSelect = () => {
   const navigate = useNavigate();
   const [responsables, setResponsables] = useState([]);
@@ -29,16 +29,17 @@ const ViewAssigned_ResponsibleSelect = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedResponsable, setSelectedResponsable] = useState(null); // Estado para el responsable seleccionado
   const itemsPerPage = 3;
+  const peticones = Peticion()
 
   // Cargar los responsables al cambiar el término de búsqueda
   useEffect(() => {
     const loadResponsables = async () => {
       setError(null);
       try {
-        const data = await fetchResponsables(searchTerm || '');
+        const data = await peticones.fetchResponsables(searchTerm || '');
         setResponsables(data);
       } catch (err) {
-        setError("No se pudieron cargar los responsables.");
+        setError("No se pudieron cargar los responsables."); 
       }
     };
     loadResponsables();
@@ -65,20 +66,13 @@ const ViewAssigned_ResponsibleSelect = () => {
 
   // Función para seleccionar y resaltar la fila, y actualizar la URL
   const handleRowClick = (responsable) => {
-    setSelectedResponsable(responsable); // Guardar el responsable completo seleccionado
-
-    // Guardar la información en localStorage
-    localStorage.setItem('selectedResponsable', JSON.stringify(responsable));
-
-    // Actualizar la URL con el nombre y token del responsable seleccionado
-    const nombreCompleto = `${responsable.nombres} ${responsable.apellido_p} ${responsable.apellido_m}`;
-    window.history.pushState({}, '', `http://localhost:3720/asignaciones/${responsable.pk}-${nombreCompleto}`);
+    setSelectedResponsable(responsable);
   };
 
   // Función para manejar el clic en "Siguiente"
   const handleNext = () => {
     if (selectedResponsable) {
-      navigate("/asignaciones/articleSelect");
+      navigate("./"+ selectedResponsable.pk);
     } else {
       alert("Por favor, selecciona un responsable antes de continuar.");
     }
@@ -185,5 +179,4 @@ const ViewAssigned_ResponsibleSelect = () => {
     </>
   );
 };
-
 export default ViewAssigned_ResponsibleSelect;

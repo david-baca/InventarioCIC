@@ -4,27 +4,87 @@ import { saveAs } from "file-saver";
 import PizZip from "pizzip";
 import Docxtemplater from "docxtemplater";
 import Componentes from "../../../components";
+import axios from 'axios';
+
+const Peticion =()=>{
+  const baseApi = import.meta.env.VITE_BASE_API;
+  const instance = axios.create({
+    baseURL: baseApi,
+  });
+  // Función para obtener los artículos desde la API
+  const ObtenerDetallesArticulo = async (no_inventario) => {
+    try {
+      const response = await instance.get(`/articulos/details/${encodeURIComponent(no_inventario)}`);
+      return response.data;
+    } catch (error) {
+      console.error(error.response?.data?.error || error.message);
+      throw new Error(error.response?.data?.error || 'Error en la interacción con la API');
+    }
+  };
+  const ObtenerDetallesReponsable = async (id) => {
+    try {
+      const response = await instance.get(`/responsables/details/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error(error.response?.data?.error || error.message);
+      throw new Error(error.response?.data?.error || 'Error al obtener los detalles del responsable');
+    }
+  };
+
+  const urlToImage= async(url)=> {
+    try {
+      const response = await axios.get(url, { responseType: 'blob' }); // Obtener la imagen como Blob
+      const reader = new FileReader();
+  
+      return new Promise((resolve, reject) => {
+        reader.onloadend = () => {
+          resolve(reader.result);  // `reader.result` contiene la imagen en base64
+        };
+        reader.onerror = (error) => reject(error);
+  
+        reader.readAsDataURL(response.data); // Convertir el Blob a base64
+      });
+    } catch (error) {
+      console.error('Error al obtener la imagen: ', error);
+      return null;
+    }
+  };
+  return {ObtenerDetallesArticulo, ObtenerDetallesReponsable, urlToImage}
+}
 
 
 const ViewAssigned = () => {
   const { pkResponsable, pkArticulo } = useParams(); // Obtener parámetros de la URL
+  const peticones = Peticion()
   const navigate = useNavigate(); // Redirección
+  const [imagen, setImagen] = useState(null);
   const [responsable, setResponsable] = useState(null);
   const [articulo, setArticulo] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const selectedResponsable = JSON.parse(localStorage.getItem("selectedResponsable"));
-    const selectedArticle = JSON.parse(localStorage.getItem("selectedArticle"));
-
-    if (selectedResponsable && selectedArticle) {
-      setResponsable(selectedResponsable);
-      setArticulo(selectedArticle);
-    } else {
-      alert("Faltan datos del responsable o artículo. Redirigiendo...");
-      navigate("/asignaciones/responsableSelect"); // Redirige a la selección inicial si no hay datos
-    }
-  }, [navigate]);
+    const loadResponsables = async () => {
+      setError(null);
+      try {
+        const data = await peticones.ObtenerDetallesReponsable(pkResponsable);
+        setResponsable(data.responsable);
+      } catch (err) {
+        setError("No se pudieron cargar los responsables.");
+      }
+    };
+    const loadArticulos = async () => {
+      setError(null);
+      try {
+        const data = await peticones.ObtenerDetallesArticulo(pkArticulo);
+        setArticulo(data.articulo);
+      } catch (err) {
+        setError("No se pudieron cargar los articulos.");
+      }
+    };
+    loadResponsables()
+    loadArticulos()
+  },[pkResponsable, pkArticulo]);
 
   // Generar y descargar el documento
   const generateAndDownloadDocument = async () => {
@@ -44,8 +104,10 @@ const ViewAssigned = () => {
   
       const content = await response.arrayBuffer();
       const zip = new PizZip(content);
-      const doc = new Docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
-  
+      let x= articulo.Condiciones[0].Imagenes[0].imagen
+
+      const doc = new Docxtemplater(zip, { paragraphLoop: true, linebreaks: true,
+       });
       doc.setData({
         dia,
         mes,
@@ -55,10 +117,15 @@ const ViewAssigned = () => {
         "nombre": articulo.nombre || "",
         "descripcion": articulo.descripcion || "",
         "costo": parseFloat(articulo.costo || 0).toFixed(2), // Convertir costo a número
+        "imagen1": "{imagen1}"
       });
   
       doc.render();
+      //finalizacion
       const out = doc.getZip().generate({ type: "blob" });
+      //insercion de texto
+      //insercion de imagen
+
       saveAs(out, `Asignacion_${responsable.nombres}_${articulo.no_inventario}.docx`);
     } catch (error) {
       console.error("Error al generar el documento:", error);

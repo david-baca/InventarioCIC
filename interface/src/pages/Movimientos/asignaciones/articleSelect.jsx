@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import Componentes from "../../../components";
 import axios from 'axios';
 
+const Peticion =()=>{
 const baseApi = import.meta.env.VITE_BASE_API;
 const instance = axios.create({
   baseURL: baseApi,
 });
-
 // Función para obtener los artículos desde la API
 const fetchArticles = async (query) => {
   try {
@@ -19,7 +19,8 @@ const fetchArticles = async (query) => {
     return [];
   }
 };
-
+return {fetchArticles}
+}
 const ArticleSelect = () => {
   const navigate = useNavigate();
   const [articles, setArticles] = useState([]);
@@ -28,13 +29,14 @@ const ArticleSelect = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedArticle, setSelectedArticle] = useState(null); // Estado para el artículo seleccionado
   const itemsPerPage = 3;
+  const peticiones = Peticion()
 
   // Cargar los artículos al cambiar la query
   useEffect(() => {
     const loadArticles = async () => {
       setError(null);
       try {
-        const data = await fetchArticles(query);
+        const data = await peticiones.fetchArticles(query);
         setArticles(data);
       } catch (err) {
         setError("No se pudieron cargar los artículos.");
@@ -64,27 +66,15 @@ const ArticleSelect = () => {
 
   // Función para seleccionar y resaltar la fila
   const handleRowClick = (article) => {
-    setSelectedArticle(article); // Guardar el artículo completo seleccionado
-    console.log("Artículo seleccionado:", article);
-
-    // Guardar la información en localStorage
-    localStorage.setItem('selectedArticle', JSON.stringify(article));
-
-    // Actualizar la URL con el nombre y token del artículo seleccionado
-    const tokenArticulo = article.no_inventario;
-    const nombreResponsable = JSON.parse(localStorage.getItem('selectedResponsable')).nombres.replace(/\s+/g, '-');
-    window.history.pushState({}, '', `/asignaciones/${nombreResponsable}/articleSelect/${tokenArticulo}`);
+    setSelectedArticle(article)
   };
 
   // Función para manejar el clic en "Siguiente"
   const handleNext = () => {
     if (selectedArticle) {
-      const selectedResponsable = JSON.parse(localStorage.getItem('selectedResponsable'));
-      const pkResponsable = selectedResponsable.pk;
-      const pkArticulo = selectedArticle.pk;
-
-      // Redirigir a ViewAssigned con los parámetros en la URL
-      navigate(`/asignaciones/${pkResponsable}/${pkArticulo}`);
+      navigate("./"+encodeURIComponent(selectedArticle.no_inventario));
+    }else{
+      alert("Por favor, selecciona un articulo antes de continuar. ");
     }
   };
 
