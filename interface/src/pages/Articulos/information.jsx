@@ -1,21 +1,21 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
+import Components from '../../components';
+import {QRCodeSVG} from 'qrcode.react';
 
 const peticion = () => {
   const section = "articulos";
   const baseApi = import.meta.env.VITE_BASE_API;
-  const instance = axios.create({
-    baseURL: baseApi,
-  });
-
+  const instance = axios.create({ baseURL: baseApi });
+  
   const ObtenerDetalles = async (no_inventario) => {
     try {
-      const response = await instance.get(`/${section}/details/${no_inventario}`);
-      return response.data; // Assumes response.data contains the article details
+      const response = await instance.get(`/${section}/details/${encodeURIComponent(no_inventario)}`);
+      return response.data;
     } catch (error) {
       console.error(error.response?.data?.error || error.message);
-      throw new Error(error.response?.data?.error || 'Error in API interaction');
+      throw new Error(error.response?.data?.error || 'Error en la interacción con la API');
     }
   };
 
@@ -23,42 +23,124 @@ const peticion = () => {
 };
 
 const ViewArticleInformation = () => {
+  // Configuración
+  const baseApi = import.meta.env.VITE_BASE_API;
+  const Peticion = peticion(); // No es necesario useMemo aquí
   const navigate = useNavigate();
-  const { no_inventario } = useParams();
-  const Peticion = peticion();
+  const { pk } = useParams();
   
+  // Estado
   const [articulo, setArticulo] = useState(null);
+  const [responsable, setResponsable] = useState(null);
+  const [imagenes, setImagenes] = useState([]);
   const [error, setError] = useState(null);
+  const [showInfo, setShowInfo] = useState(null);
 
+  // Funciones para manejar modales
+  const handleActionInfo = () => setShowInfo(null);
+  const handleActionError = () => setError(null);
+  const printContent = () => {
+    const content = document.getElementById("qr-panel"); // Get the content by ID
+    const printWindow = window.open('', '', 'height=500,width=500'); // Open a new window
+    printWindow.document.write('<html><head><title>Print QR Code</title></head><body>');
+    printWindow.document.write(content.innerHTML); // Insert the QR code's HTML content
+    printWindow.document.write('</body></html>');
+    printWindow.document.close(); // Close the document to load content
+    printWindow.print(); // Trigger the print dialog
+  };
+  // Cargar los detalles del artículo
   useEffect(() => {
     const cargarArticulo = async () => {
       try {
-        const result = await Peticion.ObtenerDetalles(no_inventario);
-        setArticulo(result.articulo); // Assumes response contains 'articulo'
+        const result = await Peticion.ObtenerDetalles(pk);
+        setArticulo(result.articulo);  // Asignar el artículo a estado
+        if (result.articulo && result.articulo.Condiciones.length > 0) {
+          setImagenes(result.articulo.Condiciones[0].Imagenes || []);  // Si tiene condiciones, asignamos las imágenes
+        }
+        if(result.articulo.responsable) setResponsable(result.articulo.responsable)
       } catch (err) {
-        setError(err.message);
+        setError(err.message);  // Mostrar mensaje de error si falla la carga
       }
     };
-    
     cargarArticulo();
-  }, [no_inventario]);
-
+  }, [pk]);  // Se ejecuta cada vez que pk cambie
+  // Mostrar contenido
   return (
     <>
-      <h1>Detalles de Artículo</h1>
-      {error && <div className="text-red-600">{error}</div>}
-      {articulo ? (
-        <div>
-          <h2>Nombre: {articulo.nombre}</h2>
-          <p>Descripción: {articulo.descripcion}</p>
-          <p>Costo: {articulo.costo}</p>
-          <p>Inventario: {articulo.no_inventario}</p>
-          <p>Estado: {articulo.estado}</p>
-          <p>Responsable: {articulo.responsable || 'No asignado'}</p>
-          {/* Agrega más campos según sea necesario */}
-        </div>
+      <Components.Modals.info mensaje={showInfo} action={handleActionInfo} />
+      <Components.Modals.error mensaje={error} action={handleActionError} />
+      
+      {/* Título con la información del artículo */}
+      <Components.Inputs.TitleHeader text="Detalles del Artículo" />
+      {articulo === null ? (
+        <div>Articulo no encontrado</div>
       ) : (
-        <div>Cargando detalles del artículo...</div>
+        <div className='flex lg:flex-row flex-row-reverse flex-wrap gap-5'>
+          <div className="gap-10 flex flex-col items-center w-[100%] lg:w-fit">
+            <div id ="qr-panel">
+            <QRCodeSVG value={baseApi+"/articulos/"+articulo.no_inventario} size={300}/>
+            </div>
+            <Components.Botones.Imprimir Onclick={printContent}/>
+          </div>
+          <div className="gap-10 flex flex-row flex-wrap lg:w-[50%]">
+            <Components.Inputs.TitleSubtitle 
+              titulo="Nombre"
+              contenido={articulo.nombre} 
+            />
+            <Components.Inputs.TitleSubtitle 
+              titulo="Costo"
+              contenido={articulo.costo} 
+            />
+            <Components.Inputs.TitleSubtitle 
+              titulo="Consumible"
+              contenido={articulo.consumible ? "Si" : "No"} 
+            />
+            <Components.Inputs.TitleSubtitle 
+              titulo="Descripción"
+              contenido={articulo.descripcion} 
+            />
+            <Components.Inputs.TitleSubtitle 
+              titulo="No.Inventario"
+              contenido={articulo.no_inventario} 
+            />
+            <Components.Inputs.TitleSubtitle 
+              titulo="Grupo"
+              contenido={articulo.grupo || "sin asignar"} 
+            />
+            <Components.Inputs.TitleSubtitle 
+              titulo="Area"
+              contenido={articulo.grupo || "sin asignar"} 
+            />
+            {/* Mostrar imágenes del artículo */}
+            {imagenes.length > 0 && (
+              <div>
+                <h3>Imágenes del Artículo</h3>
+                <div className="flex gap-4">
+                  {imagenes.map((img, index) => (
+                    <img key={index} src={baseApi+img.imagen} alt={`Imagen ${index + 1}`} className="w-32 h-32 object-cover" />
+                  ))}
+                </div>
+              </div>
+            )}
+            </div>
+          {responsable === null ? (
+            <>
+              <h1>hola</h1>
+            </>
+          ):(
+            <>
+              <Components.Inputs.TitleHeader text="Detalles de respodsable" />
+              <Components.Inputs.TitleSubtitle 
+                titulo="Nobre"
+                contenido={responsable.nombres+" "+
+                  responsable.apellido_p+" "+
+                  responsable.apellido_m+" "}/>
+              <Components.Inputs.TitleSubtitle 
+                titulo="Correo"
+                contenido={responsable.correo}/>
+            </>
+          )}
+        </div>
       )}
     </>
   );

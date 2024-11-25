@@ -2,10 +2,25 @@ import axios from 'axios';
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
-// Función de petición para obtener detalles de un grupo
+// Función de petición para obtener detalles de un grupo 
 export const peticionDetallesGrupo = () => {
   const baseApi = import.meta.env.VITE_BASE_API;
   const instance = axios.create({ baseURL: baseApi });
+  const [error, setError] = useState();
+  const [showInfo, setShowInfo] = useState(); 
+  const [success, setSuccess] = useState(); 
+
+  
+  const handleActionInfo = () => {
+    setShowInfo(null); 
+  };
+  const handleActionError = () => { 
+    setError(null); 
+  };
+  const handleActionSuccess= () => {
+    setSuccess(null); 
+    navigate('/grups');
+  };
 
   const ObtenerDetalles = async (id) => {
     try {
@@ -41,12 +56,18 @@ const ViewGrupInformation = () => {
   if (!grupo) return <div>Cargando...</div>;
 
   return (
+    <>
+    <Componentes.Modals.success mensaje={success} action={handleActionSuccess} />
+      <Componentes.Modals.info mensaje={showInfo} action={handleActionInfo} />
+      <Componentes.Modals.error mensaje={error} action={handleActionError} />
+
     <div>
       <h1>Detalles del Grupo</h1>
       <p>Nombre: {grupo.nombre}</p>
       <p>Descripción: {grupo.descripcion}</p>
       {/* Aquí puedes añadir más detalles si es necesario */}
     </div>
+    </>
   );
 };
 

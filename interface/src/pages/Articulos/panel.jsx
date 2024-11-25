@@ -26,8 +26,21 @@ const peticion = () => {
 const ViewArticle = () => {
   const navigate = useNavigate();
   const [data, setData] = useState([]);
-  const [error, setError] = useState(null);
   const [query, setQuery] = useState('');
+  const [error, setError] = useState();
+  const [showInfo, setShowInfo] = useState(); 
+  const [success, setSuccess] = useState(); 
+  
+  const handleActionInfo = () => {
+    setShowInfo(null); 
+  };
+  const handleActionEror = () => {
+    setError(null); 
+  };
+  const handleActionSuccess= () => {
+    setSuccess(null);
+    navigate('/articles');
+  };
 
   // Función que se activa cada vez que se cambia la query
   useEffect(() => {
@@ -51,18 +64,16 @@ const ViewArticle = () => {
   };
 
   const handleEdit = (pk) => {
-    navigate(`/articles/edit/${pk}`);
+    navigate(`/articles/edit/${encodeURIComponent(pk)}`);
   };
 
   const handleDelete = (pk) => {
-    navigate(`/articles/removal/${pk}`);
+    navigate(`/articles/removal/${encodeURIComponent(pk)}`);
   };
 
-  const handleTable = (pk) => {
-    navigate(`/articles/xd`);
+  const handleConsult = (pk) => {
+    navigate(`/articles/detalles/${encodeURIComponent(pk)}`);
   };
-
-
   const handleSearchChange = (value) => {
     setQuery(value);
 
@@ -81,19 +92,20 @@ const ViewArticle = () => {
 
   return (
     <>
-      <Componentes.Inputs.TitleHeader text={"Administración de Articulos"} />
+    <Componentes.Modals.success mensaje={success} action={handleActionSuccess}/>
+    <Componentes.Modals.info mensaje={showInfo} action={handleActionInfo}/>
+    <Componentes.Modals.error mensaje={error} action={handleActionEror}/>
+      <Componentes.Inputs.TitleHeader text={"Administración de Artículos"} />
       <div className='flex items-center'>
         <div className='flex items-center w-[100%]'>
-          <Componentes.Inputs.TitleSubtitle titulo={"Estos son los Articulos del inventario."}
-            contenido={"busque por token o nombre del articulo"} />
+          <Componentes.Inputs.TitleSubtitle titulo={"Estos son los Artículos del inventario."}
+            contenido={"Busque por token o nombre del Artículo"} />
         </div>
         <div className='flex items-center w-[100%]'>
           <Componentes.Buscador query={query} OnChange={handleSearchChange} />
           <Componentes.Botones.Crear onClick={handlePublish} />
         </div>
       </div>
-        {error && <div className="text-red-600">{error}</div>}
-
         {data.length > 0 ? (
           <Componentes.Table.table>
             <Componentes.Table.columna>
@@ -112,20 +124,23 @@ const ViewArticle = () => {
             </Componentes.Table.columna>
             {data.map((element) => (
               <Componentes.Table.columna key={element.pk}>
-                <Componentes.Table.fila>{element.no_inventario}</Componentes.Table.fila>
-                <Componentes.Table.fila>{element.nombre}</Componentes.Table.fila>
-                <Componentes.Table.fila>{element.costo}</Componentes.Table.fila>
+                <Componentes.Table.fila Onclik={() => handleConsult(element.no_inventario)}>
+                  {element.no_inventario}</Componentes.Table.fila>
+                <Componentes.Table.fila Onclik={() => handleConsult(element.no_inventario)}>
+                  {element.nombre}</Componentes.Table.fila>
+                <Componentes.Table.fila Onclik={() => handleConsult(element.no_inventario)}>
+                  {element.costo}</Componentes.Table.fila>
                 <Componentes.Table.fila>
                   <Componentes.Botones.iconPencil Onclik={() => handleEdit(element.no_inventario)} />
-                  <Componentes.Botones.iconTrash Onclik={() => handleDelete(element.pk)} />
+                  <Componentes.Botones.iconTrash Onclik={() => handleDelete(element.no_inventario)} />
                 </Componentes.Table.fila>
               </Componentes.Table.columna>
             ))}
           </Componentes.Table.table>
         ) : (
           <div className='flex justify-center h-full items-center'>
-            <Componentes.Inputs.TitleSubtitle titulo={"No hay Articulos que mostrar"}
-            contenido={"no se encontraron resultados"}/>
+            <Componentes.Inputs.TitleSubtitle titulo={"No hay Artículos que mostrar"}
+            contenido={"No se encontraron resultados"}/>
           </div>
         )}
       {/* Example view docs

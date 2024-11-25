@@ -3,15 +3,17 @@ const express = require('express');
 const router = express.Router();
 const asignacionController = require('../controllers/asignacionesController');
 const asignacionMiddlewares = require('../middlewares/asignacionesMiddlewares');
-
+const { uploadPdf } = require('../config/uploadPdf');
 // Endpoint para buscar asignaciones
 router.get('/search/:query', asignacionController.buscarAsignaciones);
 
 // Crear una nueva asignación con middleware
-router.post('/', asignacionMiddlewares.middleCreateAsignacion, asignacionController.crearAsignacion);
+// router.post('/crearAsignacion', asignacionMiddlewares.middleCreateAsignacion, asignacionController.crearAsignacion);
+// router.post('/crearAsignacion', asignacionController.crearAsignacion);
+// Subir documento firmado para la asignación
+// router.post('/subirDocumento', asignacionController.subirDocumentoAsignacion);
 
 // Dar de baja una asignación con middleware
-// router.patch('/:id/baja', asignacionMiddlewares.middleBajaAsignacion, asignacionController.darDeBajaAsignacion); Error
 router.patch('/:id/baja', asignacionController.darDeBajaAsignacion);
 
 // Obtener detalles de una asignación con middleware
@@ -22,5 +24,11 @@ router.get('/articulo/:fk_Articulo', asignacionController.registroAsignacionesPo
 
 // Endpoint para obtener registro de asignaciones por responsable
 router.get('/responsable/:fk_Responsable', asignacionController.registroAsignacionesPorResponsable);
+
+
+
+// Ruta para crear asignación y subir archivo
+router.post('/crearAsignacion', uploadPdf.single("file"), asignacionController.crearAsignacion);
+
 
 module.exports = router;

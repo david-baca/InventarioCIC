@@ -1,100 +1,102 @@
 // src/controllers/areaController.js
 const areaView = require('../views/areasView');
-const {Areas } = require ('../model');
+const { Areas, Articulos } = require('../model');
 const { Op } = require('sequelize');
-let areas = []; // Simulación de base de datos en memoria
-//__________________prueba de que si se actualizo el git_________________________________________________________________________________________crear (POST)
-exports.crearArea = async (req, res) => {
-    const { codigo, descripcion } = req.body;  
-    if (!codigo || !descripcion) {
-        return res.status(400).json({
-            error: 'Faltan datos requeridos: codigo y descripcion son obligatorios.'
-        });
-    }
-    const disponible = 1;  
-    const nuevaArea = { codigo, descripcion, disponible };
-
-
-    try {
-        const area = await Areas.create(nuevaArea);   
-        res.status(201).json(areaView.datosAreaCreada(area));
-    } catch (error) {
-        
-        res.status(500).json({ error: error.message });
-    }
-}; 
-
-
-//______________________________________________________________________________________________________________editar(PUT)
-exports.editarArea = async (req, res) => {
-    try {
-        const area = await Areas.findByPk(req.params.id);
-        if (!area) {
-            return res.status(404).json({ message: 'Área no encontrada' });
-        }
-        const { codigo, descripcion } = req.body;
-        if (!codigo || !descripcion) {
-            return res.status(400).json({
-                error: 'Faltan datos requeridos: codigo y descripcion y motivo son obligatorios.'
-            });
-        }  
-        await area.update({ codigo, descripcion,  }); 
-        res.status(200).json({
-            message: 'El área ha sido actualizada con éxito.',
-            area
-        });
-    } catch (error) {      
-        res.status(400).json({ error: error.message });
-    }
-};
-//______________________________________________________________________________________________________________buscar(GET)
 exports.buscarAreas = async (req, res) => {
+    const { query } = req.params;
     try {
-        const { query } = req.params; 
-       const areas = await Areas.findAll({
-            where: {
-                [Op.or]: [
-                    { codigo: query },        
-                    { descripcion: { [Op.like]: `%${query}%` } }    
-                ]
-            }
-        });
-        if (areas.length > 0) {
-            res.status(200).json(areaView.listaAreas(areas)); 
-        } else {
-            res.status(404).json({ message: 'No se encontraron áreas.' }); 
+        const whereConditions = {
+            disponible: 1 // Solo buscar áreas disponibles
+        };
+        if (query && query !== 'null' && query !== '') {
+            whereConditions[Op.or] = [
+                { codigo: { [Op.like]: `%${query}%` } },  // Cambiado de 'nombre' a 'codigo'
+                { descripcion: { [Op.like]: `%${query}%` } }
+            ];
         }
-    } catch (error) {   
-        res.status(500).json({ error: error.message });
+        const resultado = await Areas.findAll({
+            where: whereConditions
+        });
+        res.json(areaView.listaAreas(resultado)); // Adaptado a 'areaView'
+    } catch (error) {
+        res.status(500).json({ error: 'Error en la búsqueda de áreas' });
     }
 };
-
-//______________________________________________________________________________________________________________Dar de baja (PATCH)
-exports.darDeBajaArea = async (req, res) => {
-    try {     
-        
-        const area = await Areas.findByPk(req.params.id);    
-        if (!area) {
-            return res.status(404).json({ message: 'Área no encontrada' });
-        }
-
-       
-        const { motivo } = req.body; 
-        if (!motivo) {
-            return res.status(400).json({ error: 'Es necesario especificar un motivo para dar de baja el área.' });
-        }
-
-        
-        await area.update({ disponible: false, motivo });
-
-        
-        res.status(200).json({
-            message: 'El área ha sido dada de baja con éxito.',
-            motivo, 
-            area
+exports.detallesArea = async (req, res) => {
+    const { pk } = req.params;
+    try {
+        const area = await Areas.findByPk(pk);
+        if (area === undefined) return res.status(404).json({ error: 'Área no encontrada' });
+        const articulos = await Articulos.findAll({
+            where: { Area_pk: pk },
         });
-    } catch (error) {    
-        
-        res.status(500).json({ error: error.message });
+        res.json({ articulos, area });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al obtener los detalles del área: ' + error.message });
+    }
+};
+exports.crearArea = async (req, res) => {
+    const { codigo, descripcion, articulos } = req.body; // Captura la lista de artículos
+    try {
+        const nuevaArea = await Areas.create({ codigo, descripcion });
+
+        // Actualizar los artículos con la nueva área
+        if (articulos && articulos.length > 0) {
+            await Articulos.update(
+                { Area_pk: nuevaArea.pk }, // Asocia la nueva área
+                { where: { pk: articulos.map(articulo => articulo.pk) } }
+            );
+        }
+
+        res.json(areaView.datosAreaCreada(nuevaArea)); // Adaptado a 'areaView'
+    } catch (error) {
+        res.status(500).json({ error: 'Error al crear el área'+error });
+    }
+};
+exports.editarArea = async (req, res) => {
+    const { id } = req.params;
+    const { codigo, descripcion, articulos } = req.body; // Captura la lista de artículos (pks)
+    
+    try {
+        const area = await Areas.findByPk(id);
+        if (!area) {
+            return res.status(404).json(areaView.errorArea('Área no encontrada'));
+        }
+        await area.update({ codigo, descripcion });
+
+        await Articulos.update(
+            { Area_pk: null },  // Establece el campo Area_pk a null
+            { where: { Area_pk: area.pk } }  // Solo actualizamos los artículos que están actualmente asignados a esta área
+        );
+
+        // Ahora, asociamos los artículos seleccionados al área editada
+        if (articulos && articulos.length > 0) {
+            for (let i = 0; i < articulos.length; i++) {
+                const x = await Articulos.findByPk(articulos[i]);  // Encuentra el artículo por su PK
+                if (x) {
+                    x.Area_pk = area.pk;
+                    await x.save();  // Guarda los cambios
+                } else {
+                    console.log(`No se encontró el artículo con PK ${articulos[i]}`);
+                }
+            }
+        }
+
+        res.json(areaView.confirmacionEdicion(area)); // Adaptado a 'areaView'
+    } catch (error) {
+        res.status(500).json({ error: 'Error al editar el área: ' + error });
+    }
+};
+exports.darDeBajaArea = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const area = await Areas.findByPk(id);
+        if (!area) {
+            return res.status(404).json(areaView.errorArea('Área no encontrada'));
+        }
+        await area.update({ disponible: 0 }); // Marcar como no disponible
+        res.json(areaView.confirmacionBaja(area)); // Adaptado a 'areaView'
+    } catch (error) {
+        res.status(500).json({ error: 'Error al dar de baja el área' });
     }
 };

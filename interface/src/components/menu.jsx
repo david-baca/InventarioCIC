@@ -5,7 +5,7 @@ import menu from "../../public/img/menu.svg";
 const options = [
   { name: "Inicio", path: "/" },
   { name: "Artículos", path: "/articles" },
-  { name: "Grupos", path: "/groups" },
+  { name: "Grupos", path: "/grups" },
   { name: "Almacén", path: "/almacen" },
   { name: "Responsable", path: "/responsable" },
   { name: "Movimientos", path: "/movimientos" },

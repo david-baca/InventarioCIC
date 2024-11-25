@@ -11,10 +11,13 @@ router.post('/',responsablesMiddlewares.crearResponsable, responsableController.
 // Endpoint para editar un responsable
 router.put('/:id',responsablesMiddlewares.editarResponsable, responsableController.editarResponsable);
 
+// Endpoint para buscar todos los artículos
+router.get('/search/', responsableController.buscarResponsablesAll);
 // Endpoint para buscar responsables con middleware
 router.get('/search/:query', responsableController.buscarResponsables);
-
+// Endpoint para buscar todos los artículos
+router.get('/details/:pk', responsableController.buscarResponsable);
 // Endpoint para dar de baja un responsable
-router.delete('/:id/baja',responsablesMiddlewares.darDeBajaResponsable, responsableController.darDeBajaResponsable);
+router.patch('/baja/:id',responsablesMiddlewares.darDeBajaResponsable, responsableController.darDeBajaResponsable);
 
 module.exports = router;

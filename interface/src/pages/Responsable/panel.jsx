@@ -1,73 +1,139 @@
+import axios from 'axios';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Componentes from "../../components/";
 
-const peticiones = {
-  fetchResponsables: async (setResponsables) => {
+const peticion = () => {
+  const section = "responsables";
+  const baseApi = import.meta.env.VITE_BASE_API;
+  const instance = axios.create({
+    baseURL: baseApi,
+  });
+
+  const Buscar = async ({ query }) => {
     try {
-      const response = await fetch('/responsables');
-      if (!response.ok) throw new Error('Error al cargar responsables');
-      const data = await response.json();
-      setResponsables(data);
+      const response = await instance.get(`/${section}/search/${query}`);
+      return response.data; // Suponiendo que response.data es el array esperado
     } catch (error) {
-      Error(error);
+      console.error(error.response?.data?.error || error.message);
+      throw new Error(error.response?.data?.error || 'Error en la interacción con la API');
     }
-  },
-  buscarResponsables: async (query, setResponsables) => {
-    try {
-      const response = await fetch(`/responsables/search/${query}`);
-      if (!response.ok) throw new Error('Error al buscar responsables');
-      const data = await response.json();
-      setResponsables(data);
-    } catch (error) {
-      console.error(error);
-    }
-  },
+  };
+
+  return { Buscar };
 };
 
 const ViewResponsable = () => {
   const navigate = useNavigate();
-  const [responsables, setResponsables] = useState([]);
+  const [data, setData] = useState([]);
   const [query, setQuery] = useState('');
+  const [error, setError] = useState();
+  const [showInfo, setShowInfo] = useState(); 
+  const [success, setSuccess] = useState(); 
+  
+  const handleActionInfo = () => {
+    setShowInfo(null); 
+  };
+  const handleActionEror = () => {
+    setError(null); 
+  };
+  const handleActionSuccess= () => {
+    setSuccess(null); 
+    navigate('/responsable');
+  };
 
+  // Función que se activa cada vez que se cambia la query
   useEffect(() => {
-    peticiones.fetchResponsables(setResponsables);
-  }, []);
+    const cargarData = async () => {
+      const Peticion = peticion();
+      setError(null);
+      setData([]);
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    peticiones.buscarResponsables(query, setResponsables);
+      try {
+        const result = await Peticion.Buscar({ query });
+        setData(result);
+      } catch (err) {
+        setError(err.message);
+      }
+    };
+    cargarData();
+  }, [query]);
+
+  const handlePublish = () => {
+    navigate('./load');
   };
 
-  const handleEdit = (id) => {
-    navigate(`/responsables/edit/${id}`);
+  const handleEdit = (pk) => {
+    navigate(`/responsable/edit/${pk}`);
   };
 
-  const handleBaja = (id) => {
-    navigate(`/responsables/baja/${id}`);
+  const handleDelete = (pk) => {
+    navigate(`/responsable/removal/${pk}`);
+  };
+
+  const handleSearchChange = (value) => {
+    setQuery(value);
+
+    // Si hay un timeout previo, lo limpiamos
+    if (debounceTimeout) {
+      clearTimeout(debounceTimeout);
+    }
+
+    // Establecemos un nuevo timeout para la búsqueda después de 500ms
+    const newTimeout = setTimeout(() => {
+      cargarData(value); // Llamamos a cargarData después de 500ms
+    }, 500);
+
+    setDebounceTimeout(newTimeout);
   };
 
   return (
     <>
-      <h1>Panel de Responsables</h1>
-      <form onSubmit={handleSearch}>
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Buscar responsables"
-        />
-        <button type="submit">Buscar</button>
-      </form>
-      <button onClick={() => navigate('/responsables/cargar')}>Crear Responsable</button>
-      <div>
-        {responsables.map((resp) => (
-          <div key={resp.id}>
-            <h2>{resp.nombres} {resp.apellido_p} {resp.apellido_m}</h2>
-            <button onClick={() => handleEdit(resp.id)}>Editar</button>
-            <button onClick={() => handleBaja(resp.id)}>Dar de baja</button>
-          </div>
-        ))}
+    <Componentes.Modals.success mensaje={success} action={handleActionSuccess}/>
+    <Componentes.Modals.info mensaje={showInfo} action={handleActionInfo}/>
+    <Componentes.Modals.error mensaje={error} action={handleActionEror}/>
+      
+      <Componentes.Inputs.TitleHeader text={"Administración de Reponsables"} />
+      <div className='flex items-center'>
+        <div className='flex items-center w-[100%]'>
+          <Componentes.Inputs.TitleSubtitle titulo={"Estos son los Responsables del programa de inventario."}
+            contenido={"busque por nombre del responsable."} />
+        </div>
+        <div className='flex items-center w-[100%]'>
+          <Componentes.Buscador query={query} OnChange={handleSearchChange} />
+          <Componentes.Botones.Crear onClick={handlePublish} />
+        </div>
       </div>
+        {data.length > 0 ? (
+          <Componentes.Table.table>
+            <Componentes.Table.columna>
+              <Componentes.Table.encabezado>
+                Nombre:
+              </Componentes.Table.encabezado>
+              <Componentes.Table.encabezado>
+                Apellidos:
+              </Componentes.Table.encabezado>
+              <Componentes.Table.encabezado>
+                Acciones:
+              </Componentes.Table.encabezado>
+            </Componentes.Table.columna>
+            {data.map((element) => (
+              <Componentes.Table.columna key={element.pk}>
+                <Componentes.Table.fila>{element.nombres}</Componentes.Table.fila>
+                <Componentes.Table.fila>{element.apellido_p} {element.apellido_m}</Componentes.Table.fila>
+                <Componentes.Table.fila>
+                  <Componentes.Botones.iconPencil Onclik={() => handleEdit(element.pk)} />
+                  <Componentes.Botones.iconTrash Onclik={() => handleDelete(element.pk)} />
+                </Componentes.Table.fila>
+              </Componentes.Table.columna>
+            ))}
+          </Componentes.Table.table>
+        ) : (
+          <div className='flex justify-center h-full items-center'>
+            <Componentes.Inputs.TitleSubtitle titulo={"No hay Reponsables que mostrar"}
+            contenido={"no se encontraron resultados"}/>
+          </div>
+        )}
     </>
   );
 };
