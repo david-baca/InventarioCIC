@@ -32,6 +32,36 @@ const text = ({ Value, Onchange, Placeholder }) => {
   );
 };
 
+const correo = ({ Value, Onchange, Placeholder }) => {
+  return (
+    <div className="rounded p-1 relative flex border border-UP-Secundario w-[100%]" data-twe-input-wrapper-init data-twe-input-group-ref>
+      <input
+        type="email"
+        required
+        value={Value}
+        onChange={(e) => Onchange(e.target.value)}  // Asegúrate de usar onChange correctamente
+        className="peer w-full rounded border-0 bg-transparent 
+        p-1 outline-none transition-all duration-200 ease-linear 
+        focus:placeholder:opacity-100 peer-focus:text-primary 
+        data-[twe-input-state-active]:placeholder:opacity-100 
+        motion-reduce:transition-none dark:text-UP-Negro
+        dark:placeholder:text-transparent
+        dark:autofill:shadow-autofill dark:peer-focus:text-primary 
+        [&:not([data-twe-input-placeholder-active])]:placeholder:opacity-0 relative"
+      />
+      <label
+        className={`pointer-events-none absolute top-2 left-3
+            ${Value === "" ? '' : '-translate-y-6 -translate-x-2'} 
+            truncate text-UP-Negro 
+            transition-all duration-200 ease-out 
+            dark:text-UP-Secundario bg-UP-Blanco min-w-[1rem]`}
+      >
+        <h1>{Placeholder}</h1>
+      </label>
+    </div>
+  );
+};
+
 const area = ({ Value, Onchange, Placeholder }) => {
   return (
     <div className="rounded p-1 relative flex border border-UP-Secundario w-[100%]" data-twe-input-wrapper-init data-twe-input-group-ref>
@@ -97,9 +127,9 @@ const number = ({ Value, Onchange, Placeholder }) => {
 const checkbox = ({ Value, Onchange }) => {
   return (
       <input
-        type="checkbox"  
+        type="checkbox"
         checked={Value}  
-        onChange={() => Onchange(prev => !prev)}  
+        onChange={(e) => Onchange(e)}  
         className="p-5 accent-UP-Primario focus:ring-orange-300
         md:w-6 md:h-6 w-12 h-12" 
       />
@@ -181,4 +211,4 @@ const fileimg = ({ object, request, ImageUpload, clikObjectDelete, clikRequestDe
   );
 };
 
-export default { text, area, number, checkbox, fileimg };
+export default { text, area, number, correo, checkbox, fileimg };

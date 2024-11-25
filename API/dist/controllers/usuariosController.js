@@ -91,6 +91,27 @@ exports.mostrarUsuarios = async(req, res) => {
 
 
 
+// src/controllers/usuariosController.js
+// const { Usuarios } = require('../model');
+// const sequelize = require('../config/database'); // Importa la instancia de Sequelize para usar funciones de SQL
+
+// exports.mostrarUsuarios = async (req, res) => {
+//     try {
+//         const usuarios = await Usuarios.findAll({
+//             attributes: [
+//                 'correo',
+//                 [sequelize.fn('CONCAT', sequelize.col('nombres'), ' ', sequelize.col('apellido_p'), ' ', sequelize.col('apellido_m')), 'nombre_completo']
+//             ]
+//         });
+
+//         res.json(usuarios);
+//     } catch (error) {
+//         res.status(500).json({ error: 'Error al obtener los usuarios: ' + error });
+//     }
+// };
+
+
+
 exports.detallesUsuario = async(req, res) => {
     const {correo} = req.params
 

@@ -24,7 +24,7 @@ const ViewReport = () => {
               </Link>
               
               {/* Segundo recuadro interno */}
-              <Link to="/Reportes/responsables" className="flex-1 max-w-xs border rounded-md p-4 text-center hover:shadow-lg">
+              <Link to="/reportes/responsables" className="flex-1 max-w-xs border rounded-md p-4 text-center hover:shadow-lg">
                 <h2 className="text-lg font-semibold mb-2">Responsables</h2>
                 <p>Asignaciones actuales.</p>
                 <img src={responsableImg} alt="Responsables" className="mt-4 mx-auto h-32 w-auto" />

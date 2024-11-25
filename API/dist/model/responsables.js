@@ -25,6 +25,10 @@ const Responsables = sequelize.define('Responsables', {
     type: DataTypes.BOOLEAN,
     defaultValue: true,
   },
+  correo:{
+    type: DataTypes.STRING(100),
+    allowNull: false,
+  },
 }, {
   tableName: 'Responsables',
   timestamps: false,
