@@ -12,12 +12,14 @@ const instance = axios.create({
 const fetchArticles = async (query) => {
   try {
     const response = await instance.get(`/articulos/search/${query}`);
+    console.log("Artículos obtenidos:", response.data); // Verifica los datos aquí
     return response.data;
   } catch (error) {
     console.error("Error al buscar artículos:", error);
     return [];
   }
 };
+
 
 const ArticleSelect = () => {
   const navigate = useNavigate();
@@ -64,7 +66,7 @@ const ArticleSelect = () => {
   // Función para seleccionar y resaltar la fila
   const handleRowClick = (article) => {
     setSelectedArticle(article); // Guardar el artículo completo seleccionado
-
+    console.log("Artículo seleccionado:", article);
     // Guardar la información en localStorage
     localStorage.setItem('selectedArticle', JSON.stringify(article));
 
@@ -77,13 +79,19 @@ const ArticleSelect = () => {
   // Función para manejar el clic en "Siguiente"
   const handleNext = () => {
     const selectedArticle = localStorage.getItem('selectedArticle');
-    if (selectedArticle) {
-      // Pasar a la siguiente ruta con la información del artículo seleccionado
-      navigate(`/asignaciones/assign`);
+    const selectedResponsable = JSON.parse(localStorage.getItem('selectedResponsable'));
+
+    if (selectedArticle && selectedResponsable) {
+      const pkResponsable = selectedResponsable.pk;
+      const pkArticulo = JSON.parse(selectedArticle).pk;
+
+      // Redirigir a ViewAssigned con los parámetros en la URL
+      navigate(`/asignaciones/${pkResponsable}/${pkArticulo}`);
     } else {
       alert("Por favor, selecciona un artículo antes de continuar.");
     }
   };
+
 
   return (
     <>
@@ -110,30 +118,33 @@ const ArticleSelect = () => {
           <div className="text-red-600">{error}</div>
         ) : currentItems.length > 0 ? (
           <Componentes.Table.table className="w-full border border-gray-300">
-            <Componentes.Table.columna>
-              <Componentes.Table.encabezado className="bg-red-800 text-white text-center py-2">
-                Token
-              </Componentes.Table.encabezado>
-              <Componentes.Table.encabezado className="bg-red-800 text-white text-center py-2">
-                Artículo
-              </Componentes.Table.encabezado>
-            </Componentes.Table.columna>
-            {currentItems.map((article) => (
-              <tr
-                key={article.pk}
-                onClick={() => handleRowClick(article)}
-                className={`border-t border-gray-300 cursor-pointer ${
-                  selectedArticle?.pk === article.pk ? 'bg-orange-300' : ''
-                }`}
-              >
-                <Componentes.Table.fila className="text-center py-2 text-gray-600">
-                  {article.no_inventario}
-                </Componentes.Table.fila>
-                <Componentes.Table.fila className="text-center py-2 text-gray-600">
-                  {article.nombre}
-                </Componentes.Table.fila>
-              </tr>
-            ))}
+            <thead>
+              <Componentes.Table.columna>
+                <Componentes.Table.encabezado className="bg-red-800 text-white text-center py-2">
+                  Token
+                </Componentes.Table.encabezado>
+                <Componentes.Table.encabezado className="bg-red-800 text-white text-center py-2">
+                  Artículo
+                </Componentes.Table.encabezado>
+              </Componentes.Table.columna>
+            </thead>
+            <tbody>
+              {currentItems.map((article) => (
+                <tr
+                  key={article.pk}
+                  onClick={() => handleRowClick(article)}
+                  className={`border-t border-gray-300 cursor-pointer ${selectedArticle?.pk === article.pk ? 'bg-orange-300' : ''
+                    }`}
+                >
+                  <Componentes.Table.fila className="text-center py-2 text-gray-600">
+                    {article.no_inventario}
+                  </Componentes.Table.fila>
+                  <Componentes.Table.fila className="text-center py-2 text-gray-600">
+                    {article.nombre}
+                  </Componentes.Table.fila>
+                </tr>
+              ))}
+            </tbody>
           </Componentes.Table.table>
         ) : (
           <h1 className="text-gray-500">No hay datos disponibles</h1>

@@ -60,67 +60,37 @@ exports.buscarAsignaciones = async (req, res) => {
     }
 };
 
-// Función para crear una asignación y generar el PDF
+// src/controllers/asignacionesController.js
 exports.crearAsignacion = async (req, res) => {
-    const { fk_Articulo, fk_Responsable, urlDoc } = req.body;
-
-    if (!fk_Articulo || !fk_Responsable || !urlDoc) {
-        return res.status(400).json({ error: 'Todos los campos (fk_Articulo, fk_Responsable, urlDoc) son obligatorios.' });
+    const { fk_Articulo, fk_Responsable } = req.body;
+  
+    if (!req.file || !fk_Articulo || !fk_Responsable) {
+      return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
     }
-
+  
     try {
-        const nuevaAsignacion = await Asignaciones.create({
-            Articulos_pk: fk_Articulo,
-            Responsables_pk: fk_Responsable,
-            disponible: true,
-            fecha_recibido: new Date()
-        });
-
-        const responsable = await Responsables.findByPk(fk_Responsable, {
-            attributes: ['nombres', 'apellido_p', 'apellido_m']
-        });
-        const articulo = await Articulos.findByPk(fk_Articulo, {
-            attributes: ['no_inventario', 'nombre', 'descripcion', 'costo']
-        });
-
-        const templatePath = path.resolve(__dirname, 'FORMATO DE ASIGNACION - MODULO DE REPORTES.pdf');
-        const pdfBytes = fs.readFileSync(templatePath);
-        const pdfDoc = await PDFDocument.load(pdfBytes);
-
-        const pages = pdfDoc.getPages();
-        const firstPage = pages[0];
-
-        // Agregar texto en posiciones específicas en el PDF
-        firstPage.drawText(`${responsable.nombres} ${responsable.apellido_p} ${responsable.apellido_m}`, { x: 150, y: 620, size: 12 });
-        firstPage.drawText(urlDoc, { x: 350, y: 600, size: 12 });
-        firstPage.drawText(articulo.no_inventario, { x: 150, y: 580, size: 12 });
-        firstPage.drawText(articulo.nombre, { x: 150, y: 560, size: 12 });
-        firstPage.drawText(articulo.descripcion, { x: 150, y: 540, size: 12 });
-        firstPage.drawText(`$${articulo.costo}`, { x: 150, y: 520, size: 12 });
-
-        const fecha = new Date();
-        const opcionesFecha = { year: 'numeric', month: 'long', day: 'numeric' };
-        const fechaFormateada = fecha.toLocaleDateString('es-MX', opcionesFecha);
-        firstPage.drawText(`Cancún, Quintana Roo, a ${fechaFormateada}`, { x: 150, y: 500, size: 12 });
-
-        // Ruta y creación de carpeta si no existe
-        const pdfOutputDir = path.join(__dirname, '../uploads/documents');
-        if (!fs.existsSync(pdfOutputDir)) {
-            fs.mkdirSync(pdfOutputDir, { recursive: true });
-        }
-        
-        const pdfOutputPath = path.join(pdfOutputDir, `Asignacion_${nuevaAsignacion.pk}.pdf`);
-        fs.writeFileSync(pdfOutputPath, await pdfDoc.save());
-
-        return res.status(201).json({
-            message: 'Asignación creada exitosamente.',
-            pdfUrl: `/uploads/documents/Asignacion_${nuevaAsignacion.pk}.pdf`
-        });
+      // Crear el registro del archivo en la tabla Documentos
+      const documento = await Documentos.create({
+        doc_firma: req.file.path, // Ruta del archivo subido
+        fecha: new Date(),
+      });
+  
+      // Crear la asignación
+      const asignacion = await Asignaciones.create({
+        Articulos_pk: fk_Articulo,
+        Responsables_pk: fk_Responsable,
+        Documentos_pk: documento.pk, // Relación con el documento
+        disponible: true,
+        fecha_recibido: new Date(),
+      });
+  
+      res.status(201).json({ message: 'Asignación creada exitosamente.', asignacion });
     } catch (error) {
-        console.error('Error al crear la asignación:', error);
-        return res.status(500).json({ error: `Error al crear la asignación: ${error.message}` });
+      console.error("Error al crear la asignación:", error);
+      res.status(500).json({ error: 'Error al crear la asignación.' });
     }
-}; //corregir no es pdf directo es primero de word a pdf
+  };
+  
 
 
 

@@ -3,14 +3,14 @@ const { Op } = require('sequelize');
 exports.buscarArticulosAll = async (req, res) => {
     try {
         const resultado = await Articulos.findAll({
-            where: {disponible: 1},
-            attributes: ['pk','nombre','no_inventario','costo']
+            where: { disponible: 1 },
+            attributes: ['pk', 'nombre', 'no_inventario', 'descripcion', 'costo'] // Agregar 'descripcion'
         });
         res.json(resultado);
     } catch (error) {
         res.status(500).json({ error: 'Error en la búsqueda de artículos' });
     }
-}; 
+};
 
 
 exports.buscarArticulos = async (req, res) => {
@@ -24,13 +24,13 @@ exports.buscarArticulos = async (req, res) => {
                 ],
                 disponible: 1
             },
-            attributes: ['pk','nombre','no_inventario','costo']
+            attributes: ['pk', 'nombre', 'no_inventario', 'descripcion', 'costo'] // Agregar 'descripcion'
         });
         res.json(resultado);
     } catch (error) {
         res.status(500).json({ error: 'Error en la búsqueda de artículos' });
     }
-}; 
+};
 
 exports.crearArticulo = async (req, res) => {
     try {
