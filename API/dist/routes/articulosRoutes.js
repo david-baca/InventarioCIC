@@ -24,9 +24,13 @@ articulosRoutes.patch('/baja/:id', uploadImg.array('imagenes', 5), articulosMidd
 articulosRoutes.get('/details/:no_inventario', articleController.detallesArticulo);
 
 // Endpoint para obtener artículos sin grupo
-articulosRoutes.get('/sin/grupo/:fk_Grupo_execpcion', articleController.articulosSinGrupo);
+articulosRoutes.get('/sin/grupo/', articleController.articulosSinGrupo);
+articulosRoutes.get('/sin/grupo/:query', articleController.articulosSinGrupo);
+articulosRoutes.get('/sin/grupo/execption/:fk_execpcion', articleController.articulosSinGrupo);
+articulosRoutes.get('/sin/grupo/execption/:fk_execpcion/:query', articleController.articulosSinGrupo);
 
-// Endpoint para obtener artículos sin área
-articulosRoutes.get('/sin/area/:fk_Area_execpcion', articleController.articulosSinArea);
-
+articulosRoutes.get('/sin/area/', articleController.articulosSinArea);
+articulosRoutes.get('/sin/area/:query', articleController.articulosSinArea);
+articulosRoutes.get('/sin/area/execption/:fk_execpcion', articleController.articulosSinArea);
+articulosRoutes.get('/sin/area/execption/:fk_execpcion/:query', articleController.articulosSinArea);
 module.exports = articulosRoutes;

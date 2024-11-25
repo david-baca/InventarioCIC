@@ -102,14 +102,14 @@ const ViewArticleLoad = () => {
               Onchange={(value) =>setConsumible(value)}
             />
             <Componentes.Inputs.TitleSubtitle
-              titulo="Articulo consumible" 
+              titulo="Artículo consumible" 
               contenido="Active este campo si el artículo puede dejar de servir con un uso apropiado."
             />
         </div>
         {/* Pass image delete handler to Upimagen */}
         <Componentes.Inputs.TitleSubtitle 
           titulo="Evidencias (opcional)" 
-          contenido="Nos ayuda a registrar las condiciones actuales del articulo" 
+          contenido="Nos ayuda a registrar las condiciones actuales del Artículo" 
         />
         <Componentes.Labels.fileimg
             object={imagenes}

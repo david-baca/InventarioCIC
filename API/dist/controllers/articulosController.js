@@ -10,9 +10,7 @@ exports.buscarArticulosAll = async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: 'Error en la búsqueda de artículos' });
     }
-};
-
-
+}; 
 exports.buscarArticulos = async (req, res) => {
     const { query } = req.params;
     try {
@@ -30,8 +28,7 @@ exports.buscarArticulos = async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: 'Error en la búsqueda de artículos' });
     }
-};
-
+}; 
 exports.crearArticulo = async (req, res) => {
     try {
         const { no_inventario, nombre, descripcion, costo, consumible} = req.body;
@@ -62,7 +59,6 @@ exports.crearArticulo = async (req, res) => {
         res.status(500).json({ error: 'Error al crear el artículo' });
     }
 };
-
 exports.editarArticulo = async (req, res) => {
     const { id } = req.params;
     const { no_inventario, nombre, descripcion, costo, consumible} = req.body;
@@ -117,7 +113,6 @@ exports.editarArticulo = async (req, res) => {
         return res.status(500).json({ error: 'Error al editar el artículo' });
     }
 };
-
 exports.darDeBajaArticulo = async (req, res) => {
     const { id } = req.params;
     try {
@@ -167,7 +162,6 @@ exports.darDeBajaArticulo = async (req, res) => {
         res.status(500).json({ error: 'Error al dar de baja el artículo' });
     }
 };
-
 exports.detallesArticulo = async (req, res) => {
     const { no_inventario } = req.params;
     try {
@@ -211,35 +205,72 @@ exports.detallesArticulo = async (req, res) => {
         res.status(500).json({ error: 'Error al obtener los detalles del artículo: ' + error.message });
     }
 };
-
 exports.articulosSinGrupo = async (req, res) => {
-    const { fk_Grupo_execpcion } = req.params;
-
+    const { fk_execpcion, query } = req.params; // Extraemos la excepción y el query
     try {
+        const whereConditions = {
+            disponible: 1,
+            Grupos_pk: { [Op.is]: null },
+        };
+
+        if (query && query !== null) {
+            whereConditions[Op.or] = [
+                { nombre: { [Op.like]: `%${query}%` } },
+                { no_inventario: { [Op.like]: `%${query}%` } }
+            ];
+        }
+
+        // Realizamos la consulta con las condiciones correspondientes
         const resultado = await Articulos.findAll({
-            where: {
-                Grupos_pk: { [Op.ne]: fk_Grupo_execpcion },
-                disponible: 1
-            }
+            where: whereConditions
         });
+        // Si fk_execpcion tiene un valor válido, excluimos los artículos de ese grupo
+        if (fk_execpcion && fk_execpcion !== 'null') {
+            const exeptionres = await Articulos.findAll({
+                where: {
+                    disponible: 1,
+                    Grupos_pk: fk_execpcion,
+                }
+            });
+            return res.json({articulos:[...resultado, ...exeptionres]});
+        }
         res.json({ articulos: resultado });
     } catch (error) {
         res.status(500).json({ error: 'Error al obtener artículos sin grupo' });
     }
 };
-
 exports.articulosSinArea = async (req, res) => {
-    const { fk_Area_execpcion } = req.params;
-
+    const { fk_execpcion, query } = req.params; // Extraemos la excepción y el query
     try {
+        const whereConditions = {
+            disponible: 1,
+            Area_pk: { [Op.is]: null },
+        };
+
+        if (query && query !== null) {
+            whereConditions[Op.or] = [
+                { nombre: { [Op.like]: `%${query}%` } },
+                { no_inventario: { [Op.like]: `%${query}%` } }
+            ];
+        }
+
+        // Realizamos la consulta con las condiciones correspondientes
         const resultado = await Articulos.findAll({
-            where: {
-                Areas_pk: { [Op.ne]: fk_Area_execpcion },
-                disponible: 1
-            }
+            where: whereConditions
         });
+        // Si fk_execpcion tiene un valor válido, excluimos los artículos de ese grupo
+        if (fk_execpcion && fk_execpcion !== 'null') {
+            const exeptionres = await Articulos.findAll({
+                where: {
+                    disponible: 1,
+                    Area_pk: fk_execpcion,
+                }
+            });
+            return res.json({articulos:[...resultado, ...exeptionres]});
+        }
         res.json({ articulos: resultado });
     } catch (error) {
-        res.status(500).json({ error: 'Error al obtener artículos sin área' });
+        res.status(500).json({ error: 'Error al obtener artículos sin area' });
     }
 };
+

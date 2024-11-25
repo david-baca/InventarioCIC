@@ -120,7 +120,7 @@ const ViewArticleRenoval = () => {
             />
             <Componentes.Inputs.TitleSubtitle 
               titulo="Evidencias (opcional)" 
-              contenido="Nos ayuda a registrar las condiciones actuales del articulo" 
+              contenido="Nos ayuda a registrar las condiciones actuales del Artículo" 
             />
             <Componentes.Labels.fileimg
               object={nuevasImagenes}

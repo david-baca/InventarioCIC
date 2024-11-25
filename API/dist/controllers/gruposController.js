@@ -1,18 +1,21 @@
 const grupoView = require('../views/gruposView');
 const { Grupos, Articulos } = require('../model'); // Asegúrate de tener el modelo Grupos importado
-const { Op } = require('sequelize');
+const { Op, where } = require('sequelize');
 // Buscar grupos
 exports.buscarGrupos = async (req, res) => {
-    const { query } = req.params;
+    const { query } = req.params; // Extraemos el query
     try {
+        const whereConditions = {
+            disponible: 1 // Solo buscar grupos disponibles
+        };
+        if (query && query !== 'null' && query !== '') {
+            whereConditions[Op.or] = [
+                { nombre: { [Op.like]: `%${query}%` } },
+                { descripcion: { [Op.like]: `%${query}%` } }
+            ];
+        }
         const resultado = await Grupos.findAll({
-            where: {
-                [Op.or]: [
-                    { nombre: { [Op.like]: `%${query}%` } },
-                    { descripcion: { [Op.like]: `%${query}%` } }
-                ],
-                disponible: 1 // Solo buscar grupos disponibles
-            }
+            where: whereConditions
         });
         res.json(grupoView.listaGrupos(resultado));
     } catch (error) {
@@ -33,7 +36,7 @@ exports.detallesGrupo = async (req, res) => {
         res.status(500).json({ error: 'Error al obtener los detalles del artículo: ' + error.message });
     }
 };
-// Crear un nuevo grupo
+// Crear un nuevo grupo 
 exports.crearGrupo = async (req, res) => {
     const { nombre, descripcion, articulos } = req.body; // Captura la lista de artículos
     try {
@@ -47,36 +50,52 @@ exports.crearGrupo = async (req, res) => {
             );
         }
 
-        res.json(grupoView.datosGrupoCreado(nuevoGrupo));
+        res.json(grupoView.datosGrupoCreado({message:"grupo exitosamente creado", grupo:nuevoGrupo}));
     } catch (error) {
         res.status(500).json({ error: 'Error al crear el grupo' });
     }
 };
 
-// Editar un grupo existente
+// Editar
 exports.editarGrupo = async (req, res) => {
+    console.log("entra en editar grupo");
     const { id } = req.params;
-    const { nombre, descripcion, articulos } = req.body; // Captura la lista de artículos
+    const { nombre, descripcion, articulos } = req.body; // Captura la lista de artículos (pks)
+    
     try {
         const grupo = await Grupos.findByPk(id);
         if (!grupo) {
             return res.status(404).json(grupoView.errorGrupo('Grupo no encontrado'));
         }
-        // Actualiza los detalles del grupo
         await grupo.update({ nombre, descripcion });
-        // Actualizar los artículos con el nuevo grupo
+        await Articulos.update(
+            { Grupos_pk: null },  // Establece el campo Grupos_pk a null
+            { where: { Grupos_pk: grupo.pk } }  // Solo actualizamos los artículos que están actualmente asignados a este grupo
+        );
+        // Ahora, asociamos los artículos seleccionados al grupo editado
         if (articulos && articulos.length > 0) {
-            await Articulos.update(
-                { Grupos_pk: grupo.pk }, // Asocia el grupo editado
-                { where: { pk: articulos.map(articulo => articulo.pk) } }
-            );
+            for (let i = 0; i < articulos.length; i++) {
+                const x = await Articulos.findByPk(articulos[i]);  // Encuentra el artículo por su PK
+                console.log(x);
+                if (x) {
+                    x.Grupos_pk = grupo.pk
+                    await x.save();  // Guarda los cambios
+                    console.log('Artículo actualizado: ', x);
+                } else {
+                    console.log(`No se encontró el artículo con PK ${articulos[i]}`);
+                }
+            }
         }
 
-        res.json(grupoView.confirmacionEdicion(grupo));
+        console.log("Paso 3");
+        // Retorna la respuesta con el grupo actualizado
+        res.json(grupoView.confirmacionEdicion({message:"grupo exitosamente editado", grupo:grupo}));
+
     } catch (error) {
-        res.status(500).json({ error: 'Error al editar el grupo' });
+        res.status(500).json({ error: 'Error al editar el grupo'+ error });
     }
 };
+
 
 // Dar de baja un grupo
 exports.darDeBajaGrupo = async (req, res) => {
