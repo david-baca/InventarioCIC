@@ -1,7 +1,10 @@
 // src/controllers/asignacionController.js
 const asignacionView = require('../views/asignacionesView');
 const { Documentos, Asignaciones, Articulos, Responsables, Historial } = require('../model');
-
+// const { PDFDocument } = require('pdf-lib');
+const { uploadPdf } = require('../config/uploadPdf');
+const fs = require('fs');
+const path = require('path');
 // const { Asignaciones } = require('../model')
 
 let asignaciones = []; // Simulación de base de datos en memoria
@@ -57,90 +60,39 @@ exports.buscarAsignaciones = async (req, res) => {
     }
 };
 
-// Crear una nueva asignación
+// src/controllers/asignacionesController.js
 exports.crearAsignacion = async (req, res) => {
-    const { fk_Articulo, fk_Responsable, urlDoc } = req.body;
-
-    // Validar campos obligatorios
-    if (!fk_Articulo || !fk_Responsable || !urlDoc) {
-        return res.status(400).json({
-            error: 'Todos los campos (fk_Articulo, fk_Responsable, urlDoc) son obligatorios.'
-        });
+    const { fk_Articulo, fk_Responsable } = req.body;
+  
+    if (!req.file || !fk_Articulo || !fk_Responsable) {
+      return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
     }
-
+  
     try {
-        // Verificar si ya existe una asignación con el mismo artículo y responsable
-        const asignacionExistente = await Asignaciones.findOne({
-            where: {
-                Articulos_pk: fk_Articulo,
-                Responsables_pk: fk_Responsable
-            }
-        });
-
-        // Si ya existe una asignación, verificar si el documento también existe
-        if (asignacionExistente) {
-            const documentoExistente = await Documentos.findOne({
-                where: {
-                    doc_firma: urlDoc,
-                    Asignaciones_pk: asignacionExistente.pk
-                }
-            });
-
-            if (documentoExistente) {
-                return res.status(400).json({
-                    error: 'Este artículo ya está asignado a este responsable con el mismo documento. No se puede volver a asignar.'
-                });
-            }
-        }
-
-        // Crear la nueva asignación en la base de datos
-        const nuevaAsignacion = await Asignaciones.create({
-            Articulos_pk: fk_Articulo,
-            Responsables_pk: fk_Responsable,
-            disponible: true,
-            fecha_recibido: new Date()
-        });
-
-        // Crear el documento vinculado a la asignación
-        const nuevoDocumento = await Documentos.create({
-            doc_firma: urlDoc, // Guardar el URL del documento
-            fecha: new Date(),
-            Asignaciones_pk: nuevaAsignacion.pk
-        });
-
-        // Obtener la asignación creada con los detalles del artículo, responsable y documento
-        const asignacionConDetalles = await Asignaciones.findOne({
-            where: { pk: nuevaAsignacion.pk },
-            include: [
-                {
-                    model: Articulos,
-                    attributes: ['nombre']
-                },
-                {
-                    model: Responsables,
-                    attributes: ['nombres', 'apellido_p', 'apellido_m']
-                },
-                {
-                    model: Documentos,
-                    as: 'Documentos', // Especifica el alias aquí
-                    attributes: ['doc_firma', 'fecha']
-                }
-            ]
-        });
-
-        // Devolver la respuesta con los datos de la nueva asignación y los detalles
-        return res.status(201).json({
-            message: 'Asignación creada exitosamente.',
-            asignacion: asignacionConDetalles,
-            documento: nuevoDocumento
-        });
+      // Crear el registro del archivo en la tabla Documentos
+      const documento = await Documentos.create({
+        doc_firma: req.file.path, // Ruta del archivo subido
+        fecha: new Date(),
+      });
+  
+      // Crear la asignación
+      const asignacion = await Asignaciones.create({
+        Articulos_pk: fk_Articulo,
+        Responsables_pk: fk_Responsable,
+        Documentos_pk: documento.pk, // Relación con el documento
+        disponible: true,
+        fecha_recibido: new Date(),
+      });
+  
+      res.status(201).json({ message: 'Asignación creada exitosamente.', asignacion });
     } catch (error) {
-        console.error('Error al crear la asignación:', error);
-        return res.status(500).json({
-            error: `Error al crear la asignación: ${error.message}`
-        });
+      console.error("Error al crear la asignación:", error);
+      res.status(500).json({ error: 'Error al crear la asignación.' });
     }
-};
+  };
+  
+
+
 
 // Dar de baja una asignación por ID
 exports.darDeBajaAsignacion = async (req, res) => {

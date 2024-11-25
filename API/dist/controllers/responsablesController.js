@@ -1,7 +1,6 @@
 const responsableView = require('../views/responsablesView');
 const { Responsables, Asignaciones, Articulos, Documentos } = require('../model'); // Asegúrate de tener el modelo Responsables importado
 const { Op, Sequelize } = require('sequelize');
-
 exports.buscarResponsable=async(req,res)=>{
     const { pk } = req.params;
     try {
@@ -67,7 +66,7 @@ exports.editarResponsable = async (req, res) => {
 };
 
 exports.buscarResponsables = async (req, res) => {
-    const { query } = req.params;
+    const query = req.params.query || ''; // Usa un query vacío si no se proporciona
     try {
         const resultado = await Responsables.findAll({
             where: {

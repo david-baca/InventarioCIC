@@ -35,6 +35,7 @@ const ViewArticleInformation = () => {
   const [imagenes, setImagenes] = useState([]);
   const [error, setError] = useState(null);
   const [showInfo, setShowInfo] = useState(null);
+
   // Funciones para manejar modales
   const handleActionInfo = () => setShowInfo(null);
   const handleActionError = () => setError(null);
@@ -47,7 +48,6 @@ const ViewArticleInformation = () => {
     printWindow.document.close(); // Close the document to load content
     printWindow.print(); // Trigger the print dialog
   };
-
   // Cargar los detalles del artículo
   useEffect(() => {
     const cargarArticulo = async () => {

@@ -74,8 +74,6 @@ const ViewArticle = () => {
   const handleConsult = (pk) => {
     navigate(`/articles/detalles/${encodeURIComponent(pk)}`);
   };
-
-  
   const handleSearchChange = (value) => {
     setQuery(value);
 
@@ -97,7 +95,6 @@ const ViewArticle = () => {
     <Componentes.Modals.success mensaje={success} action={handleActionSuccess}/>
     <Componentes.Modals.info mensaje={showInfo} action={handleActionInfo}/>
     <Componentes.Modals.error mensaje={error} action={handleActionEror}/>
-      
       <Componentes.Inputs.TitleHeader text={"Administración de Artículos"} />
       <div className='flex items-center'>
         <div className='flex items-center w-[100%]'>

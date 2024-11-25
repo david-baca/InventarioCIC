@@ -1,127 +1,248 @@
-import React, { useState } from 'react';
-import { useNavigate, Link, useLocation } from 'react-router-dom';
-// import { FaSearch } from 'react-icons/fa';
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { saveAs } from "file-saver";
+import PizZip from "pizzip";
+import Docxtemplater from "docxtemplater";
+import Componentes from "../../../components";
+import axios from 'axios';
 
-// Componente principal de selección de responsable
-const ViewAssigned = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 3;
-
-  const responsables = [
-    { id: 1, correo: 'David Stephen', usuario: 'Baca' },
-    { id: 2, correo: 'Ana', usuario: 'Sanchez' },
-    { id: 3, correo: 'Sonia Fernanda', usuario: 'Estroza' },
-    // Agrega más responsables si es necesario
-  ];
-
-  const filteredResponsables = responsables.filter((responsable) =>
-    responsable.correo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    responsable.usuario.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredResponsables.slice(indexOfFirstItem, indexOfLastItem);
-
-  const totalPages = Math.ceil(filteredResponsables.length / itemsPerPage);
-
-  const handlePageChange = (direction) => {
-    if (direction === 'next' && currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    } else if (direction === 'prev' && currentPage > 1) {
-      setCurrentPage(currentPage - 1);
+const Peticion =()=>{
+  const baseApi = import.meta.env.VITE_BASE_API;
+  const instance = axios.create({
+    baseURL: baseApi,
+  });
+  // Función para obtener los artículos desde la API
+  const ObtenerDetallesArticulo = async (no_inventario) => {
+    try {
+      const response = await instance.get(`/articulos/details/${encodeURIComponent(no_inventario)}`);
+      return response.data;
+    } catch (error) {
+      console.error(error.response?.data?.error || error.message);
+      throw new Error(error.response?.data?.error || 'Error en la interacción con la API');
+    }
+  };
+  const ObtenerDetallesReponsable = async (id) => {
+    try {
+      const response = await instance.get(`/responsables/details/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error(error.response?.data?.error || error.message);
+      throw new Error(error.response?.data?.error || 'Error al obtener los detalles del responsable');
     }
   };
 
-  const handleNext = () => {
-    // Redirige a la ruta especificada en index.js
-    navigate("/asignaciones/responsibleSelect");
+  const urlToImage= async(url)=> {
+    try {
+      const response = await axios.get(url, { responseType: 'blob' }); // Obtener la imagen como Blob
+      const reader = new FileReader();
+  
+      return new Promise((resolve, reject) => {
+        reader.onloadend = () => {
+          resolve(reader.result);  // `reader.result` contiene la imagen en base64
+        };
+        reader.onerror = (error) => reject(error);
+  
+        reader.readAsDataURL(response.data); // Convertir el Blob a base64
+      });
+    } catch (error) {
+      console.error('Error al obtener la imagen: ', error);
+      return null;
+    }
+  };
+  return {ObtenerDetallesArticulo, ObtenerDetallesReponsable, urlToImage}
+}
+
+
+const ViewAssigned = () => {
+  const { pkResponsable, pkArticulo } = useParams(); // Obtener parámetros de la URL
+  const peticones = Peticion()
+  const navigate = useNavigate(); // Redirección
+  const [imagen, setImagen] = useState(null);
+  const [responsable, setResponsable] = useState(null);
+  const [articulo, setArticulo] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const loadResponsables = async () => {
+      setError(null);
+      try {
+        const data = await peticones.ObtenerDetallesReponsable(pkResponsable);
+        setResponsable(data.responsable);
+      } catch (err) {
+        setError("No se pudieron cargar los responsables.");
+      }
+    };
+    const loadArticulos = async () => {
+      setError(null);
+      try {
+        const data = await peticones.ObtenerDetallesArticulo(pkArticulo);
+        setArticulo(data.articulo);
+      } catch (err) {
+        setError("No se pudieron cargar los articulos.");
+      }
+    };
+    loadResponsables()
+    loadArticulos()
+  },[pkResponsable, pkArticulo]);
+
+  // Generar y descargar el documento
+  const generateAndDownloadDocument = async () => {
+    if (!responsable || !articulo) {
+      alert("Datos incompletos para generar el documento.");
+      return;
+    }
+  
+    const fecha = new Date();
+    const dia = fecha.getDate();
+    const mes = fecha.toLocaleString("es-ES", { month: "long" });
+    const año = fecha.getFullYear();
+  
+    try {
+      const response = await fetch("/FORMATO DE ASIGNACION - MODULO DE REPORTES.docx");
+      if (!response.ok) throw new Error("No se pudo cargar la plantilla.");
+  
+      const content = await response.arrayBuffer();
+      const zip = new PizZip(content);
+      let x= articulo.Condiciones[0].Imagenes[0].imagen
+
+      const doc = new Docxtemplater(zip, { paragraphLoop: true, linebreaks: true,
+       });
+      doc.setData({
+        dia,
+        mes,
+        año,
+        "responsable.nombres": `${responsable.nombres}${responsable.apellido_p}${responsable.apellido_m}`,
+        "no_inventario": articulo.no_inventario || "",
+        "nombre": articulo.nombre || "",
+        "descripcion": articulo.descripcion || "",
+        "costo": parseFloat(articulo.costo || 0).toFixed(2), // Convertir costo a número
+        "imagen1": "{imagen1}"
+      });
+  
+      doc.render();
+      //finalizacion
+      const out = doc.getZip().generate({ type: "blob" });
+      //insercion de texto
+      //insercion de imagen
+
+      saveAs(out, `Asignacion_${responsable.nombres}_${articulo.no_inventario}.docx`);
+    } catch (error) {
+      console.error("Error al generar el documento:", error);
+      alert("Hubo un problema al generar el documento. Inténtelo de nuevo.");
+    }
+  };
+  
+
+  // Manejar la selección de archivo para subir
+  const handleFileSelect = (event) => {
+    setSelectedFile(event.target.files[0]);
   };
 
+ // Manejar la subida de archivos y la creación de asignación
+// Manejar la subida de archivos y la creación de asignaciones
+const handleSubmit = async () => {
+  if (!selectedFile) {
+    alert("Por favor, selecciona un archivo antes de continuar.");
+    return;
+  }
+
+  if (!responsable || !articulo) {
+    alert("Datos incompletos del responsable o artículo.");
+    return;
+  }
+
+  try {
+    // Crear un FormData para enviar el archivo y los datos adicionales
+    const formData = new FormData();
+    formData.append("file", selectedFile); // Archivo seleccionado
+    formData.append("fk_Articulo", articulo.pk); // ID del artículo
+    formData.append("fk_Responsable", responsable.pk); // ID del responsable
+
+    const response = await fetch("http://localhost:3720/asignaciones/crearAsignacion", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error("Error al subir el archivo o crear la asignación.");
+    }
+
+    const result = await response.json();
+    alert("Asignación creada exitosamente.");
+    navigate("/asignaciones/completado"); // Redirige al completar la asignación
+  } catch (error) {
+    console.error("Error al subir el archivo o crear la asignación:", error);
+    alert("Hubo un problema al procesar la solicitud. Intente nuevamente.");
+  }
+};
+
+
+
   return (
-
     <>
-        {/* Sección de selección de responsable */}
-        <div className='flex flex-col w-full p-5 bg-gray-100'>
-          {/* Encabezado de selección de responsable */}
-          <div className="bg-red-800 text-white text-lg font-bold p-4 rounded-t-md mb-4">
-            Selección el articulo
-          </div>
-          <div className="bg-white shadow-md p-4 rounded-b-md mb-6">
-            <p className="text-gray-700 mb-2">Estos son los Responsables actuales del sistema.</p>
-            <p className="text-sm text-gray-500 mb-4">Seleccione el responsable al que desea asignar un artículo.</p>
-
-            {/* Campo de búsqueda */}
-            <div className="flex items-center mb-4">
-              <input
-                type="text"
-                placeholder="Buscar"
-                className="px-2 py-1 border rounded-l-md w-full focus:outline-none"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <div className="bg-gray-200 p-2 rounded-r-md">
-                {/* <FaSearch className="text-gray-500" /> */}
-              </div>
-            </div>
-
-            {/* Tabla de responsables */}
-            <div className="overflow-x-auto">
-              <table className="min-w-full bg-white border">
-                <thead>
-                  <tr className="bg-red-800 text-white">
-                    <th className="text-left py-3 px-4 font-semibold">Correos</th>
-                    <th className="text-left py-3 px-4 font-semibold">Usuario</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {currentItems.map((responsable) => (
-                    <tr className="border-t" key={responsable.id}>
-                      <td className="py-3 px-4 text-sm">{responsable.correo}</td>
-                      <td className="py-3 px-4 text-sm">{responsable.usuario}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Paginación */}
-            <div className="flex flex-col sm:flex-row justify-between items-center mt-4 text-sm">
-              <span className="text-gray-600">
-                Mostrando {indexOfFirstItem + 1} a {Math.min(indexOfLastItem, filteredResponsables.length)} de {filteredResponsables.length}
-              </span>
-              <div className="flex space-x-4 mt-2 sm:mt-0">
-                <button 
-                  onClick={() => handlePageChange("prev")} 
-                  className={`text-gray-600 hover:text-gray-800 ${currentPage === 1 && "opacity-50 cursor-not-allowed"}`}
-                  disabled={currentPage === 1}
-                >
-                  Anterior
-                </button>
-                <button 
-                  onClick={() => handlePageChange("next")} 
-                  className={`text-gray-600 hover:text-gray-800 ${currentPage === totalPages && "opacity-50 cursor-not-allowed"}`}
-                  disabled={currentPage === totalPages}
-                >
-                  Siguiente
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Botón siguiente */}
-          <div className="mt-6 flex justify-center">
-            <button 
-              onClick={handleNext}
-              className="flex items-center px-6 py-2 bg-gray-200 text-gray-700 rounded-md shadow hover:bg-gray-300"
-            >
-              Siguiente
-            </button>
-          </div>
+      <Componentes.Inputs.TitleHeader text={"Importación de responsiva - (asignación)"} />
+      <div className="bg-white shadow-md rounded-md p-6 w-full">
+        <div className="mb-6">
+          <Componentes.Inputs.TitleSubtitle
+            titulo={"Presentación de documento de asignación"}
+            contenido={"Verifique que el documento sea correcto y suba el documento firmado por las partes."}
+          />
         </div>
+
+        {/* Botón de descarga */}
+        <div className="flex justify-between items-center mb-6 w-full">
+          <p className="text-gray-700 font-semibold">
+            Archivo: {selectedFile ? selectedFile.name : "No se ha seleccionado ningún archivo"}
+          </p>
+          <button
+            className="bg-orange-500 text-white px-4 py-2 rounded-md shadow hover:bg-orange-600"
+            onClick={generateAndDownloadDocument}
+          >
+            Descargar
+          </button>
+        </div>
+
+        {/* Campo de selección de archivo */}
+        <div className="flex items-center justify-between mb-6 w-full">
+          <label
+            htmlFor="fileUpload"
+            className="bg-gray-200 px-4 py-2 rounded-md shadow cursor-pointer hover:bg-gray-300"
+          >
+            Examinar...
+          </label>
+          <input
+            id="fileUpload"
+            type="file"
+            onChange={handleFileSelect}
+            className="hidden"
+          />
+          <span className="text-gray-500">
+            {selectedFile ? selectedFile.name : "Sin archivos seleccionados"}
+          </span>
+        </div>
+
+        {/* Botón para terminar la asignación */}
+        <div className="flex justify-center">
+          <button
+            onClick={handleSubmit}
+            className="bg-red-500 text-white px-6 py-3 rounded-md shadow hover:bg-red-600 w-full" // Botón ocupa todo el ancho
+          >
+            Terminar asignación
+          </button>
+        </div>
+      </div>
+
+      {/* Vista previa del archivo */}
+      {selectedFile && (
+        <div className="mt-6 w-full bg-gray-100 p-4 rounded-md shadow">
+          <embed
+            src={URL.createObjectURL(selectedFile)}
+            type="application/pdf"
+            className="w-full h-[500px] border rounded-md"
+          />
+        </div>
+      )}
     </>
   );
 };
