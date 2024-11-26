@@ -19,6 +19,7 @@ const columna = ({ children, Onclik }) => {
 
 const encabezado = ({ children }) => {
     return (
+        <>
         <th className="bg-UP-Secundario border border-UP-Opaco">
             <div className="w-full  py-2 flex justify-center">
                 <h1 className="font-montserrat font-bold text-white px-5 text-sm sm:text-base md:text-base lg:text-base">
@@ -26,13 +27,16 @@ const encabezado = ({ children }) => {
                 </h1>
             </div>
         </th>
+        </>
     );
 };
 
 const table = ({ children }) => {
     return (
         <table className="bg-UP-Blanco">
+            <tbody>
             {children}
+            </tbody>
         </table>
     );
 };
