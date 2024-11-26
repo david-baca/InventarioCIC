@@ -71,7 +71,7 @@ exports.editarArea = async (req, res) => {
 
         await Articulos.update(
             { Area_pk: null },  // Establece el campo Area_pk a null
-            { where: { Area_pk: null } }  // Solo actualizamos los artículos que están actualmente asignados a esta área
+            { where: { Area_pk: id } }  // Solo actualizamos los artículos que están actualmente asignados a esta área
         );
 
         // Ahora, asociamos los artículos seleccionados al área editada

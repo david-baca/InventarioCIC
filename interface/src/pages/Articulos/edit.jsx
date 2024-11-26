@@ -109,7 +109,7 @@ const ViewArticleEdit = () => {
     } 
     for (let i = 0; i < imagenes.length; i++) {
       formData.append('pathimg', imagenes[i].imagen);
-    }
+    } 
     try {
       const success = await Peticion.EditarArticulo(formData, articulo.pk); // Actualiza el artículo en la base de datos
       setSuccess(success.message)
