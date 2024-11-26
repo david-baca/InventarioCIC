@@ -109,7 +109,7 @@ const ViewAreaLoad = () => {  // Cambié el nombre de "ViewGrupLoad" a "ViewArea
       <form onSubmit={handleSubmit} className="space-y-4">
         <Componentes.Inputs.TitleHeader text={"Carga de Área"} />
         <Componentes.Inputs.TitleSubtitle titulo={"Información del Área"} contenido={"Ingrese los detalles del nuevo área."} />
-        <Componentes.Labels.text Value={codigo} Onchange={setCodigo} Placeholder={"Codigo del Área"} />
+        <Componentes.Labels.text Value={codigo} Onchange={setCodigo} Placeholder={"Nombre del Área"} />
         <Componentes.Labels.area Value={descripcion} Onchange={setDescripcion} Placeholder={"Descripción del Área"} />
         <div className='flex items-center w-[100%]'>
           <Componentes.Inputs.TitleSubtitle titulo={"Seleccionar Artículos"} contenido={"Seleccione los artículos que desea asociar a este área."} />
