@@ -145,14 +145,11 @@ const ViewGrupEdit = () => {
       <Componentes.Modals.info mensaje={showInfo} action={handleActionInfo} />
       <Componentes.Modals.error mensaje={error} action={handleActionError} />
 
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-6">
       <Componentes.Inputs.TitleHeader text={"Edición de Grupo"} />
-      <Componentes.Inputs.TitleSubtitle titulo={"Información del Grupo"} contenido={"Actualiza los detalles del grupo."} />
-      <div className="space-y-2">
-        <Componentes.Labels.text Value={nombre} Onchange={setNombre} Placeholder={"Nombre del Grupo"} />
-        <Componentes.Labels.area Value={descripcion} Onchange={setDescripcion} Placeholder={"Descripción del Grupo"} />
-      </div>
-
+      <Componentes.Inputs.TitleSubtitle titulo={"Información del Grupo"} contenido={"Actualiza los detalles del grupo."} />  
+      <Componentes.Labels.text Value={nombre} Onchange={setNombre} Placeholder={"Nombre del Grupo"} />
+      <Componentes.Labels.area Value={descripcion} Onchange={setDescripcion} Placeholder={"Descripción del Grupo"} />
       <Componentes.Inputs.TitleSubtitle titulo={"Seleccionar Artículos"} contenido={"Seleccione los artículos que desea asociar a este grupo."} />
       <div className="flex items-center w-[100%]">
         <Componentes.Buscador query={query} OnChange={handleSearchChange} />

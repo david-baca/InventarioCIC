@@ -54,7 +54,7 @@ const ViewStoreRemoval = () => {
     <Componentes.Modals.success mensaje={success} action={handleActionSuccess} />
       <Componentes.Modals.info mensaje={showInfo} action={handleActionInfo} />
       <Componentes.Modals.error mensaje={error} action={handleActionEror} />
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-6">
       <Componentes.Inputs.TitleHeader text={"Baja de Área"} />
       <Componentes.Inputs.TitleSubtitle
         titulo={"Motivo de la Baja"}

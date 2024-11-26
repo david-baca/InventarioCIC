@@ -30,7 +30,7 @@ const ViewArticle = () => {
   const [error, setError] = useState();
   const [showInfo, setShowInfo] = useState(); 
   const [success, setSuccess] = useState(); 
-  
+  const [limit, setLimit] = useState({}); 
   const handleActionInfo = () => {
     setShowInfo(null); 
   };
@@ -96,17 +96,18 @@ const ViewArticle = () => {
     <Componentes.Modals.info mensaje={showInfo} action={handleActionInfo}/>
     <Componentes.Modals.error mensaje={error} action={handleActionEror}/>
       <Componentes.Inputs.TitleHeader text={"Administración de Artículos"} />
-      <div className='flex items-center'>
+      <div className='flex items-center flex-wrap md:flex-nowrap'>
         <div className='flex items-center w-[100%]'>
           <Componentes.Inputs.TitleSubtitle titulo={"Estos son los Artículos del inventario."}
             contenido={"Busque por token o nombre del Artículo"} />
         </div>
-        <div className='flex items-center w-[100%]'>
+        <div className='flex items-center w-[100%] flex-wrap sm:flex-nowrap'>
           <Componentes.Buscador query={query} OnChange={handleSearchChange} />
           <Componentes.Botones.Crear onClick={handlePublish} />
         </div>
       </div>
         {data.length > 0 ? (
+          <>
           <Componentes.Table.table>
             <Componentes.Table.columna>
               <Componentes.Table.encabezado>
@@ -122,21 +123,25 @@ const ViewArticle = () => {
                 Acciones:
               </Componentes.Table.encabezado>
             </Componentes.Table.columna>
-            {data.map((element) => (
-              <Componentes.Table.columna key={element.pk}>
-                <Componentes.Table.fila Onclik={() => handleConsult(element.no_inventario)}>
-                  {element.no_inventario}</Componentes.Table.fila>
-                <Componentes.Table.fila Onclik={() => handleConsult(element.no_inventario)}>
-                  {element.nombre}</Componentes.Table.fila>
-                <Componentes.Table.fila Onclik={() => handleConsult(element.no_inventario)}>
-                  {element.costo}</Componentes.Table.fila>
-                <Componentes.Table.fila>
-                  <Componentes.Botones.iconPencil Onclik={() => handleEdit(element.no_inventario)} />
-                  <Componentes.Botones.iconTrash Onclik={() => handleDelete(element.no_inventario)} />
-                </Componentes.Table.fila>
-              </Componentes.Table.columna>
+            {data.map((element,index) => 
+              ((index <= limit.max && index >= limit.min) && (
+                <Componentes.Table.columna key={element.pk}>
+                  <Componentes.Table.fila Onclik={() => handleConsult(element.no_inventario)}>
+                    {element.no_inventario}</Componentes.Table.fila>
+                  <Componentes.Table.fila Onclik={() => handleConsult(element.no_inventario)}>
+                    {element.nombre}</Componentes.Table.fila>
+                  <Componentes.Table.fila Onclik={() => handleConsult(element.no_inventario)}>
+                    {element.costo}</Componentes.Table.fila>
+                  <Componentes.Table.fila>
+                    <Componentes.Botones.iconPencil Onclik={() => handleEdit(element.no_inventario)} />
+                    <Componentes.Botones.iconTrash Onclik={() => handleDelete(element.no_inventario)} />
+                  </Componentes.Table.fila>
+                </Componentes.Table.columna>
+              )
             ))}
           </Componentes.Table.table>
+          <Componentes.Inputs.Paginacion data={data} handleLimit={(value)=>setLimit(value)}/>
+          </>
         ) : (
           <div className='flex justify-center h-full items-center'>
             <Componentes.Inputs.TitleSubtitle titulo={"No hay Artículos que mostrar"}

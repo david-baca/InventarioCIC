@@ -46,24 +46,16 @@ const ViewUser = () => {
   };
 
   return (
-    <div className="min-h-screen bg-UP-Blanco flex flex-col items-center p-4 justify-between">
-      <main className="w-full rounded-lg mt-6 p-6">
-            <div className="justify-between mt-6">
-              <div>
-                <h2 className="flex items-center text-2xl font-bold bg-UP-Secundario text-UP-Blanco mb-4 pl-8 h-20 w-38 ">Administración de permisos</h2>
-                <div className='flex'>
-                  <div>
-                    <p className="text-UP-Opaco mb-4">Estos son los permisos del Inventario. </p>
-                    <p className="text-UP-Opaco mb-4">Los cambios se hacen en tiempo real.</p>
-                  </div>
-
-                  <Link to="./load/" className="inline-block font-bold w-24 py-5 ml-auto" >
-                    <Componentes.Botones.Crear/>
-                  </Link>
-                  
-                </div>
-              </div>
-            </div>
+    <>
+      <Componentes.Inputs.TitleHeader text="Administración de permisos"/>
+      <div className='flex justify-between items-center w-[100%] flex-wrap sm:flex-nowrap'>
+        <Componentes.Inputs.TitleSubtitle titulo="Estos son los permisos del Inventario."
+        contenido="Los cambios se hacen en tiempo real." />
+        <Link to="./load/"  className='w-[25%]'>
+          <Componentes.Botones.Crear/>
+        </Link>
+      </div>
+      
             
         <div className="bg-UP-Blanco ">
           {error && <div className="text-UP-Error">{error}</div>}
@@ -100,9 +92,7 @@ const ViewUser = () => {
             <h1 className="text-gray-500">No hay usuarios disponibles</h1>
           )}
         </div>
-      </main>
-    </div>
-      
+  </>
   );
 };
 

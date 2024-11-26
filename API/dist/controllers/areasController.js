@@ -42,10 +42,15 @@ exports.crearArea = async (req, res) => {
 
         // Actualizar los artículos con la nueva área
         if (articulos && articulos.length > 0) {
-            await Articulos.update(
-                { Area_pk: nuevaArea.pk }, // Asocia la nueva área
-                { where: { pk: articulos.map(articulo => articulo.pk) } }
-            );
+            for (let i = 0; i < articulos.length; i++) {
+                const x = await Articulos.findByPk(articulos[i]);  // Encuentra el artículo por su PK
+                if (x) {
+                    x.Area_pk = nuevaArea.pk;
+                    await x.save();  // Guarda los cambios
+                } else {
+                    console.log(`No se encontró el artículo con PK ${articulos[i]}`);
+                }
+            }
         }
 
         res.json(areaView.datosAreaCreada(nuevaArea)); // Adaptado a 'areaView'
@@ -66,7 +71,7 @@ exports.editarArea = async (req, res) => {
 
         await Articulos.update(
             { Area_pk: null },  // Establece el campo Area_pk a null
-            { where: { Area_pk: area.pk } }  // Solo actualizamos los artículos que están actualmente asignados a esta área
+            { where: { Area_pk: null } }  // Solo actualizamos los artículos que están actualmente asignados a esta área
         );
 
         // Ahora, asociamos los artículos seleccionados al área editada

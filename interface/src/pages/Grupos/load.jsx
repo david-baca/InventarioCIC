@@ -34,6 +34,7 @@ const ViewGrupLoad = () => {
   const [nombre, setNombre] = useState('');
   const [descripcion, setDescripcion] = useState('');
   const [articulos, setArticulos] = useState([]); // To store articles that are not assigned to any group
+  const [limit, setLimit] = useState({}); 
   const [selectedArticulos, setSelectedArticulos] = useState([]); // To store selected articles for the group
   const [query, setQuery] = useState(''); // Search query for articles
   const Peticion = peticionCrear();
@@ -78,26 +79,21 @@ const ViewGrupLoad = () => {
     }
   };
   
-  const handleCheckboxChange = (newNumber) => {
-    console.log(newNumber)
-    setSelectedArticulos((prevArticulos) => {
-      if (prevArticulos.includes(newNumber)) {
-        return prevArticulos.filter((num) => num !== newNumber);
+  const handleCheckboxChange = (articulo) => {
+    setSelectedArticulos((prevSelected) => {
+      if (prevSelected.includes(articulo.pk)) {
+        // Si ya está seleccionado, lo eliminamos
+        return prevSelected.filter((item) => item !== articulo.pk);
       } else {
-        return [...prevArticulos, newNumber];
+        // Si no está seleccionado, lo añadimos
+        return [...prevSelected, articulo.pk];
       }
     });
+    console.log(selectedArticulos)
   };
 
   const handleSearchChange = (value) => {
     setQuery(value);
-    // Si hay un timeout previo, lo limpiamos
-    if (debounceTimeout) clearTimeout(debounceTimeout);
-    // Establecemos un nuevo timeout para la búsqueda después de 500ms
-    const newTimeout = setTimeout(() => {
-      cargarData(value); // Llamamos a cargarData después de 500ms
-    }, 500);
-    setDebounceTimeout(newTimeout);
   };
 
   return (
@@ -105,7 +101,7 @@ const ViewGrupLoad = () => {
     <Componentes.Modals.success mensaje={success} action={handleActionSuccess}/>
       <Componentes.Modals.info mensaje={showInfo} action={handleActionInfo}/>
       <Componentes.Modals.error mensaje={error} action={handleActionError}/>
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-6">
       <Componentes.Inputs.TitleHeader text={"Carga de Grupo"} />
       <Componentes.Inputs.TitleSubtitle titulo={"Información del Grupo"} contenido={"Ingrese los detalles del nuevo grupo."} />
       <Componentes.Labels.text Value={nombre} Onchange={setNombre} Placeholder={"Nombre del Grupo"} />
@@ -116,6 +112,7 @@ const ViewGrupLoad = () => {
       </div>
       
       {articulos.length > 0 ? (
+        <>
         <Componentes.Table.table>
           <Componentes.Table.columna>
               <Componentes.Table.encabezado children={"No. Inventario"}/>
@@ -123,22 +120,22 @@ const ViewGrupLoad = () => {
               <Componentes.Table.encabezado children={"Costo"}/>
               <Componentes.Table.encabezado children={"Acciones"}/>
           </Componentes.Table.columna>
-            {articulos.map((articulo) => (
-              <Componentes.Table.columna key={articulo.id}>
+            {articulos.map((articulo,index) => ((index <= limit.max && index >= limit.min) && (
+              <Componentes.Table.columna key={articulo.pk}>
                 <Componentes.Table.fila children={articulo.no_inventario}/>
                 <Componentes.Table.fila children={articulo.nombre}/>
                 <Componentes.Table.fila children={articulo.costo}/>
                 <Componentes.Table.fila>
-                {articulo.pk}
                   <Componentes.Labels.checkbox
-                    value={articulo}
-                    checked={articulos.includes(articulo)}
+                    Value={selectedArticulos.includes(articulo.pk)}
                     Onchange={() => handleCheckboxChange(articulo)}
                   />
                 </Componentes.Table.fila>
-              </Componentes.Table.columna>
+              </Componentes.Table.columna>)
             ))}
         </Componentes.Table.table>
+        <Componentes.Inputs.Paginacion data={articulos} handleLimit={(value)=>setLimit(value)}/>
+        </>
       ) : (
         <div className="flex justify-center h-full items-center">
           <Componentes.Inputs.TitleSubtitle 

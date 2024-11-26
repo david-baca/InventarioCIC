@@ -130,7 +130,7 @@ const ViewArticleEdit = () => {
         contenido="Edita los campos para actualizar el Artículo."
       />
       {articulo ? (
-        <form onSubmit={handleEdit} className="flex flex-col space-y-4 gap-3">
+        <form onSubmit={handleEdit} className="flex flex-col space-y-6">
           <Componentes.Labels.text Onchange={(value) =>setNo_inventario(value)} Value={no_inventario} Placeholder={"Numero de inventario"}/>
           <Componentes.Labels.text Onchange={(value) =>setNombre(value)} Value={nombre} Placeholder={"Nombre"}/>
           <Componentes.Labels.number Onchange={(value) =>setCosto(value)} Value={costo} Placeholder={"Costo"}/>

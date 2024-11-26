@@ -44,10 +44,17 @@ exports.crearGrupo = async (req, res) => {
 
         // Actualizar los artículos con el nuevo grupo
         if (articulos && articulos.length > 0) {
-            await Articulos.update(
-                { Grupos_pk: nuevoGrupo.pk }, // Asocia el nuevo grupo
-                { where: { pk: articulos.map(articulo => articulo.pk) } }
-            );
+            for (let i = 0; i < articulos.length; i++) {
+                const x = await Articulos.findByPk(articulos[i]);  // Encuentra el artículo por su PK
+                console.log(x);
+                if (x) {
+                    x.Grupos_pk = nuevoGrupo.pk
+                    await x.save();  // Guarda los cambios
+                    console.log('Artículo actualizado: ', x);
+                } else {
+                    console.log(`No se encontró el artículo con PK ${articulos[i]}`);
+                }
+            }
         }
 
         res.json(grupoView.datosGrupoCreado({message:"grupo exitosamente creado", grupo:nuevoGrupo}));

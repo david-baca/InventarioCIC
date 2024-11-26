@@ -97,7 +97,7 @@ const ViewResponsableRenoval = () => {
         <div>Cargando detalles del responsable...</div>
       ) : (
         <div className="gap-10 flex flex-col">
-          <form onSubmit={handleSubmit} className='gap-10 flex flex-col'>
+          <form onSubmit={handleSubmit} className='space-y-6'>
             <Componentes.Inputs.TitleSubtitle 
               titulo="Los motivos de eliminación son campos para comentar el porqué se elimina un registro." 
               contenido="Motivo de la baja" 
@@ -108,7 +108,7 @@ const ViewResponsableRenoval = () => {
               Placeholder="Motivo de la baja" 
             />
             <div className="flex flex-row w-[100%] gap-4">
-              <Componentes.Botones.Cancelar text="Cancelar" onClick={() => navigate('/responsables')} />
+              <Componentes.Botones.Cancelar text="Cancelar" onClick={() => navigate('/responsable')} />
               <Componentes.Botones.ConfirmarRojo text="Confirmar Baja" />
             </div>
           </form>

@@ -81,13 +81,14 @@ const ViewAreaLoad = () => {  // Cambié el nombre de "ViewGrupLoad" a "ViewArea
     }
   };
 
-  const handleCheckboxChange = (newNumber) => {
-    console.log(newNumber);
-    setSelectedArticulos((prevArticulos) => {
-      if (prevArticulos.includes(newNumber)) {
-        return prevArticulos.filter((num) => num !== newNumber);
+  const handleCheckboxChange = (articulo) => {
+    setSelectedArticulos((prevSelected) => {
+      if (prevSelected.includes(articulo.pk)) {
+        // Si ya está seleccionado, lo eliminamos
+        return prevSelected.filter((item) => item !== articulo.pk);
       } else {
-        return [...prevArticulos, newNumber];
+        // Si no está seleccionado, lo añadimos
+        return [...prevSelected, articulo.pk];
       }
     });
   };
@@ -106,7 +107,7 @@ const ViewAreaLoad = () => {  // Cambié el nombre de "ViewGrupLoad" a "ViewArea
       <Componentes.Modals.success mensaje={success} action={handleActionSuccess} />
       <Componentes.Modals.info mensaje={showInfo} action={handleActionInfo} />
       <Componentes.Modals.error mensaje={error} action={handleActionEror} />
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-6">
         <Componentes.Inputs.TitleHeader text={"Carga de Área"} />
         <Componentes.Inputs.TitleSubtitle titulo={"Información del Área"} contenido={"Ingrese los detalles correspondientes al alta de la nueva área."} />
         <Componentes.Labels.text Value={codigo} Onchange={setCodigo} Placeholder={"Nombre del Área"} />
@@ -131,8 +132,7 @@ const ViewAreaLoad = () => {  // Cambié el nombre de "ViewGrupLoad" a "ViewArea
                 <Componentes.Table.fila children={articulo.costo} />
                 <Componentes.Table.fila>
                   <Componentes.Labels.checkbox
-                    value={articulo}
-                    checked={articulos.includes(articulo)}
+                    Value={selectedArticulos.includes(articulo.pk)}
                     Onchange={() => handleCheckboxChange(articulo)}
                   />
                 </Componentes.Table.fila>

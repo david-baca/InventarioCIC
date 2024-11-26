@@ -21,7 +21,7 @@ const encabezado = ({ children }) => {
     return (
         <>
         <th className="bg-UP-Secundario border border-UP-Opaco">
-            <div className="w-full  py-2 flex justify-center">
+            <div className="py-2 flex justify-center">
                 <h1 className="font-montserrat font-bold text-white px-5 text-sm sm:text-base md:text-base lg:text-base">
                     {children}
                 </h1>
@@ -33,11 +33,13 @@ const encabezado = ({ children }) => {
 
 const table = ({ children }) => {
     return (
-        <table className="bg-UP-Blanco">
-            <tbody>
+        <div className="w-full flex flex-col overflow-scroll">
+        <table className="bg-UP-Blanco table-auto">
+            <tbody className="">
             {children}
             </tbody>
         </table>
+        </div>
     );
 };
 

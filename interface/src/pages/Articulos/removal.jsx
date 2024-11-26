@@ -108,7 +108,7 @@ const ViewArticleRenoval = () => {
         <div>Cargando detalles del artículo...</div>
       ) : (
         <div className="gap-10 flex flex-col">
-          <form onSubmit={handleSubmit} className='gap-10 flex flex-col'>
+          <form onSubmit={handleSubmit} className='flex flex-col space-y-6'>
             <Componentes.Inputs.TitleSubtitle 
               titulo="Los motivos de eliminación son campos para comentar el porqué se elimina un registro." 
               contenido="Motivo de eliminación" 

@@ -92,7 +92,7 @@ const ViewArticleLoad = () => {
       <Componentes.Inputs.TitleHeader text={"Alta de Artículo"}/>
       <Componentes.Inputs.TitleSubtitle titulo={"Datos de un articulo"} 
         contenido={"Rellene todos los campos para poder crear un articulo. "}/>
-      <form onSubmit={handlePublish} className="flex flex-col space-y-4 gap-3">
+      <form onSubmit={handlePublish} className="flex flex-col space-y-6">
         <Componentes.Labels.text Value={noInventario} Onchange={(value) => setNoInventario(value)} Placeholder={"No. Inventario"}/>
         <Componentes.Labels.text Value={nombre} Onchange={(value) => setNombre(value)} Placeholder={"Nombre"}/>
         <Componentes.Labels.number Value={costo} Onchange={(value) => setCosto(value)} Placeholder={"Costo"}/>
@@ -108,7 +108,7 @@ const ViewArticleLoad = () => {
         </div>
         {/* Pass image delete handler to Upimagen */}
         <Componentes.Inputs.TitleSubtitle 
-          titulo="Evidencias (opcional)" 
+          titulo="Evidencias (opcional) " 
           contenido="Nos ayuda a registrar las condiciones actuales del Artículo" 
         />
         <Componentes.Labels.fileimg

@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+#printableArea {
+  width: 21.59cm;  /* 8.5 pulgadas */
+  height: 27.94cm; /* 11 pulgadas */
+  display: flex;
+  margin: 0 auto;
+  page-break-before: always;
+}
   @font-face {
     font-family: 'Roboto';
     src: url('../fonts/Roboto/Roboto-Regular.woff2') format('woff2'),

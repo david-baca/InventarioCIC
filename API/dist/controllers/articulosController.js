@@ -156,7 +156,11 @@ exports.darDeBajaArticulo = async (req, res) => {
                 });
             }
         }
-        articulo = await Articulos.update({ disponible: 0 }, { where: { pk:id } });
+        articulo = await Articulos.update({ 
+            disponible: 0,
+            Grupos_pk: null,
+            Area_pk: null
+            }, { where: { pk:id } });
         res.json({ message: 'Artículo dado de baja exitosamente'});
     } catch (error) {
         res.status(500).json({ error: 'Error al dar de baja el artículo' });

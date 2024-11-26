@@ -92,7 +92,7 @@ const ViewResponsableEdit = () => {
         contenido="Edita los campos para actualizar la información del responsable."
       />
 
-      <form onSubmit={handleEdit} className="space-y-4">
+      <form onSubmit={handleEdit} className="space-y-6">
         {/* Nombres */}
         <Componentes.Labels.text
           Value={responsable.nombres}
@@ -125,7 +125,7 @@ const ViewResponsableEdit = () => {
         <div className="flex flex-row w-[100%] gap-4">
           <Componentes.Botones.Cancelar
             text="Cancelar"
-            onClick={() => navigate('/responsables')}  // Redirige a la lista de responsables
+            onClick={() => navigate('/responsable')}  // Redirige a la lista de responsables
           />
           <Componentes.Botones.ConfirmarVerde
             text={"Guardar Cambios"}
