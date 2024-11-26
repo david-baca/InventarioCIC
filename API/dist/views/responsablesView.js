@@ -2,21 +2,21 @@
 
 exports.datosResponsableCreado = (responsable) => {
     return {
-        mensaje: 'Responsable creado exitosamente',
+        message: 'Responsable creado exitosamente',
         responsable
     };
 };
 
 exports.confirmacionEdicion = (responsable) => {
     return {
-        mensaje: 'Responsable editado exitosamente',
+        message: 'Responsable editado exitosamente',
         responsable
     };
 };
 
 exports.confirmacionBaja = (responsable) => {
     return {
-        mensaje: 'Responsable dado de baja exitosamente',
+        message: 'Responsable dado de baja exitosamente',
         responsable
     };
 };
@@ -27,8 +27,8 @@ exports.listaResponsables = (responsables) => {
     };
 };
 
-exports.errorResponsable = (mensaje) => {
+exports.errorResponsable = (message) => {
     return {
-        mensaje
+        message
     };
 };

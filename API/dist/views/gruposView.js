@@ -9,7 +9,7 @@ exports.datosGrupoCreado = (grupo) => {
 
 exports.confirmacionEdicion = (grupo) => {
     return {
-        mensaje: 'Grupo editado exitosamente',
+        message: 'Grupo editado exitosamente',
         grupo
     };
 };

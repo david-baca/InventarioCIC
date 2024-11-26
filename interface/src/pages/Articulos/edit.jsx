@@ -6,20 +6,16 @@ import Componentes from '../../components';
 const peticion = () => {
   const section = "articulos";
   const baseApi = import.meta.env.VITE_BASE_API;
-  const instance = axios.create({
-    baseURL: baseApi,
-  });
-
+  const instance = axios.create({baseURL: baseApi});
   const ObtenerDetalles = async (no_inventario) => {
     try {
-      const response = await instance.get(`/${section}/details/${no_inventario}`);
+      const response = await instance.get(`/${section}/details/${encodeURIComponent(no_inventario)}`);
       return response.data;
     } catch (error) {
       console.error(error.response?.data?.error || error.message);
       throw new Error(error.response?.data?.error || 'Error en la interacción con la API');
     }
   };
-
   const EditarArticulo = async (data, id) => {
     try {
       const response = await instance.put(`/${section}/${id}`, data);
@@ -29,16 +25,16 @@ const peticion = () => {
       throw new Error(error.response?.data?.error || 'Error en la interacción con la API');
     }
   };
-
   return { ObtenerDetalles, EditarArticulo };
 };
 
 const ViewArticleEdit = () => {
+  //variables config
   const navigate = useNavigate();
-  const { pk } = useParams();
+  const { pk } =  useParams();
   const Peticion = peticion();
+  //variables form
   const [articulo, setArticulo] = useState(null);
-  const [error, setError] = useState();
   const [no_inventario, setNo_inventario] = useState('');
   const [nombre, setNombre] = useState('');
   const [descripcion, setDescripcion] = useState('');
@@ -47,9 +43,11 @@ const ViewArticleEdit = () => {
   const [consumible, setConsumible] = useState(false);
   const [imagenes, setImagenes] = useState([]); // Para las imágenes actuales
   const [nuevasImagenes, setNuevasImagenes] = useState([]); // Para las nuevas imágenes
+  //variables de modals
   const [showInfo, setShowInfo] = useState(); 
   const [success, setSuccess] = useState(); 
-  
+  const [error, setError] = useState();
+  //funciones modal
   const handleActionInfo = () => {
     setShowInfo(null); 
   };
@@ -60,7 +58,7 @@ const ViewArticleEdit = () => {
     setSuccess(null); 
     navigate('/articles');
   };
-  
+  //carga de datos
   useEffect(() => {
     const cargarArticulo = async () => {
       try {
@@ -73,13 +71,12 @@ const ViewArticleEdit = () => {
         setConsumible(result.articulo.consumible);
         if(result.articulo.Condiciones.length > 0){
         setImagenes(result.articulo.Condiciones[0].Imagenes || []);}
-      } catch (err) {
+        if (result.articulo.responsable != null) setError('No se puede editar un artículo asociado a un responsable.');      } catch (err) {
         setError(err.message);
       }
     };
     cargarArticulo();
   }, [pk]);
-
   // Manejo de imágenes nuevas (cargadas localmente)
   const handleImageUpload = (event) => {
     const files = Array.from(event.target.files);
@@ -89,23 +86,17 @@ const ViewArticleEdit = () => {
     }
     setNuevasImagenes(prev => [...prev, ...files]);
   };
-
   // Eliminar imágenes cargadas localmente
   const handleImageDelete = (index) => {
     setNuevasImagenes(prev => prev.filter((_, i) => i !== index));
   };
-
   // Eliminar imágenes ya cargadas en el servidor
   const handleRequestImageDelete = (index) => {
     setImagenes(prev => prev.filter((_, i) => i !== index));
   };
-
+  //envio de datos form
   const handleEdit = async (e) => {
     e.preventDefault();
-    if (articulo.responsable) {
-      setError('No se puede editar un artículo asociado a un responsable.');
-      return;
-    }
     const formData = new FormData();
     formData.append('nombre', nombre);
     formData.append('no_inventario', no_inventario);
@@ -115,7 +106,7 @@ const ViewArticleEdit = () => {
     formData.append('motivo', motivo);
     for (let i = 0; i < nuevasImagenes.length; i++) {
       formData.append('imagenes', nuevasImagenes[i]);
-    }
+    } 
     for (let i = 0; i < imagenes.length; i++) {
       formData.append('pathimg', imagenes[i].imagen);
     }
@@ -133,10 +124,10 @@ const ViewArticleEdit = () => {
     <Componentes.Modals.info mensaje={showInfo} action={handleActionInfo}/>
     <Componentes.Modals.error mensaje={error} action={handleActionEror}/>
       
-      <Componentes.Inputs.TitleHeader text={"Edicion de un Articulo."}/>
+      <Componentes.Inputs.TitleHeader text={"Edición de un Artículo."}/>
       <Componentes.Inputs.TitleSubtitle
-        titulo="Datos del artículo" 
-        contenido="Edita los campos para actualizar el artículo."
+        titulo="Datos del Artículo" 
+        contenido="Edita los campos para actualizar el Artículo."
       />
       {articulo ? (
         <form onSubmit={handleEdit} className="flex flex-col space-y-4 gap-3">
@@ -149,10 +140,14 @@ const ViewArticleEdit = () => {
               Onchange={(value) =>setConsumible(value)}
             />
             <Componentes.Inputs.TitleSubtitle
-              titulo="Articulo consumible" 
-              contenido="Active este campo si el artículo puede dejar de servir con un uso apropiado."
+              titulo="Artículo consumible" 
+              contenido="Active este campo si el Artículo puede dejar de servir con un uso apropiado."
             />
           </div>
+          <Componentes.Inputs.TitleSubtitle 
+            titulo="Evidencias (opcional)" 
+            contenido="Nos ayuda a registrar las condiciones actuales del Artículo" 
+          />
           <Componentes.Labels.fileimg
             object={nuevasImagenes}
             request={imagenes}
@@ -161,8 +156,8 @@ const ViewArticleEdit = () => {
             clikRequestDelete={handleRequestImageDelete}
           />
           <Componentes.Inputs.TitleSubtitle
-            titulo="Nota de edicion" 
-            contenido="Las notas de edicion son campos para comentar el porque se edita un registro"
+            titulo="Nota de Edición" 
+            contenido="Las notas sirven para justificar el porqué se editó el artículo."
           />
           <Componentes.Labels.area Onchange={(value) =>setMotivo(value)} Value={motivo} Placeholder={"Motivo"}/>
           {/* Botones para cancelar o confirmar */}
@@ -172,7 +167,7 @@ const ViewArticleEdit = () => {
               onClick={() => navigate('/articles')} 
             />
             <Componentes.Botones.ConfirmarVerde
-              text="Confirmar" 
+              text={"Confirmar"} 
             />
           </div>
         </form>
