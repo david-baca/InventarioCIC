@@ -39,7 +39,8 @@ exports.createUsuario = (req, res, next) => {
 // Middleware para validar los datos de edición de un usuario existente
 exports.editUsuario = (req, res, next) => {
     try {
-        const { id, disponible,} = req.body;
+        const { id } = req.params;
+        const { disponible,} = req.body;
         let errores = [];
 
         if (!id) errores.push('Es necesario definir el (id) del usuario.');

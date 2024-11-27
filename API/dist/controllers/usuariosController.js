@@ -42,30 +42,40 @@ exports.editarUsuario = async(req, res) =>
     const { disponible, permisos } = req.body;
 
     try{
-        const usuario = await Usuarios.findByPk(id);
-        if (!usuario)
-        {
-            return res.status(404).json(usuarioView.errorUsuario('Usuario no encontrado'));
-        }
-            
-            usuario.disponible = disponible !== undefined ? disponible : usuario.disponible;
-            await usuario.save();
-
-            await Permisos.destroy({
-                where: { Usuarios_pk: id }
+        let usuario = await Usuarios.update(
+            {disponible:disponible},
+            {where:{pk:id}  }
+        );
+        // Actualizar permisos si se proporcionan
+        if (permisos !== undefined) {
+            if (!Array.isArray(permisos)) {
+            return res.status(400).json({
+                error: "El campo `permisos` no es valido.",
             });
-
-            for (const permiso of permisos) {
-                await Permisos.create({
-                    Usuarios_pk: id,
-                    Funciones_pk: permiso
-                });
             }
-
-        res.json(userView.confirmacionActualizacion(usuario));
+    
+            // Eliminar permisos existentes del usuario
+            await Permisos.destroy({
+                where: { Usuarios_pk: id },
+            });
+    
+            // Crear nuevos permisos si el arreglo no está vacío
+            if (permisos.length > 0) {
+            for(let i=0;i<permisos.length > 0;i++){
+                await Permisos.create({
+                    Usuarios_pk:id,
+                    Funciones_pk:permisos[i]
+                
+                })
+            }
+            }
+        }
+  
+        res.json(userView.confirmacionEdicion(usuario));
     }catch (error)
     {
-        res.status(500).json(usuarioView.errorUsuario('Error al editar el responsable'+ error));
+        console.error("Error al editar el usuario:", error);
+        res.status(500).json(userView.errorUsuario('Error al editar el usuario'+ error));
     }
 };
 
@@ -91,34 +101,32 @@ exports.mostrarUsuarios = async(req, res) => {
 
 
 
-// src/controllers/usuariosController.js
-// const { Usuarios } = require('../model');
-// const sequelize = require('../config/database'); // Importa la instancia de Sequelize para usar funciones de SQL
-
-// exports.mostrarUsuarios = async (req, res) => {
-//     try {
-//         const usuarios = await Usuarios.findAll({
-//             attributes: [
-//                 'correo',
-//                 [sequelize.fn('CONCAT', sequelize.col('nombres'), ' ', sequelize.col('apellido_p'), ' ', sequelize.col('apellido_m')), 'nombre_completo']
-//             ]
-//         });
-
-//         res.json(usuarios);
-//     } catch (error) {
-//         res.status(500).json({ error: 'Error al obtener los usuarios: ' + error });
-//     }
-// };
-
-
 
 exports.detallesUsuario = async(req, res) => {
     const {correo} = req.params
+    const { disponible } = req.query;
 
     try {
+        const condiciones = { correo };
+        if (disponible !== undefined) {
+            if (![0, 1].includes(parseInt(disponible))) {
+                return res.status(400).json({
+                error: "La disponivilidad no esta definida.",
+            });
+        }
+        condiciones.disponible = parseInt(disponible);
+        }
+        
         const usuario = await Usuarios.findOne({
-            where:{correo: correo}
-        });
+            where: condiciones,
+          });
+      
+          if (!usuario) {
+            return res.status(404).json({
+              error: "Usuario no encontrado.",
+            });
+          }
+        
         const permisos = await Permisos.findAll({
             where:{Usuarios_pk: usuario.pk}
         })
@@ -129,22 +137,3 @@ exports.detallesUsuario = async(req, res) => {
     }
     
 };
-
-// exports.verificarCorreo = async (req, res) => {
-//     try {
-//       const { correo } = req.params;
-  
-//       const usuario = await Usuarios.findOne({
-//         where: { correo },
-//         attributes: ["pk", "nombres", "apellido_p", "apellido_m", "correo"],
-//       });
-  
-//       if (!usuario) {
-//         return res.status(404).json({ error: "Correo no encontrado" });
-//       }
-  
-//       res.json(usuario);
-//     } catch (error) {
-//       res.status(500).json({ error: "Error al verificar el correo: " + error });
-//     }
-//   };

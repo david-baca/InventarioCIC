@@ -49,8 +49,8 @@ const ViewUserEdit = () => {
     Grupos: [4, 5, 6],
     Responsable: [7, 8, 9],
     Movimientos: [10, 11, 12],
-    Reporte: [13, 14, 0],
-    Historial: [15, 0, 0],
+    Reporte: [13, 14],
+    Historial: [15],
   };
 
   useEffect(() => {
@@ -58,7 +58,12 @@ const ViewUserEdit = () => {
       try {
         const data = await obtenerUsuario(pk);
         setUsuario(data.usuario);
-        setPermisos(data.usuario.permisos || []);
+        let Funciones_pk = []
+        for(let i=0;i<data.permisos.length;i++){
+          Funciones_pk.push(data.permisos[i].Funciones_pk)
+        }
+        console.log(Funciones_pk)
+        setPermisos(Funciones_pk);
         setEstado(data.usuario.disponible);
       } catch (error) {
         setError('Error al cargar los datos del usuario');
@@ -77,13 +82,13 @@ const ViewUserEdit = () => {
   };
 
   const handleEstadoChange = () => {
-    setEstado((prevEstado) => (prevEstado === 1 ? 0 : 1));
+    setEstado((prevEstado) => (prevEstado === true ? false : true));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await actualizarUsuario(pk, {
+      await actualizarUsuario(usuario.pk, {
         permisos,
         disponible: estado,
       });
@@ -117,9 +122,9 @@ const ViewUserEdit = () => {
             <button
               type="button"
               onClick={handleEstadoChange}
-              className={`ml-auto px-1 py-1 rounded-lg ${estado === 1 ? 'bg-UP-Exito' : 'bg-UP-Error'} text-white`}
+              className={`ml-auto px-1 py-1 rounded-lg ${estado === true ? 'bg-UP-Exito' : 'bg-UP-Error'} text-white`}
             >
-              {estado === 1 ? 'Activo' : 'Inactivo'}
+              {estado === true ? 'Activo' : 'Inactivo'}
             </button>
           </div>
         </div>
@@ -163,12 +168,9 @@ const ViewUserEdit = () => {
               {listaPermisos.map((permiso) => (
                 <label key={permiso} className="inline-flex items-center mr-4">
                   <Components.Labels.checkbox
-                    type="checkbox"
-                    value={permiso}
-                    checked={permisos.includes(permiso)}
-                    onChange={() => handleCheckboxChange(permiso)}
-                    className="form-checkbox">
-                  </Components.Labels.checkbox>
+                    Value={permisos.includes(permiso)}
+                    Onchange={() => handleCheckboxChange(permiso)}
+                   />
                   
                 </label>
               ))}

@@ -105,7 +105,7 @@ const ViewGrupEdit = () => {
   const handleCheckboxChange = (articulo) => {
     setSelectedArticulos((prevSelected) => {
       if (prevSelected.includes(articulo.pk)) {
-        // Si ya está seleccionado, lo eliminamos
+        // Si ya está seleccionado, lo eliminamos 
         return prevSelected.filter((item) => item !== articulo.pk);
       } else {
         // Si no está seleccionado, lo añadimos
