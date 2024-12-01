@@ -55,11 +55,27 @@ const options = [
     ]
   },
   {
+    name: "Repotes",
+    routes: [
+      { path: "/reportes/articulo/:pk", codePermiso: 13 },
+      { path: "/reportes/articulos", codePermiso: 13 },
+      { path: "/reportes", codePermiso: 13 },
+      { path: "/reportes/responsable/:pk", codePermiso: 13 },
+      { path: "/reportes/responsables", codePermiso: 13 }
+    ]
+  },
+  {
     name: "Coordinadores",
     routes: [
       { path: "/coordinadores", codePermiso: 14 },
       { path: "/coordinadores/edit/:pk", codePermiso: 15 },
       { path: "/coordinadores/load", codePermiso: 15 }
+    ]
+  },
+  {
+    name: "Historial",
+    routes: [
+      { path: "/historial", codePermiso: 13 }
     ]
   }
 ]
@@ -184,7 +200,7 @@ const Menu = ({ children }) => {
            ) : (
            
            
-           //<h1>No tienes permiso de estar aquí ☺</h1>
+           //<h1 className='flex items-center justify-center h-screen text-2xl font-bold text-UP-Primario'>No tienes permiso de estar aquí ☺</h1>
            children
            )}
             
