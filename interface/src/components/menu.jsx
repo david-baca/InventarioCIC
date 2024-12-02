@@ -80,6 +80,19 @@ const options = [
   }
 ]
 
+const createRouteRegex = (structure) => {
+  // Convierte la estructura en una expresión regular
+  const regexPattern = structure
+    .replace(/:[^\s/]+/g, '([^/]+)') 
+    .replace(/\//g, '\\/'); 
+  return new RegExp(`^${regexPattern}$`); 
+};
+
+const compareRoutes = (route, structure) => {
+  const routeRegex = createRouteRegex(structure); // Genera la expresión regular a partir de la estructura
+  return routeRegex.test(route); // Verifica si la ruta coincide con la estructura
+};
+
 const OptionNav = ({ name, isSelected }) => (
   <div className={`w-[100%] p-2 flex flex-row justify-start items-center 
     gap-1 border-[0.5px] border-UP-Opaco border-s-[1.5rem] rounded-e-md
@@ -131,12 +144,14 @@ const Menu = ({ children }) => {
     if(localCredetial !== null){
     // Recorre las opciones y verifica si el usuario tiene permisos para alguna ruta
     options.forEach(({ routes }) => {
-      for(let i = 0; i<routes.length; i++){
-        //console.log(routes[i].codePermiso[0])
-        //console.log(localCredetial)
-        for(let i2 = 0; i2<localCredetial.permisos.length; i2++){
-          if(localCredetial.permisos[i2].Funciones_pk == routes[i].codePermiso && routes[i].path == location.pathname){
-            bandera=true}
+      for (let i = 0; i < routes.length; i++) {
+        for (let i2 = 0; i2 < localCredetial.permisos.length; i2++) {
+          if (
+            localCredetial.permisos[i2].Funciones_pk == routes[i].codePermiso &&
+            compareRoutes(location.pathname, routes[i].path)
+          ) {
+            bandera = true;
+          }
         }
       }
     });
@@ -172,12 +187,12 @@ const Menu = ({ children }) => {
             <div className="py-5 flex flex-col gap-2.5 w-[100%]">
               <div className="text-UP-Negro">Apartados</div>
               {options.map(({ name, routes }) => {
-  return (
-    <Link key={name} to={routes[0].path}>
-      <OptionNav name={name} isSelected={routes.some(route => location.pathname.includes(route.path))} />
-    </Link>
-  );
-})}
+              return (
+                <Link key={name} to={routes[0].path}>
+                  <OptionNav name={name} isSelected={routes.some(route => location.pathname.includes(route.path))} />
+                </Link>
+              );
+            })}
             </div>
           </div>
         )}
