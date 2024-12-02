@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { Link } from 'react-router-dom';
 import Logo from "../../public/img/upqroo.png"
 import { useAuth } from '../context/AuthContext';
 import {saveToLocalStorage, getFromLocalStorage} from '../context/Credentials';

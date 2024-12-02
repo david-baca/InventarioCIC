@@ -69,7 +69,7 @@ const options = [
     routes: [
       { path: "/coordinadores", codePermiso: 99 },
       { path: "/coordinadores/edit/:pk", codePermiso: 99 },
-      { path: "/coordinadores/load", codePermiso: 99 }
+      { path: "/coordinadores/load/", codePermiso: 99 }
     ]
   },
   {
