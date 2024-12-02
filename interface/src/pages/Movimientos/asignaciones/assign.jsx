@@ -89,13 +89,17 @@ const ViewAssigned = () => {
       try {
         const data = await peticones.ObtenerDetallesArticulo(pkArticulo);
         setArticulo(data.articulo);
+
+        // Cargar la imagen del artículo
+        const imagenUrl = await peticones.obtenerImagenArticulo(pkArticulo);  // Usar la función importada
+        setImagen(imagenUrl);
       } catch (err) {
         setError("No se pudieron cargar los articulos.");
       }
     };
-    loadResponsables()
-    loadArticulos()
-  },[pkResponsable, pkArticulo]);
+    loadResponsables();
+    loadArticulos();
+  }, [pkResponsable, pkArticulo]);
 
   // Generar y descargar el documento
   const generateAndDownloadDocument = async () => {
@@ -103,36 +107,40 @@ const ViewAssigned = () => {
       alert("Datos incompletos para generar el documento.");
       return;
     }
-
+  
     const fecha = new Date();
     const dia = fecha.getDate();
     const mes = fecha.toLocaleString("es-ES", { month: "long" });
     const año = fecha.getFullYear();
-
+  
     try {
+      // Obtener la imagen asociada al artículo
+      const imagenUrl = await obtenerImagenArticulo(articulo.pk);
+  
       const response = await fetch("/FORMATO DE ASIGNACION - MODULO DE REPORTES.docx");
       if (!response.ok) throw new Error("No se pudo cargar la plantilla.");
-
+  
       const content = await response.arrayBuffer();
       const zip = new PizZip(content);
       const doc = new Docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
-
+  
+      // Reemplazar el marcador {imagen1} por la URL de la imagen o el texto alternativo
       doc.setData({
         dia,
         mes,
         año,
-        "responsable.nombres": `${responsable.nombres}${responsable.apellido_p}${responsable.apellido_m}`,
+        "responsable.nombres": `${responsable.nombres} ${responsable.apellido_p} ${responsable.apellido_m}`,
         "no_inventario": articulo.no_inventario || "",
         "nombre": articulo.nombre || "",
         "descripcion": articulo.descripcion || "",
         "costo": parseFloat(articulo.costo || 0).toFixed(2),
-        "imagen1": "{imagen1}"
+        "imagen1": imagenUrl
       });
-
+  
       doc.render();
       const out = doc.getZip().generate({ type: "blob" });
       saveAs(out, `Asignacion_${responsable.nombres}_${articulo.no_inventario}.docx`);
-
+  
       // Ahora llamar a la función para convertir el archivo Word a PDF
       await convertWordToPdf(out);
     } catch (error) {
@@ -140,6 +148,8 @@ const ViewAssigned = () => {
       alert("Hubo un problema al generar el documento. Inténtelo de nuevo.");
     }
   };
+  
+
 
    // Función para convertir el archivo Word a PDF usando la API de iLovePDF
    const convertWordToPdf = async (wordBlob) => {
@@ -208,6 +218,25 @@ const handleSubmit = async () => {
     alert("Hubo un problema al procesar la solicitud. Intente nuevamente.");
   }
 };
+
+const obtenerImagenArticulo = async (idArticulo) => {
+  try {
+    const response = await instance.get(`/imagenes/${idArticulo}`); // Asegúrate que este endpoint es correcto
+    console.log("Respuesta de la API de imágenes:", response.data); // Verifica la respuesta
+
+    // Si la respuesta contiene imágenes, devolver la URL
+    if (response.data && response.data.length > 0) {
+      return response.data[0].url; // Asegúrate de que la URL esté en esta propiedad
+    }
+    return "No contiene imágenes este artículo"; // Si no tiene imágenes
+  } catch (error) {
+    console.error("Error al obtener la imagen del artículo:", error);
+    return "No contiene imágenes este artículo"; // Retorna el texto alternativo si ocurre un error
+  }
+};
+
+
+
 
   return (
     <>
