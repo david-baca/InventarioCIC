@@ -60,7 +60,6 @@ const ViewStoreRemoval = () => {
         titulo={"Motivo de la Baja"}
         contenido={"Por favor, ingrese el motivo para dar de baja el área."}
       />
-
       <div className="space-y-2">
         <Componentes.Labels.area
           Value={motivo}

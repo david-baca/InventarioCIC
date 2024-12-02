@@ -52,6 +52,7 @@ const ViewGrupEdit = () => {
   const [selectedArticulos, setSelectedArticulos] = useState([]);  // Artículos seleccionados para el grupo
   const [query, setQuery] = useState('');
   const [debounceTimeout, setDebounceTimeout] = useState(null); // Para el debounce de búsqueda
+  const [limit, setLimit] = useState({});
   const Peticion = peticionDetalles();
 
   const [error, setError] = useState();
@@ -156,6 +157,7 @@ const ViewGrupEdit = () => {
       </div>
       
       {articulos.length > 0 ? (
+        <>
         <Componentes.Table.table>
           <Componentes.Table.columna>
               <Componentes.Table.encabezado children={"No. Inventario"}/>
@@ -163,7 +165,7 @@ const ViewGrupEdit = () => {
               <Componentes.Table.encabezado children={"Costo"}/>
               <Componentes.Table.encabezado children={"Acciones"}/>
           </Componentes.Table.columna>
-          {articulos.map((articulo) => (
+          {articulos.map((articulo,index) => ((index <= limit.max && index >= limit.min) && ( 
             <Componentes.Table.columna key={articulo.pk}>
               <Componentes.Table.fila children={articulo.no_inventario}/>
               <Componentes.Table.fila children={articulo.nombre}/>
@@ -174,9 +176,11 @@ const ViewGrupEdit = () => {
                   Onchange={() => handleCheckboxChange(articulo)}  // Cambiamos el estado de selección al hacer click
                 />
               </Componentes.Table.fila>
-            </Componentes.Table.columna>
+            </Componentes.Table.columna>)
           ))}
         </Componentes.Table.table>
+        <Componentes.Inputs.Paginacion data={articulos} handleLimit={(value) => setLimit(value)} />
+        </>
       ) : (
         <div className="flex justify-center h-full items-center">
           <Componentes.Inputs.TitleSubtitle 

@@ -136,6 +136,35 @@ const checkbox = ({ Value, Onchange }) => {
   );
 };
 
+const select = ({List, Placeholder, setValue, Value})=>{
+  const handleChange = (e) => {
+    console.log(e.target.value)
+    setValue(e.target.value); 
+  };
+  return(<>
+    <div className="rounded p-1 relative flex border border-UP-Secundario w-[100%] ">
+      <select value={Value} onChange={handleChange} className='w-full'>
+        <option value={null}>
+          {Placeholder}
+        </option>
+        {List.map((item)=>(
+          <option key={item.pk} value={item.pk}>
+            {item.nombre}
+          </option>
+        ))}
+      </select>
+        <label
+          className={`pointer-events-none absolute top-2 left-3 -translate-y-6 -translate-x-2
+              truncate text-UP-Negro 
+              transition-all duration-200 ease-out 
+              dark:text-UP-Secundario bg-UP-Blanco min-w-[1rem]`}
+        >
+        <h1>{Placeholder}</h1>
+      </label>
+    </div>
+  </>)
+}
+
 const fileimg = ({ object, request, ImageUpload, clikObjectDelete, clikRequestDelete }) => {
   const baseApi = import.meta.env.VITE_BASE_API;
   return (
@@ -211,4 +240,4 @@ const fileimg = ({ object, request, ImageUpload, clikObjectDelete, clikRequestDe
   );
 };
 
-export default { text, area, number, correo, checkbox, fileimg };
+export default { text, area, number, correo, checkbox,select, fileimg };

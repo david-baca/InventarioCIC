@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Componentes from "../../components/";
@@ -22,7 +22,16 @@ const peticion = () => {
       throw new Error(error.response?.data?.error || 'Error in API interaction');
     }
   };
-  return { Publicar };
+  const GruposDisponibles = async (query) => {
+    try {
+      const response = await instance.get(`/grupos/${query}`);
+      return response.data.grupos; // Ajusta según la respuesta esperada
+    } catch (error) {
+      console.error(error.response?.data?.error || error.message);
+      throw new Error(error.response?.data?.error || 'Error en la búsqueda de grupos');
+    }
+  };
+  return { Publicar, GruposDisponibles };
 };
 
 const ViewArticleLoad = () => {
@@ -33,10 +42,24 @@ const ViewArticleLoad = () => {
   const [costo, setCosto] = useState('');
   const [consumible, setConsumible] = useState(false);
   const [imagenes, setImagenes] = useState([]);
+  const [dataGrupos, setDataGrupos] = useState([]);
+  const [grupo, setGrupo] = useState([]);
   const [error, setError] = useState();
   const [showInfo, setShowInfo] = useState(); 
   const [success, setSuccess] = useState(); 
-  
+  const Peticion = peticion();
+  useEffect(() => {
+    const cargarGrupos = async () => {
+      try {
+        const grupos = await Peticion.GruposDisponibles("");
+        setDataGrupos(grupos);
+      }catch(err){
+        setError(err.message);
+      }
+    };
+    cargarGrupos();
+  }, []);
+
   const handleActionInfo = () => {
     setShowInfo(null); 
   };
@@ -47,7 +70,6 @@ const ViewArticleLoad = () => {
     setSuccess(null); 
     navigate('/articles');
   };
-  const Peticion = peticion();
   // Handle image upload
   const handleImageUpload = (event) => {
     const files = Array.from(event.target.files);
@@ -73,6 +95,7 @@ const ViewArticleLoad = () => {
     formData.append('descripcion', descripcion);
     formData.append('costo', parseFloat(costo));
     formData.append('consumible', consumible ? 1 : 0);
+    formData.append('grupo', grupo);
     for (let i = 0; i < imagenes.length; i++) {
       formData.append('imagenes', imagenes[i]);
     }
@@ -97,6 +120,16 @@ const ViewArticleLoad = () => {
         <Componentes.Labels.text Value={nombre} Onchange={(value) => setNombre(value)} Placeholder={"Nombre"}/>
         <Componentes.Labels.number Value={costo} Onchange={(value) => setCosto(value)} Placeholder={"Costo"}/>
         <Componentes.Labels.area Value={descripcion} Onchange={(value) => setDescripcion(value)} Placeholder={"Descripción"}/>
+        <Componentes.Inputs.TitleSubtitle 
+          titulo="Grupo (opcional) " 
+          contenido="Seleccione un grupo para asociarlo a su articulo" 
+        />
+        <Componentes.Labels.select 
+          List={dataGrupos} 
+          Placeholder={"Secciona un grupo"} 
+          setValue={(i)=>{setGrupo(i)}}
+          Value={grupo}
+        />
         <div className="flex items-center p-5 gap-5">
             <Componentes.Labels.checkbox Value={consumible}
               Onchange={(value) =>setConsumible(value)}

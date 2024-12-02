@@ -38,6 +38,7 @@ const ViewArticleRenoval = () => {
   const [imagenes, setImagenes] = useState([]); // Para las imágenes actuales
   const [nuevasImagenes, setNuevasImagenes] = useState([]); // Para las nuevas imágenes
   //variables de modals
+  const [bloqued, setBloqued] = useState(null);
   const [showInfo, setShowInfo] = useState();
   const [success, setSuccess] = useState();
   const [error, setError] = useState();
@@ -56,7 +57,8 @@ const ViewArticleRenoval = () => {
         setArticulo(result.articulo);
         if(result.articulo.Condiciones.length > 0){
         setImagenes(result.articulo.Condiciones[0].Imagenes || []);}
-        if (result.articulo.responsable != null) setError('No se puede editar un artículo asociado a un responsable.');      } catch (err) {
+        if (result.articulo.responsable != null) setBloqued('No se puede dar de baja a un artículo asociado a un responsable.');      
+      } catch (err) {
         setError(err.message);
       }
     };
@@ -97,7 +99,7 @@ const ViewArticleRenoval = () => {
       setError(err.message);
     }
   };
-
+  if(bloqued!==null)return(<Componentes.Modals.error mensaje={bloqued} action={()=>{navigate("/articles")}}/>)
   return (
     <>
       <Componentes.Modals.success mensaje={success} action={handleActionSuccess}/>

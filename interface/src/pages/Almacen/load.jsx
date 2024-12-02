@@ -40,6 +40,7 @@ const ViewAreaLoad = () => {  // Cambié el nombre de "ViewGrupLoad" a "ViewArea
   const [articulos, setArticulos] = useState([]); // Para almacenar artículos no asignados a ningún área
   const [selectedArticulos, setSelectedArticulos] = useState([]); // Para almacenar artículos seleccionados para el área
   const [query, setQuery] = useState(''); // Query de búsqueda para artículos
+  const [limit, setLimit] = useState({});
   const Peticion = peticionCrear();
 
   const [error, setError] = useState();
@@ -118,27 +119,30 @@ const ViewAreaLoad = () => {  // Cambié el nombre de "ViewGrupLoad" a "ViewArea
         </div>
         
         {articulos.length > 0 ? (
-          <Componentes.Table.table>
-            <Componentes.Table.columna>
-                <Componentes.Table.encabezado children={"No. Inventario"} />
-                <Componentes.Table.encabezado children={"Nombre"} />
-                <Componentes.Table.encabezado children={"Costo"} />
-                <Componentes.Table.encabezado children={"Acciones"} />
-            </Componentes.Table.columna>
-            {articulos.map((articulo) => (
-              <Componentes.Table.columna key={articulo.id}>
-                <Componentes.Table.fila children={articulo.no_inventario} />
-                <Componentes.Table.fila children={articulo.nombre} />
-                <Componentes.Table.fila children={articulo.costo} />
-                <Componentes.Table.fila>
-                  <Componentes.Labels.checkbox
-                    Value={selectedArticulos.includes(articulo.pk)}
-                    Onchange={() => handleCheckboxChange(articulo)}
-                  />
-                </Componentes.Table.fila>
+          <>
+            <Componentes.Table.table>
+              <Componentes.Table.columna>
+                  <Componentes.Table.encabezado children={"No. Inventario"} />
+                  <Componentes.Table.encabezado children={"Nombre"} />
+                  <Componentes.Table.encabezado children={"Costo"} />
+                  <Componentes.Table.encabezado children={"Acciones"} />
               </Componentes.Table.columna>
-            ))}
-          </Componentes.Table.table>
+              {articulos.map((articulo, index) => ((index <= limit.max && index >= limit.min) && (
+                <Componentes.Table.columna key={articulo.id}>
+                  <Componentes.Table.fila children={articulo.no_inventario} />
+                  <Componentes.Table.fila children={articulo.nombre} />
+                  <Componentes.Table.fila children={articulo.costo} />
+                  <Componentes.Table.fila>
+                    <Componentes.Labels.checkbox
+                      Value={selectedArticulos.includes(articulo.pk)}
+                      Onchange={() => handleCheckboxChange(articulo)}
+                    />
+                  </Componentes.Table.fila>
+                </Componentes.Table.columna>)
+              ))}
+            </Componentes.Table.table>
+            <Componentes.Inputs.Paginacion data={articulos} handleLimit={(value) => setLimit(value)} />
+          </>
         ) : (
           <div className="flex flex-col items-center mt-4">
             <Componentes.Inputs.TitleSubtitle 
