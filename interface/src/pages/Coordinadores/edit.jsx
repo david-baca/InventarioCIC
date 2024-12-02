@@ -81,8 +81,13 @@ const ViewUserEdit = () => {
     });
   };
   
+
   const handleActionEror = () => {
     setError(null); 
+  };
+  const handleActionSuccess= () => {
+    setSuccess(null); 
+    navigate('../coordinadores');
   };
 
   const handleEstadoChange = () => {
@@ -113,9 +118,8 @@ const ViewUserEdit = () => {
 
   return (
     <div className="min-h-screen  flex flex-col items-center p-4">
-      {success && <Components.Modals.success mensaje={success} />}
-      {error && <Components.Modals.error mensaje={error} />}
-      <Componentes.Modals.error mensaje={error} action={handleActionEror}/>
+      <Components.Modals.success mensaje={success} action={handleActionSuccess}/>
+      <Components.Modals.error mensaje={error} action={handleActionEror}/>
       <main className="w-full rounded-lg mt-6 p-6">
         <h2 className="flex items-center text-2xl font-bold bg-UP-Secundario text-UP-Blanco mb-4 pl-8 h-20 w-38 ">Administración de Permisos</h2>
         

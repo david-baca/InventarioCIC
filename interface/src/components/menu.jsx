@@ -67,9 +67,9 @@ const options = [
   {
     name: "Coordinadores",
     routes: [
-      { path: "/coordinadores", codePermiso: 14 },
-      { path: "/coordinadores/edit/:pk", codePermiso: 15 },
-      { path: "/coordinadores/load", codePermiso: 15 }
+      { path: "/coordinadores", codePermiso: 99 },
+      { path: "/coordinadores/edit/:pk", codePermiso: 99 },
+      { path: "/coordinadores/load", codePermiso: 99 }
     ]
   },
   {
@@ -200,8 +200,8 @@ const Menu = ({ children }) => {
            ) : (
            
            
-           //<h1 className='flex items-center justify-center h-screen text-2xl font-bold text-UP-Primario'>No tienes permiso de estar aquí ☺</h1>
-           children
+           <h1 className='flex items-center justify-center h-screen text-2xl font-bold text-UP-Primario'>No tienes permiso de estar aquí ☺</h1>
+           
            )}
             
           </div>
