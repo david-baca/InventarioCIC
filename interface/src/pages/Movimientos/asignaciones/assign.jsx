@@ -72,6 +72,7 @@ const ViewAssigned = () => {
   const [articulo, setArticulo] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const loadResponsables = async () => {
@@ -102,22 +103,20 @@ const ViewAssigned = () => {
       alert("Datos incompletos para generar el documento.");
       return;
     }
-  
+
     const fecha = new Date();
     const dia = fecha.getDate();
     const mes = fecha.toLocaleString("es-ES", { month: "long" });
     const año = fecha.getFullYear();
-  
+
     try {
       const response = await fetch("/FORMATO DE ASIGNACION - MODULO DE REPORTES.docx");
       if (!response.ok) throw new Error("No se pudo cargar la plantilla.");
-  
+
       const content = await response.arrayBuffer();
       const zip = new PizZip(content);
-      let x= articulo.Condiciones[0].Imagenes[0].imagen
+      const doc = new Docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
 
-      const doc = new Docxtemplater(zip, { paragraphLoop: true, linebreaks: true,
-       });
       doc.setData({
         dia,
         mes,
@@ -126,20 +125,53 @@ const ViewAssigned = () => {
         "no_inventario": articulo.no_inventario || "",
         "nombre": articulo.nombre || "",
         "descripcion": articulo.descripcion || "",
-        "costo": parseFloat(articulo.costo || 0).toFixed(2), // Convertir costo a número
+        "costo": parseFloat(articulo.costo || 0).toFixed(2),
         "imagen1": "{imagen1}"
       });
-  
-      doc.render();
-      //finalizacion
-      const out = doc.getZip().generate({ type: "blob" });
-      //insercion de texto
-      //insercion de imagen
 
+      doc.render();
+      const out = doc.getZip().generate({ type: "blob" });
       saveAs(out, `Asignacion_${responsable.nombres}_${articulo.no_inventario}.docx`);
+
+      // Ahora llamar a la función para convertir el archivo Word a PDF
+      await convertWordToPdf(out);
     } catch (error) {
       console.error("Error al generar el documento:", error);
       alert("Hubo un problema al generar el documento. Inténtelo de nuevo.");
+    }
+  };
+
+   // Función para convertir el archivo Word a PDF usando la API de iLovePDF
+   const convertWordToPdf = async (wordBlob) => {
+    setLoading(true);
+    
+    try {
+      const formData = new FormData();
+      formData.append("file", wordBlob, "FORMATO DE ASIGNACION - MODULO DE REPORTES.docx");
+
+      // El endpoint de la API de iLovePDF
+      const apiKey = "project_public_18d8cf2f66627f182b1bf856b53bde47_VZbOJ03448e676545ea468e11bb7a0ff7da12"; // Reemplaza con tu API Key de iLovePDF
+      const url = "https://api.ilovepdf.com/v1/convert/word_to_pdf"; // Endpoint de iLovePDF para convertir Word a PDF
+
+      const response = await axios.post(url, formData, {
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'multipart/form-data',
+        },
+        responseType: 'blob',
+      });
+
+      if (response.status === 200) {
+        const pdfBlob = response.data;
+        saveAs(pdfBlob, `Asignacion_${responsable.nombres}_${articulo.no_inventario}.pdf`);
+      } else {
+        throw new Error("Error al convertir el archivo Word a PDF.");
+      }
+    } catch (error) {
+      console.error("Error al convertir a PDF:", error);
+      alert("Hubo un problema al convertir el archivo. Inténtelo de nuevo.");
+    } finally {
+      setLoading(false);
     }
   };
   
@@ -177,11 +209,9 @@ const handleSubmit = async () => {
   }
 };
 
-
-
   return (
     <>
-      <Componentes.Inputs.TitleHeader text={"Importación de responsiva - (asignación)"} />
+       <Componentes.Inputs.TitleHeader text={"Importación de responsiva - (asignación)"} />
       <div className="bg-white shadow-md rounded-md p-6 w-full">
         <div className="mb-6">
           <Componentes.Inputs.TitleSubtitle
@@ -190,21 +220,22 @@ const handleSubmit = async () => {
           />
         </div>
 
-        {/* Botón de descarga */}
-        <div className="flex justify-between items-center mb-6 w-full">
+         {/* Botón de descarga */}
+         <div className="flex justify-between items-center mb-6 w-full">
           <p className="text-gray-700 font-semibold">
             Archivo: {selectedFile ? selectedFile.name : "No se ha seleccionado ningún archivo"}
           </p>
           <button
             className="bg-orange-500 text-white px-4 py-2 rounded-md shadow hover:bg-orange-600"
             onClick={generateAndDownloadDocument}
+            disabled={loading}
           >
-            Descargar
+            {loading ? "Generando PDF..." : "Descargar PDF"}
           </button>
         </div>
 
-        {/* Campo de selección de archivo */}
-        <div className="flex items-center justify-between mb-6 w-full">
+      {/* Campo de selección de archivo */}
+      <div className="flex items-center justify-between mb-6 w-full">
           <label
             htmlFor="fileUpload"
             className="bg-gray-200 px-4 py-2 rounded-md shadow cursor-pointer hover:bg-gray-300"
@@ -214,19 +245,18 @@ const handleSubmit = async () => {
           <input
             id="fileUpload"
             type="file"
-            onChange={handleFileSelect}
+            onChange={(e) => setSelectedFile(e.target.files[0])}
             className="hidden"
           />
           <span className="text-gray-500">
             {selectedFile ? selectedFile.name : "Sin archivos seleccionados"}
           </span>
         </div>
-
         {/* Botón para terminar la asignación */}
         <div className="flex justify-center">
           <button
             onClick={handleSubmit}
-            className="bg-red-500 text-white px-6 py-3 rounded-md shadow hover:bg-red-600 w-full" // Botón ocupa todo el ancho
+            className="bg-red-500 text-white px-6 py-3 rounded-md shadow hover:bg-red-600 w-full"
           >
             Terminar asignación
           </button>
@@ -234,7 +264,7 @@ const handleSubmit = async () => {
       </div>
 
       {/* Vista previa del archivo */}
-      {selectedFile && (
+      {/* {selectedFile && (
         <div className="mt-6 w-full bg-gray-100 p-4 rounded-md shadow">
           <embed
             src={URL.createObjectURL(selectedFile)}
@@ -242,7 +272,7 @@ const handleSubmit = async () => {
             className="w-full h-[500px] border rounded-md"
           />
         </div>
-      )}
+      )} */}
     </>
   );
 };
