@@ -33,13 +33,19 @@ const Peticion =()=>{
 
   const Asignar = async (formData) => {
     try {
-      const response = await instance.post(`/asignaciones/crearAsignacion`, formData);
-      return response.data;
+      // Enviar los datos con el archivo al endpoint correspondiente
+      const response = await instance.post(`/asignaciones/crearAsignacion`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data', // Asegúrate de usar el tipo de contenido correcto
+        },
+      });
+      return response.data; // Retorna los datos de la respuesta
     } catch (error) {
       console.error(error.response?.data?.error || error.message);
-      throw new Error(error.response?.data?.error || 'Error al obtener los detalles del responsable');
+      throw new Error(error.response?.data?.error || 'Error al crear la asignación');
     }
   };
+  
 
   const urlToImage= async(url)=> {
     try {
@@ -207,17 +213,24 @@ const handleSubmit = async () => {
   try {
     // Crear un FormData para enviar el archivo y los datos adicionales
     const formData = new FormData();
-    console.log(selectedFile)
     formData.append("file", selectedFile); // Archivo seleccionado
     formData.append("fk_Articulo", articulo.pk); // ID del artículo
     formData.append("fk_Responsable", responsable.pk); // ID del responsable
-    const result =await peticones.Asignar(formData)
-    //Setsuccess
+
+    // Enviar la asignación con los datos y archivo al backend
+    const response = await peticones.Asignar(formData); // Usar la función de asignar que ya tienes
+    if (response) {
+      alert("Asignación creada con éxito.");
+      navigate("/movimientos"); // Redirigir a la vista deseada después de la asignación
+    } else {
+      alert("Hubo un error al crear la asignación.");
+    }
   } catch (error) {
-    console.error("Error al subir el archivo o crear la asignación:", error);
-    alert("Hubo un problema al procesar la solicitud. Intente nuevamente.");
+    console.error("Error al enviar los datos:", error);
+    alert("Hubo un problema al guardar los datos. Inténtelo de nuevo.");
   }
 };
+
 
 const obtenerImagenArticulo = async (idArticulo) => {
   try {
@@ -234,9 +247,6 @@ const obtenerImagenArticulo = async (idArticulo) => {
     return "No contiene imágenes este artículo"; // Retorna el texto alternativo si ocurre un error
   }
 };
-
-
-
 
   return (
     <>
