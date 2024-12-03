@@ -68,251 +68,161 @@ const Peticion =()=>{
   return {Asignar,ObtenerDetallesArticulo, ObtenerDetallesReponsable, urlToImage}
 }
 
-
 const ViewAssigned = () => {
-  const { pkResponsable, pkArticulo } = useParams(); // Obtener parámetros de la URL
-  const peticones = Peticion()
-  const navigate = useNavigate(); // Redirección
-  const [imagen, setImagen] = useState(null);
+  const { pkResponsable, pkArticulo } = useParams();
   const [responsable, setResponsable] = useState(null);
   const [articulo, setArticulo] = useState(null);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const loadResponsables = async () => {
-      setError(null);
-      try {
-        const data = await peticones.ObtenerDetallesReponsable(pkResponsable);
-        setResponsable(data.responsable);
-      } catch (err) {
-        setError("No se pudieron cargar los responsables.");
-      }
-    };
-    const loadArticulos = async () => {
-      setError(null);
-      try {
-        const data = await peticones.ObtenerDetallesArticulo(pkArticulo);
-        setArticulo(data.articulo);
-
-        // Cargar la imagen del artículo
-        const imagenUrl = await peticones.obtenerImagenArticulo(pkArticulo);  // Usar la función importada
-        setImagen(imagenUrl);
-      } catch (err) {
-        setError("No se pudieron cargar los articulos.");
-      }
-    };
-    loadResponsables();
-    loadArticulos();
-  }, [pkResponsable, pkArticulo]);
-
-  // Generar y descargar el documento
-  const generateAndDownloadDocument = async () => {
-    if (!responsable || !articulo) {
-      alert("Datos incompletos para generar el documento.");
-      return;
-    }
-  
-    const fecha = new Date();
-    const dia = fecha.getDate();
-    const mes = fecha.toLocaleString("es-ES", { month: "long" });
-    const año = fecha.getFullYear();
-  
-    try {
-      // Obtener la imagen asociada al artículo
-      const imagenUrl = await obtenerImagenArticulo(articulo.pk);
-  
-      const response = await fetch("/FORMATO DE ASIGNACION - MODULO DE REPORTES.docx");
-      if (!response.ok) throw new Error("No se pudo cargar la plantilla.");
-  
-      const content = await response.arrayBuffer();
-      const zip = new PizZip(content);
-      const doc = new Docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
-  
-      // Reemplazar el marcador {imagen1} por la URL de la imagen o el texto alternativo
-      doc.setData({
-        dia,
-        mes,
-        año,
-        "responsable.nombres": `${responsable.nombres} ${responsable.apellido_p} ${responsable.apellido_m}`,
-        "no_inventario": articulo.no_inventario || "",
-        "nombre": articulo.nombre || "",
-        "descripcion": articulo.descripcion || "",
-        "costo": parseFloat(articulo.costo || 0).toFixed(2),
-        "imagen1": imagenUrl
-      });
-  
-      doc.render();
-      const out = doc.getZip().generate({ type: "blob" });
-      saveAs(out, `Asignacion_${responsable.nombres}_${articulo.no_inventario}.docx`);
-  
-      // Ahora llamar a la función para convertir el archivo Word a PDF
-      await convertWordToPdf(out);
-    } catch (error) {
-      console.error("Error al generar el documento:", error);
-      alert("Hubo un problema al generar el documento. Inténtelo de nuevo.");
-    }
-  };
-  
-
-
-   // Función para convertir el archivo Word a PDF usando la API de iLovePDF
-   const convertWordToPdf = async (wordBlob) => {
+  // Función para obtener los detalles del responsable
+  const loadResponsable = async () => {
     setLoading(true);
-    
     try {
-      const formData = new FormData();
-      formData.append("file", wordBlob, "FORMATO DE ASIGNACION - MODULO DE REPORTES.docx");
-
-      // El endpoint de la API de iLovePDF
-      const apiKey = "project_public_18d8cf2f66627f182b1bf856b53bde47_VZbOJ03448e676545ea468e11bb7a0ff7da12"; // Reemplaza con tu API Key de iLovePDF
-      const url = "https://api.ilovepdf.com/v1/convert/word_to_pdf"; // Endpoint de iLovePDF para convertir Word a PDF
-
-      const response = await axios.post(url, formData, {
-        headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'multipart/form-data',
-        },
-        responseType: 'blob',
-      });
-
-      if (response.status === 200) {
-        const pdfBlob = response.data;
-        saveAs(pdfBlob, `Asignacion_${responsable.nombres}_${articulo.no_inventario}.pdf`);
-      } else {
-        throw new Error("Error al convertir el archivo Word a PDF.");
-      }
+      const data = await obtenerResponsable(pkResponsable);
+      setResponsable(data.responsable);
     } catch (error) {
-      console.error("Error al convertir a PDF:", error);
-      alert("Hubo un problema al convertir el archivo. Inténtelo de nuevo.");
+      console.error("Error al obtener responsable:", error);
     } finally {
       setLoading(false);
     }
   };
-  
 
-  // Manejar la selección de archivo para subir
-  const handleFileSelect = (event) => {
-    setSelectedFile(event.target.files[0]);
+  // Función para obtener los detalles del artículo
+  const loadArticulo = async () => {
+    setLoading(true);
+    try {
+      const data = await obtenerArticulo(pkArticulo);
+      setArticulo(data.articulo);
+    } catch (error) {
+      console.error("Error al obtener artículo:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
- // Manejar la subida de archivos y la creación de asignación
-// Manejar la subida de archivos y la creación de asignaciones
-const handleSubmit = async () => {
-  if (!selectedFile) {
-    alert("Por favor, selecciona un archivo antes de continuar.");
-    return;
-  }
+  useEffect(() => {
+    loadResponsable();
+    loadArticulo();
+  }, [pkResponsable, pkArticulo]);
 
-  if (!responsable || !articulo) {
-    alert("Datos incompletos del responsable o artículo.");
-    return;
-  }
-
-  try {
-    // Crear un FormData para enviar el archivo y los datos adicionales
-    const formData = new FormData();
-    formData.append("file", selectedFile); // Archivo seleccionado
-    formData.append("fk_Articulo", articulo.pk); // ID del artículo
-    formData.append("fk_Responsable", responsable.pk); // ID del responsable
-
-    // Enviar la asignación con los datos y archivo al backend
-    const response = await peticones.Asignar(formData); // Usar la función de asignar que ya tienes
-    if (response) {
-      alert("Asignación creada con éxito.");
-      navigate("/movimientos"); // Redirigir a la vista deseada después de la asignación
-    } else {
-      alert("Hubo un error al crear la asignación.");
+  // Función para generar y enviar a imprimir el documento
+  const generateAndPrint = () => {
+    if (!responsable || !articulo) {
+      alert("Datos incompletos para generar el documento.");
+      return;
     }
-  } catch (error) {
-    console.error("Error al enviar los datos:", error);
-    alert("Hubo un problema al guardar los datos. Inténtelo de nuevo.");
-  }
-};
 
+    const fecha = new Date();
+    const dia = fecha.getDate();
+    const mes = fecha.toLocaleString("es-ES", { month: "long" });
+    const año = fecha.getFullYear();
 
-const obtenerImagenArticulo = async (idArticulo) => {
-  try {
-    const response = await instance.get(`/imagenes/${idArticulo}`); // Asegúrate que este endpoint es correcto
-    console.log("Respuesta de la API de imágenes:", response.data); // Verifica la respuesta
+    // Crear una nueva ventana para el contenido HTML
+    const printWindow = window.open('', '', 'width=800,height=600');
+    
+    // Escribir el contenido del documento en la nueva ventana
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Asignación de Artículo</title>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              font-size: 12px;
+              margin: 20px;
+            }
+            h1 {
+              text-align: center;
+            }
+            .content {
+              margin-top: 20px;
+            }
+            .section {
+              margin-top: 10px;
+            }
+            .footer {
+              position: absolute;
+              bottom: 20px;
+              width: 100%;
+              text-align: center;
+              font-size: 12px;
+            }
+          </style>
+        </head>
+        <body>
+          <h1>Asignación de Artículo</h1>
+          <div class="content">
+            <p><strong>ASUNTO:</strong> ASIGNACION DE ARTICULO</p>
+            <p>Cancún, Quintana Roo, a ${dia} de ${mes} de ${año}.</p>
+            <p><strong>Nombre:</strong> ${responsable.nombres}</p>
+            <p><strong>Cargo:</strong> ${responsable.cargo}</p>
+            <p><strong>PRESENTE:</strong></p>
+            <p>Por medio de la presente se hace constar la asignación de artículos de inventario entre las siguientes partes:</p>
 
-    // Si la respuesta contiene imágenes, devolver la URL
-    if (response.data && response.data.length > 0) {
-      return response.data[0].url; // Asegúrate de que la URL esté en esta propiedad
-    }
-    return "No contiene imágenes este artículo"; // Si no tiene imágenes
-  } catch (error) {
-    console.error("Error al obtener la imagen del artículo:", error);
-    return "No contiene imágenes este artículo"; // Retorna el texto alternativo si ocurre un error
-  }
-};
+            <div class="section">
+              <p><strong>Responsable de asignación:</strong> _________.</p>
+              <p><strong>Asignado a:</strong> ${responsable.nombres}.</p>
+            </div>
+
+            <div class="section">
+              <p><strong>DECLARACIONES</strong></p>
+              <p><strong>Primera:</strong> El responsable de la asignación declara que los artículos asignados se encuentran en el estado que a continuación se detalla y son entregados al asignado en calidad de préstamo o asignación temporal, conforme a las políticas de la empresa.</p>
+              <p><strong>Segunda:</strong> El asignado se compromete a hacer uso responsable de los artículos asignados, garantizando su buen estado de conservación, salvo por el desgaste normal derivado del uso.</p>
+            </div>
+
+            <div class="section">
+              <p><strong>CLÁUSULAS</strong></p>
+              <p><strong>Primera:</strong> Se acuerda la asignación de los siguientes artículos, cuyo estado y condiciones se detallan a continuación.</p>
+              <p><strong>Segunda:</strong> El responsable de la asignación garantiza que los artículos se encuentran en el estado declarado al momento de la entrega.</p>
+              <p><strong>Tercera:</strong> El asignado se compromete a utilizar los artículos asignados de acuerdo con su propósito y a reportar cualquier inconveniente o deterioro.</p>
+              <p><strong>Cuarta:</strong> El asignado se compromete a devolver los artículos en las mismas condiciones en que fueron recibidos, salvo por el desgaste normal. La devolución deberá realizarse al responsable de la asignación o en el área designada.</p>
+            </div>
+
+            <div class="section">
+              <p><strong>DETALLES DEL ARTÍCULO</strong></p>
+              <p><strong>No. Inventario:</strong> ${articulo.no_inventario}</p>
+              <p><strong>Nombre:</strong> ${articulo.nombre}</p>
+              <p><strong>Descripción:</strong> ${articulo.descripcion}</p>
+              <p><strong>Precio:</strong> ${articulo.precio}</p>
+            </div>
+
+            <div class="section">
+              <p><strong>EVIDENCIAS ADJUNTAS</strong></p>
+              <p><strong>Fotos:</strong></p>
+              <p>${articulo.imagenes ? articulo.imagenes.map(img => <img src="${img}" alt="Imagen del artículo" style="width: 100px; height: 100px; margin: 5px;" />).join('') : "No hay fotos disponibles."}</p>
+            </div>
+          </div>
+          <div class="footer">
+            <p>Firma del Responsable: _________</p>
+            <p>Firma del Asignado: _________</p>
+          </div>
+        </body>
+      </html>
+    `);
+
+    printWindow.document.close(); // Cerrar el documento para que pueda renderizarse
+
+    // Esperar a que la página se haya cargado completamente antes de imprimir
+    printWindow.onload = () => {
+      printWindow.print();
+    };
+  };
 
   return (
-    <>
-       <Componentes.Inputs.TitleHeader text={"Importación de responsiva - (asignación)"} />
-      <div className="bg-white shadow-md rounded-md p-6 w-full">
-        <div className="mb-6">
-          <Componentes.Inputs.TitleSubtitle
-            titulo={"Presentación de documento de asignación"}
-            contenido={"Verifique que el documento sea correcto y suba el documento firmado por las partes."}
-          />
-        </div>
-
-         {/* Botón de descarga */}
-         <div className="flex justify-between items-center mb-6 w-full">
-          <p className="text-gray-700 font-semibold">
-            Archivo: {selectedFile ? selectedFile.name : "No se ha seleccionado ningún archivo"}
-          </p>
-          <button
-            className="bg-orange-500 text-white px-4 py-2 rounded-md shadow hover:bg-orange-600"
-            onClick={generateAndDownloadDocument}
-            disabled={loading}
-          >
-            {loading ? "Generando PDF..." : "Descargar PDF"}
-          </button>
-        </div>
-
-      {/* Campo de selección de archivo */}
-      <div className="flex items-center justify-between mb-6 w-full">
-          <label
-            htmlFor="fileUpload"
-            className="bg-gray-200 px-4 py-2 rounded-md shadow cursor-pointer hover:bg-gray-300"
-          >
-            Examinar...
-          </label>
-          <input
-            id="fileUpload"
-            type="file"
-            onChange={(e) => setSelectedFile(e.target.files[0])}
-            className="hidden"
-          />
-          <span className="text-gray-500">
-            {selectedFile ? selectedFile.name : "Sin archivos seleccionados"}
-          </span>
-        </div>
-        {/* Botón para terminar la asignación */}
-        <div className="flex justify-center">
-          <button
-            onClick={handleSubmit}
-            className="bg-red-500 text-white px-6 py-3 rounded-md shadow hover:bg-red-600 w-full"
-          >
-            Terminar asignación
-          </button>
-        </div>
+    <div>
+      <h1>Vista de Asignación</h1>
+      <div>
+        {loading ? (
+          <p>Cargando...</p>
+        ) : (
+          <div>
+            <button onClick={generateAndPrint}>
+              Imprimir Documento de Asignación
+            </button>
+          </div>
+        )}
       </div>
-
-      {/* Vista previa del archivo */}
-      {/* {selectedFile && (
-        <div className="mt-6 w-full bg-gray-100 p-4 rounded-md shadow">
-          <embed
-            src={URL.createObjectURL(selectedFile)}
-            type="application/pdf"
-            className="w-full h-[500px] border rounded-md"
-          />
-        </div>
-      )} */}
-    </>
+    </div>
   );
 };
 
