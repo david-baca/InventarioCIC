@@ -65,7 +65,7 @@ const ViewGrupRenoval = () => {
       <Componentes.Modals.info mensaje={showInfo} action={handleActionInfo} />
       <Componentes.Modals.error mensaje={error} action={handleActionError} />
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-6">
         <Componentes.Inputs.TitleHeader text={"Baja de Grupo"} />
         <Componentes.Inputs.TitleSubtitle
           titulo={"Motivo de la Baja"}

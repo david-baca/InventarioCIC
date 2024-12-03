@@ -100,22 +100,19 @@ const ArticleSelect = () => {
       </div>
 
       {/* Tabla de artículos */}
-      <div className="bg-gray-900 flex flex-col flex-wrap">
+     
         {error ? (
           <div className="text-red-600">{error}</div>
         ) : currentItems.length > 0 ? (
-          <Componentes.Table.table className="w-full border border-gray-300">
-            <thead>
+          <Componentes.Table.table >
               <Componentes.Table.columna>
-                <Componentes.Table.encabezado className="bg-red-800 text-white text-center py-2">
+                <Componentes.Table.encabezado >
                   Token
                 </Componentes.Table.encabezado>
-                <Componentes.Table.encabezado className="bg-red-800 text-white text-center py-2">
+                <Componentes.Table.encabezado >
                   Artículo
                 </Componentes.Table.encabezado>
               </Componentes.Table.columna>
-            </thead>
-            <tbody>
               {currentItems.map((article) => (
                 <tr
                   key={article.pk}
@@ -124,20 +121,19 @@ const ArticleSelect = () => {
                     selectedArticle?.pk === article.pk ? 'bg-orange-500 text-white' : 'text-gray-600'
                   }`}
                 >
-                  <Componentes.Table.fila className="text-center py-2">
+                  <Componentes.Table.fila>
                     {article.no_inventario}
                   </Componentes.Table.fila>
-                  <Componentes.Table.fila className="text-center py-2">
+                  <Componentes.Table.fila >
                     {article.nombre}
                   </Componentes.Table.fila>
                 </tr>
               ))}
-            </tbody>
           </Componentes.Table.table>
         ) : (
           <h1 className="text-gray-500">No hay datos disponibles</h1>
         )}
-      </div>
+      
 
       {/* Paginación */}
       <div className="p-4 rounded-b-md mb-0 flex flex-col sm:flex-row justify-between items-center mt-4 text-sm">

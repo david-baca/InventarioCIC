@@ -40,13 +40,13 @@ const ViewArticleInformation = () => {
   const handleActionInfo = () => setShowInfo(null);
   const handleActionError = () => setError(null);
   const printContent = () => {
-    const content = document.getElementById("qr-panel"); // Get the content by ID
-    const printWindow = window.open('', '', 'height=500,width=500'); // Open a new window
-    printWindow.document.write('<html><head><title>Print QR Code</title></head><body>');
-    printWindow.document.write(content.innerHTML); // Insert the QR code's HTML content
+    const content = document.getElementById("printableArea"); // Obtener el contenido a imprimir // Abrir una nueva pestaña
+    const printWindow = window.open('', '_blank'); // Escribir el contenido en la nueva pestaña
+    printWindow.document.write('<html><head><title>UPQROO Inventario</title></head><body>');
+    printWindow.document.write(content.innerHTML); // Insertar el contenido HTML a imprimir
     printWindow.document.write('</body></html>');
-    printWindow.document.close(); // Close the document to load content
-    printWindow.print(); // Trigger the print dialog
+    printWindow.document.close(); // Cerrar el documento para que se renderice
+    printWindow.print(); // 
   };
   // Cargar los detalles del artículo
   useEffect(() => {
@@ -77,10 +77,12 @@ const ViewArticleInformation = () => {
       ) : (
         <div className='flex lg:flex-row flex-row-reverse flex-wrap gap-5'>
           <div className="gap-10 flex flex-col items-center w-[100%] lg:w-fit">
-            <div id ="qr-panel">
-            <QRCodeSVG value={baseApi+"/articulos/"+articulo.no_inventario} size={300}/>
+            <div className='w-[20rem] h-[20rem] overflow-scroll'>
+              <div id ="printableArea" className='w-[21.59cm] h-[27.94cm]'>
+                <QRCodeSVG value={baseApi+"/articulos/"+articulo.no_inventario} size={100}/>
+              </div>
             </div>
-            <Components.Botones.Imprimir Onclick={printContent}/>
+            <Components.Botones.Imprimir onClick={printContent}/>
           </div>
           <div className="gap-10 flex flex-row flex-wrap lg:w-[50%]">
             <Components.Inputs.TitleSubtitle 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 const Title = ({ titulo }) => {
   return (
@@ -29,4 +29,52 @@ const TitleSubtitle = ({ titulo, contenido }) => {
     );
   };
 
-  export default { Title, TitleSubtitle, TitleHeader}
+  const Paginacion =({data, handleLimit})=>{
+    const tolerancia = 5;
+    const [page, setPage] = useState();
+    const [index, setIndex] = useState({});//index actual de paginacion
+    const [pages, setPages] = useState();//calculo de posibles paginas
+    const next=()=>{
+      const x = {min:index.max+1,max:index.max+tolerancia}
+      setPage(page+1)
+      setIndex(x)
+      handleLimit(x)
+    }
+    const prev=()=>{
+      const x = {min:index.min-tolerancia,max:index.min-1}
+      setPage(page-1)
+      setIndex(x)
+      handleLimit(x)
+    }
+    useEffect(() => {
+      setPage(1)
+      setPages(Math.ceil(data.length / tolerancia)) 
+      setIndex({min:0,max:tolerancia-1})
+      handleLimit({min:0,max:tolerancia-1})
+    }, [data]);
+    return(
+    <div className="p-4 flex flex-col sm:flex-row justify-between items-center mt-4 text-sm">
+      <span className="text-gray-600">
+        Mostrando {page} de {pages}
+      </span>
+      <div className="flex space-x-4 mt-2 sm:mt-0">
+        <button
+          onClick={()=>prev()}
+          className={`text-gray-600 hover:text-gray-800 ${page == 1 && "opacity-50 cursor-not-allowed"}`}
+          disabled={page == 1}
+        >
+          Anterior
+        </button>
+        <button
+          onClick={()=>next()}
+          className={`text-gray-600 hover:text-gray-800 ${page == pages && "opacity-50 cursor-not-allowed"}`}
+          disabled={page == pages}
+        >
+          Siguiente
+        </button>
+      </div>
+    </div>
+    )
+  }
+
+  export default { Title, TitleSubtitle, TitleHeader,Paginacion}

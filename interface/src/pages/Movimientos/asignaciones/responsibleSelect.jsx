@@ -103,18 +103,15 @@ const ViewAssigned_ResponsibleSelect = () => {
           {error ? (
             <div className="text-red-600">{error}</div>
           ) : currentItems.length > 0 ? (
-            <Componentes.Table.table className="w-full">
-              <thead>
+            <Componentes.Table.table>
                 <Componentes.Table.columna>
-                  <Componentes.Table.encabezado className="bg-red-800 text-white text-center py-2">
+                  <Componentes.Table.encabezado>
                     Correo
                   </Componentes.Table.encabezado>
-                  <Componentes.Table.encabezado className="bg-red-800 text-white text-center py-2">
+                  <Componentes.Table.encabezado>
                     Nombre Completo
                   </Componentes.Table.encabezado>
                 </Componentes.Table.columna>
-              </thead>
-              <tbody>
                 {currentItems.map((responsable) => (
                   <tr
                     key={responsable.pk}
@@ -131,7 +128,6 @@ const ViewAssigned_ResponsibleSelect = () => {
                     </Componentes.Table.fila>
                   </tr>
                 ))}
-              </tbody>
             </Componentes.Table.table>
           ) : (
             <h1 className="text-gray-500 text-center">No hay datos disponibles</h1>

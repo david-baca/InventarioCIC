@@ -52,6 +52,7 @@ const ViewGrupEdit = () => {
   const [selectedArticulos, setSelectedArticulos] = useState([]);  // Artículos seleccionados para el grupo
   const [query, setQuery] = useState('');
   const [debounceTimeout, setDebounceTimeout] = useState(null); // Para el debounce de búsqueda
+  const [limit, setLimit] = useState({});
   const Peticion = peticionDetalles();
 
   const [error, setError] = useState();
@@ -105,7 +106,7 @@ const ViewGrupEdit = () => {
   const handleCheckboxChange = (articulo) => {
     setSelectedArticulos((prevSelected) => {
       if (prevSelected.includes(articulo.pk)) {
-        // Si ya está seleccionado, lo eliminamos
+        // Si ya está seleccionado, lo eliminamos 
         return prevSelected.filter((item) => item !== articulo.pk);
       } else {
         // Si no está seleccionado, lo añadimos
@@ -145,20 +146,18 @@ const ViewGrupEdit = () => {
       <Componentes.Modals.info mensaje={showInfo} action={handleActionInfo} />
       <Componentes.Modals.error mensaje={error} action={handleActionError} />
 
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-6">
       <Componentes.Inputs.TitleHeader text={"Edición de Grupo"} />
-      <Componentes.Inputs.TitleSubtitle titulo={"Información del Grupo"} contenido={"Actualiza los detalles del grupo."} />
-      <div className="space-y-2">
-        <Componentes.Labels.text Value={nombre} Onchange={setNombre} Placeholder={"Nombre del Grupo"} />
-        <Componentes.Labels.area Value={descripcion} Onchange={setDescripcion} Placeholder={"Descripción del Grupo"} />
-      </div>
-
+      <Componentes.Inputs.TitleSubtitle titulo={"Información del Grupo"} contenido={"Actualiza los detalles del grupo."} />  
+      <Componentes.Labels.text Value={nombre} Onchange={setNombre} Placeholder={"Nombre del Grupo"} />
+      <Componentes.Labels.area Value={descripcion} Onchange={setDescripcion} Placeholder={"Descripción del Grupo"} />
       <Componentes.Inputs.TitleSubtitle titulo={"Seleccionar Artículos"} contenido={"Seleccione los artículos que desea asociar a este grupo."} />
       <div className="flex items-center w-[100%]">
         <Componentes.Buscador query={query} OnChange={handleSearchChange} />
       </div>
       
       {articulos.length > 0 ? (
+        <>
         <Componentes.Table.table>
           <Componentes.Table.columna>
               <Componentes.Table.encabezado children={"No. Inventario"}/>
@@ -166,7 +165,7 @@ const ViewGrupEdit = () => {
               <Componentes.Table.encabezado children={"Costo"}/>
               <Componentes.Table.encabezado children={"Acciones"}/>
           </Componentes.Table.columna>
-          {articulos.map((articulo) => (
+          {articulos.map((articulo,index) => ((index <= limit.max && index >= limit.min) && ( 
             <Componentes.Table.columna key={articulo.pk}>
               <Componentes.Table.fila children={articulo.no_inventario}/>
               <Componentes.Table.fila children={articulo.nombre}/>
@@ -177,9 +176,11 @@ const ViewGrupEdit = () => {
                   Onchange={() => handleCheckboxChange(articulo)}  // Cambiamos el estado de selección al hacer click
                 />
               </Componentes.Table.fila>
-            </Componentes.Table.columna>
+            </Componentes.Table.columna>)
           ))}
         </Componentes.Table.table>
+        <Componentes.Inputs.Paginacion data={articulos} handleLimit={(value) => setLimit(value)} />
+        </>
       ) : (
         <div className="flex justify-center h-full items-center">
           <Componentes.Inputs.TitleSubtitle 

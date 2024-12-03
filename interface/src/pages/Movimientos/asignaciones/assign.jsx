@@ -31,6 +31,16 @@ const Peticion =()=>{
     }
   };
 
+  const Asignar = async (formData) => {
+    try {
+      const response = await instance.post(`/asignaciones/crearAsignacion`, formData);
+      return response.data;
+    } catch (error) {
+      console.error(error.response?.data?.error || error.message);
+      throw new Error(error.response?.data?.error || 'Error al obtener los detalles del responsable');
+    }
+  };
+
   const urlToImage= async(url)=> {
     try {
       const response = await axios.get(url, { responseType: 'blob' }); // Obtener la imagen como Blob
@@ -49,7 +59,7 @@ const Peticion =()=>{
       return null;
     }
   };
-  return {ObtenerDetallesArticulo, ObtenerDetallesReponsable, urlToImage}
+  return {Asignar,ObtenerDetallesArticulo, ObtenerDetallesReponsable, urlToImage}
 }
 
 
@@ -155,22 +165,12 @@ const handleSubmit = async () => {
   try {
     // Crear un FormData para enviar el archivo y los datos adicionales
     const formData = new FormData();
+    console.log(selectedFile)
     formData.append("file", selectedFile); // Archivo seleccionado
     formData.append("fk_Articulo", articulo.pk); // ID del artículo
     formData.append("fk_Responsable", responsable.pk); // ID del responsable
-
-    const response = await fetch("http://localhost:3720/asignaciones/crearAsignacion", {
-      method: "POST",
-      body: formData,
-    });
-
-    if (!response.ok) {
-      throw new Error("Error al subir el archivo o crear la asignación.");
-    }
-
-    const result = await response.json();
-    alert("Asignación creada exitosamente.");
-    navigate("/asignaciones/completado"); // Redirige al completar la asignación
+    const result =await peticones.Asignar(formData)
+    //Setsuccess
   } catch (error) {
     console.error("Error al subir el archivo o crear la asignación:", error);
     alert("Hubo un problema al procesar la solicitud. Intente nuevamente.");

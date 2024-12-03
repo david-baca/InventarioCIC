@@ -31,13 +31,14 @@ exports.buscarArticulos = async (req, res) => {
 }; 
 exports.crearArticulo = async (req, res) => {
     try {
-        const { no_inventario, nombre, descripcion, costo, consumible} = req.body;
+        const { no_inventario, nombre, descripcion, costo, consumible, grupo} = req.body;
         const nuevoArticulo = await Articulos.create({
             no_inventario:no_inventario,
             nombre:nombre,
             descripcion:descripcion,
             costo:costo,
             consumible: consumible,
+            Grupos_pk: grupo,
             disponible: 1,
         });
         if (req.files && req.files.length > 0) {
@@ -61,13 +62,14 @@ exports.crearArticulo = async (req, res) => {
 };
 exports.editarArticulo = async (req, res) => {
     const { id } = req.params;
-    const { no_inventario, nombre, descripcion, costo, consumible} = req.body;
+    const { grupo, no_inventario, nombre, descripcion, costo, consumible} = req.body;
     try {
         //buscamos articulo
         articulo = await Articulos.findByPk(id)
         // Actualizar los campos del artículo
         await articulo.update(
-            { no_inventario, nombre, descripcion, costo, consumible }
+            { no_inventario, nombre, descripcion, costo, consumible, 
+            Grupos_pk:grupo }
         );
         //verificamos si es necesario cambiar las condiciones
         const { pathimg } = req.body;
@@ -156,7 +158,11 @@ exports.darDeBajaArticulo = async (req, res) => {
                 });
             }
         }
-        articulo = await Articulos.update({ disponible: 0 }, { where: { pk:id } });
+        articulo = await Articulos.update({ 
+            disponible: 0,
+            Grupos_pk: null,
+            Area_pk: null
+            }, { where: { pk:id } });
         res.json({ message: 'Artículo dado de baja exitosamente'});
     } catch (error) {
         res.status(500).json({ error: 'Error al dar de baja el artículo' });

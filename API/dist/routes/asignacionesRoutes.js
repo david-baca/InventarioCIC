@@ -30,5 +30,4 @@ router.get('/responsable/:fk_Responsable', asignacionController.registroAsignaci
 // Ruta para crear asignación y subir archivo
 router.post('/crearAsignacion', uploadPdf.single("file"), asignacionController.crearAsignacion);
 
-
 module.exports = router;

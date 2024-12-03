@@ -25,6 +25,7 @@ export const peticion = () => {
 const ViewGrup = () => {
   const navigate = useNavigate();
   const [data, setData] = useState([]);
+  const [limit, setLimit] = useState({});
   const [query, setQuery] = useState('');
   const Peticion = peticion();
   const [error, setError] = useState();
@@ -112,6 +113,7 @@ const ViewGrup = () => {
 
       {/* Mostrar los grupos si existen */}
       {data.length > 0 ? (
+        <>
         <Componentes.Table.table>
           <Componentes.Table.columna>
             <Componentes.Table.encabezado>Nombre</Componentes.Table.encabezado>
@@ -119,7 +121,7 @@ const ViewGrup = () => {
             <Componentes.Table.encabezado>Acciones</Componentes.Table.encabezado>
           </Componentes.Table.columna>
 
-          {data.map((element) => (
+          {data.map((element, index) => ((index <= limit.max && index >= limit.min) && (
             <Componentes.Table.columna key={element.pk}>
               <Componentes.Table.fila children={element.nombre}/>
               <Componentes.Table.fila children={element.descripcion}/>
@@ -131,9 +133,11 @@ const ViewGrup = () => {
                     Onclik={() => handleDelete(element.pk)} 
                   />
               </Componentes.Table.fila>
-            </Componentes.Table.columna>
+            </Componentes.Table.columna>)
           ))}
         </Componentes.Table.table>
+        <Componentes.Inputs.Paginacion data={data} handleLimit={(value)=>setLimit(value)}/>
+        </>
       ) : (
         <div className='flex justify-center h-full items-center'>
           <Componentes.Inputs.TitleSubtitle 

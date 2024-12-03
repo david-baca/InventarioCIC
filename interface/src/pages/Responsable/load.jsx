@@ -80,7 +80,7 @@ const ViewResponsableLoad = () => {
       <Componentes.Inputs.TitleSubtitle titulo={"Datos de un responsable"} 
         contenido={"Rellene todos los campos para poder crear un Responsable."}/>
 
-      <form onSubmit={handlePublish} className="flex flex-col space-y-4 gap-3">
+      <form onSubmit={handlePublish} className="space-y-6">
         <Componentes.Labels.text 
           Value={nombres} 
           Onchange={(value) => setNombres(value)} 

@@ -20,7 +20,7 @@ exports.createArea = async (req, res, next) => {
             for (let i = 0; i < articulos.length; i++) {
                 const articulo = await Articulos.findAll({
                     where: {
-                        pk: articulos[i].pk,
+                        pk: articulos[i],
                         Area_pk: { [Op.ne]: null }  // Verifica que no esté asociado a ningún área
                     }
                 });

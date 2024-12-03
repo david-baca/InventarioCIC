@@ -25,7 +25,16 @@ const peticion = () => {
       throw new Error(error.response?.data?.error || 'Error en la interacción con la API');
     }
   };
-  return { ObtenerDetalles, EditarArticulo };
+  const GruposDisponibles = async (query) => {
+    try {
+      const response = await instance.get(`/grupos/${query}`);
+      return response.data.grupos; // Ajusta según la respuesta esperada
+    } catch (error) {
+      console.error(error.response?.data?.error || error.message);
+      throw new Error(error.response?.data?.error || 'Error en la búsqueda de grupos');
+    }
+  };
+  return { ObtenerDetalles, EditarArticulo, GruposDisponibles };
 };
 
 const ViewArticleEdit = () => {
@@ -43,10 +52,13 @@ const ViewArticleEdit = () => {
   const [consumible, setConsumible] = useState(false);
   const [imagenes, setImagenes] = useState([]); // Para las imágenes actuales
   const [nuevasImagenes, setNuevasImagenes] = useState([]); // Para las nuevas imágenes
+  const [dataGrupos, setDataGrupos] = useState([]);
+  const [grupo, setGrupo] = useState([]);
   //variables de modals
   const [showInfo, setShowInfo] = useState(); 
   const [success, setSuccess] = useState(); 
   const [error, setError] = useState();
+  const [bloqued, setBloqued] = useState(null);
   //funciones modal
   const handleActionInfo = () => {
     setShowInfo(null); 
@@ -69,13 +81,23 @@ const ViewArticleEdit = () => {
         setDescripcion(result.articulo.descripcion);
         setCosto(result.articulo.costo);
         setConsumible(result.articulo.consumible);
+        if(result.articulo.Grupos_pk)setGrupo(result.articulo.Grupos_pk)
         if(result.articulo.Condiciones.length > 0){
         setImagenes(result.articulo.Condiciones[0].Imagenes || []);}
-        if (result.articulo.responsable != null) setError('No se puede editar un artículo asociado a un responsable.');      } catch (err) {
+        if (result.articulo.responsable != null) setBloqued('No se puede editar un artículo asociado a un responsable.');      } catch (err) {
+        setError(err.message);
+      }
+    };
+    const cargarGrupos = async () => {
+      try {
+        const grupos = await Peticion.GruposDisponibles("");
+        setDataGrupos(grupos);
+      }catch(err){
         setError(err.message);
       }
     };
     cargarArticulo();
+    cargarGrupos();
   }, [pk]);
   // Manejo de imágenes nuevas (cargadas localmente)
   const handleImageUpload = (event) => {
@@ -104,12 +126,13 @@ const ViewArticleEdit = () => {
     formData.append('costo', parseFloat(costo));
     formData.append('consumible', consumible ? 1 : 0);
     formData.append('motivo', motivo);
+    formData.append('grupo', grupo);
     for (let i = 0; i < nuevasImagenes.length; i++) {
       formData.append('imagenes', nuevasImagenes[i]);
     } 
     for (let i = 0; i < imagenes.length; i++) {
       formData.append('pathimg', imagenes[i].imagen);
-    }
+    } 
     try {
       const success = await Peticion.EditarArticulo(formData, articulo.pk); // Actualiza el artículo en la base de datos
       setSuccess(success.message)
@@ -117,7 +140,7 @@ const ViewArticleEdit = () => {
       setError(err.message);
     }
   };
-
+  if(bloqued!==null)return(<Componentes.Modals.error mensaje={bloqued} action={()=>{navigate("/articles")}}/>)
   return (
     <>
     <Componentes.Modals.success mensaje={success} action={handleActionSuccess}/>
@@ -130,11 +153,21 @@ const ViewArticleEdit = () => {
         contenido="Edita los campos para actualizar el Artículo."
       />
       {articulo ? (
-        <form onSubmit={handleEdit} className="flex flex-col space-y-4 gap-3">
+        <form onSubmit={handleEdit} className="flex flex-col space-y-6">
           <Componentes.Labels.text Onchange={(value) =>setNo_inventario(value)} Value={no_inventario} Placeholder={"Numero de inventario"}/>
           <Componentes.Labels.text Onchange={(value) =>setNombre(value)} Value={nombre} Placeholder={"Nombre"}/>
           <Componentes.Labels.number Onchange={(value) =>setCosto(value)} Value={costo} Placeholder={"Costo"}/>
           <Componentes.Labels.area Onchange={(value) =>setDescripcion(value)} Value={descripcion} Placeholder={"Descripción"}/>
+          <Componentes.Inputs.TitleSubtitle 
+            titulo="Grupo (opcional) " 
+            contenido="Seleccione un grupo para asociarlo a su articulo" 
+          />
+          <Componentes.Labels.select 
+            List={dataGrupos} 
+            Placeholder={"Secciona un grupo"} 
+            setValue={(i)=>{setGrupo(i)}}
+            Value={grupo}
+          />
           <div className="flex items-center p-5 gap-5">
             <Componentes.Labels.checkbox Value={consumible}
               Onchange={(value) =>setConsumible(value)}

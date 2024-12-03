@@ -77,15 +77,6 @@ const ViewLogin = () => {
           />
           <span className="text-gray-700 font-medium">Google</span>
         </button>
-
-
-        <Link to="./coordinadores">
-          <button className="flex items-center justify-center w-full border border-gray-400 py-2 rounded-full hover:bg-gray-100 transition">
-          <span className="text-gray-700 font-medium">Boton por mientras </span>
-            <img src="https://i.pinimg.com/originals/36/69/82/36698270a51a0c4129847dbfca2e068b.gif"
-              className="w-5 h-5 mr-2"/>            
-          </button>
-        </Link>
       </div>
     </div>
     </>
