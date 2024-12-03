@@ -51,15 +51,21 @@ const options = [
   {
     name: "Movimientos",
     routes: [
-      { path: "/movimientos", codePermiso: 13 }
+      { path: "/movimientos", codePermiso: 13 },
+      { path: "/asignaciones/", codePermiso: 13 },
+      { path: "/asignaciones/:pkResponsable", codePermiso: 13 },
+      { path: "/asignaciones/:pkResponsable/:pkArticulo", codePermiso: 13 },
+      { path: "/devoluciones/", codePermiso: 13 },
+      { path: "/devoluciones/:pkResponsable", codePermiso: 13 },
+      { path: "/devoluciones/:pkResponsable/:pkArticulo", codePermiso: 13 }
     ]
   },
   {
     name: "Repotes",
     routes: [
+      { path: "/reportes", codePermiso: 13 },
       { path: "/reportes/articulo/:pk", codePermiso: 13 },
       { path: "/reportes/articulos", codePermiso: 13 },
-      { path: "/reportes", codePermiso: 13 },
       { path: "/reportes/responsable/:pk", codePermiso: 13 },
       { path: "/reportes/responsables", codePermiso: 13 }
     ]

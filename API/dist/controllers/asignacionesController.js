@@ -63,35 +63,35 @@ exports.buscarAsignaciones = async (req, res) => {
 // src/controllers/asignacionesController.js
 exports.crearAsignacion = async (req, res) => {
     const { fk_Articulo, fk_Responsable } = req.body;
-  
-    if (!req.file || !fk_Articulo || !fk_Responsable) {
-      return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
-    }
-  
-    try {
-      // Crear el registro del archivo en la tabla Documentos
-      const documento = await Documentos.create({
-        doc_firma: req.file.path, // Ruta del archivo subido
-        fecha: new Date(),
-      });
-  
-      // Crear la asignación
-      const asignacion = await Asignaciones.create({
-        Articulos_pk: fk_Articulo,
-        Responsables_pk: fk_Responsable,
-        Documentos_pk: documento.pk, // Relación con el documento
-        disponible: true,
-        fecha_recibido: new Date(),
-      });
-  
-      res.status(201).json({ message: 'Asignación creada exitosamente.', asignacion });
-    } catch (error) {
-      console.error("Error al crear la asignación:", error);
-      res.status(500).json({ error: 'Error al crear la asignación.' });
-    }
-  };
-  
 
+    // Validar si el archivo y los datos de la asignación están presentes
+    if (!req.file || !fk_Articulo || !fk_Responsable) {
+        return res.status(400).json({ error: 'Todos los campos son obligatorios, incluyendo el archivo PDF.' });
+      }      
+
+    try {
+        // Crear el registro del archivo en la tabla Documentos
+        const documento = await Documentos.create({
+            doc_firma: req.file.path, // Ruta del archivo subido
+            fecha: new Date(),
+        });
+
+        // Crear la asignación
+        const asignacion = await Asignaciones.create({
+            Articulos_pk: fk_Articulo,
+            Responsables_pk: fk_Responsable,
+            Documentos_pk: documento.pk, // Relación con el documento
+            disponible: true,
+            fecha_recibido: new Date(),
+        });
+
+        // Responder con el mensaje de éxito y los datos de la asignación
+        res.status(201).json({ message: 'Asignación creada exitosamente.', asignacion });
+    } catch (error) {
+        console.error("Error al crear la asignación:", error);
+        res.status(500).json({ error: 'Error al crear la asignación.' });
+    }
+};
 
 
 // Dar de baja una asignación por ID

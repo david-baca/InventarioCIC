@@ -127,7 +127,7 @@ const ViewArticleInformation = () => {
             </div>
           {responsable === null ? (
             <>
-              <h1>hola</h1>
+              <h1>No se ha asignado un responsable</h1>
             </>
           ):(
             <>

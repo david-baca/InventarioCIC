@@ -38,6 +38,7 @@ const ViewArticleRenoval = () => {
   const [imagenes, setImagenes] = useState([]); // Para las imágenes actuales
   const [nuevasImagenes, setNuevasImagenes] = useState([]); // Para las nuevas imágenes
   //variables de modals
+  const [bloqued, setBloqued] = useState(null);
   const [showInfo, setShowInfo] = useState();
   const [success, setSuccess] = useState();
   const [error, setError] = useState();
@@ -56,7 +57,8 @@ const ViewArticleRenoval = () => {
         setArticulo(result.articulo);
         if(result.articulo.Condiciones.length > 0){
         setImagenes(result.articulo.Condiciones[0].Imagenes || []);}
-        if (result.articulo.responsable != null) setError('No se puede editar un artículo asociado a un responsable.');      } catch (err) {
+        if (result.articulo.responsable != null) setBloqued('No se puede dar de baja a un artículo asociado a un responsable.');      
+      } catch (err) {
         setError(err.message);
       }
     };
@@ -97,26 +99,26 @@ const ViewArticleRenoval = () => {
       setError(err.message);
     }
   };
-
+  if(bloqued!==null)return(<Componentes.Modals.error mensaje={bloqued} action={()=>{navigate("/articles")}}/>)
   return (
     <>
       <Componentes.Modals.success mensaje={success} action={handleActionSuccess}/>
       <Componentes.Modals.info mensaje={showInfo} action={handleActionInfo}/>
       <Componentes.Modals.error mensaje={error} action={handleActionEror}/>
-      <Componentes.Inputs.TitleHeader text="Eliminación de un Artículo" />
+      <Componentes.Inputs.TitleHeader text="Baja de un Artículo" />
       {articulo === null ? (
         <div>Cargando detalles del artículo...</div>
       ) : (
         <div className="gap-10 flex flex-col">
           <form onSubmit={handleSubmit} className='flex flex-col space-y-6'>
             <Componentes.Inputs.TitleSubtitle 
-              titulo="Los motivos de eliminación son campos para comentar el porqué se elimina un registro." 
-              contenido="Motivo de eliminación" 
+              titulo="Los motivos de baja son campos para comentar el porqué se da de baja un registro." 
+              contenido="Motivo de baja" 
             />
             <Componentes.Labels.area 
               Onchange={(value) => setMotivo(value)} 
               Value={motivo} 
-              Placeholder="Motivo de eliminación" 
+              Placeholder="Motivo de baja" 
             />
             <Componentes.Inputs.TitleSubtitle 
               titulo="Evidencias (opcional)" 
@@ -135,8 +137,8 @@ const ViewArticleRenoval = () => {
             </div>
           </form>
           <Componentes.Inputs.TitleSubtitle 
-            titulo={`Eliminación del responsable ${articulo.responsable ? articulo.responsable.nombre : 'Desconocido'}`} 
-            contenido={`Yo, [user name], en mi calidad de Administrador, declaro que en fecha ${new Date().toLocaleDateString()} se procede a dar de baja el responsable ${articulo.responsable ? articulo.responsable.nombre : 'Desconocido'}. Esta decisión se toma debido a [${motivo}], lo que impide su seguimiento en esta institución.`} 
+            titulo={`baja del articulo ${articulo.nombre ? articulo.nombres : 'Desconocido'}`} 
+            contenido={`Yo, [user name], en mi calidad de [rol], declaro que en fecha ${new Date().toLocaleDateString()} se procede a dar de baja el articulo ${articulo.nombre ? articulo.nombres : 'Desconocido'}. Esta decisión se toma debido a [${motivo}], lo que impide su seguimiento en esta institución.`} 
           />
         </div>
       )}

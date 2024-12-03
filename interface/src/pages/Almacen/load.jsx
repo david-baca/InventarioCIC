@@ -40,6 +40,7 @@ const ViewAreaLoad = () => {  // Cambié el nombre de "ViewGrupLoad" a "ViewArea
   const [articulos, setArticulos] = useState([]); // Para almacenar artículos no asignados a ningún área
   const [selectedArticulos, setSelectedArticulos] = useState([]); // Para almacenar artículos seleccionados para el área
   const [query, setQuery] = useState(''); // Query de búsqueda para artículos
+  const [limit, setLimit] = useState({});
   const Peticion = peticionCrear();
 
   const [error, setError] = useState();
@@ -109,40 +110,43 @@ const ViewAreaLoad = () => {  // Cambié el nombre de "ViewGrupLoad" a "ViewArea
       <Componentes.Modals.error mensaje={error} action={handleActionEror} />
       <form onSubmit={handleSubmit} className="space-y-6">
         <Componentes.Inputs.TitleHeader text={"Carga de Área"} />
-        <Componentes.Inputs.TitleSubtitle titulo={"Información del Área"} contenido={"Ingrese los detalles correspondientes al alta de la nueva área."} />
+        <Componentes.Inputs.TitleSubtitle titulo={"Información del Área"} contenido={"Ingrese los detalles correspondientes para el alta de la nueva área."} />
         <Componentes.Labels.text Value={codigo} Onchange={setCodigo} Placeholder={"Nombre del Área"} />
         <Componentes.Labels.area Value={descripcion} Onchange={setDescripcion} Placeholder={"Descripción del Área"} />
         <div className='flex items-center w-[100%]'>
-          <Componentes.Inputs.TitleSubtitle titulo={"Seleccionar Artículos"} contenido={"Seleccione los artículos que desea asociar a este área."} />
+          <Componentes.Inputs.TitleSubtitle titulo={"Seleccionar Artículos"} contenido={"Seleccione los artículos que desea asociar con esta área."} />
           <Componentes.Buscador query={query} OnChange={handleSearchChange} />
         </div>
         
         {articulos.length > 0 ? (
-          <Componentes.Table.table>
-            <Componentes.Table.columna>
-                <Componentes.Table.encabezado children={"No. Inventario"} />
-                <Componentes.Table.encabezado children={"Nombre"} />
-                <Componentes.Table.encabezado children={"Costo"} />
-                <Componentes.Table.encabezado children={"Acciones"} />
-            </Componentes.Table.columna>
-            {articulos.map((articulo) => (
-              <Componentes.Table.columna key={articulo.id}>
-                <Componentes.Table.fila children={articulo.no_inventario} />
-                <Componentes.Table.fila children={articulo.nombre} />
-                <Componentes.Table.fila children={articulo.costo} />
-                <Componentes.Table.fila>
-                  <Componentes.Labels.checkbox
-                    Value={selectedArticulos.includes(articulo.pk)}
-                    Onchange={() => handleCheckboxChange(articulo)}
-                  />
-                </Componentes.Table.fila>
+          <>
+            <Componentes.Table.table>
+              <Componentes.Table.columna>
+                  <Componentes.Table.encabezado children={"No. Inventario"} />
+                  <Componentes.Table.encabezado children={"Nombre"} />
+                  <Componentes.Table.encabezado children={"Costo"} />
+                  <Componentes.Table.encabezado children={"Acciones"} />
               </Componentes.Table.columna>
-            ))}
-          </Componentes.Table.table>
+              {articulos.map((articulo, index) => ((index <= limit.max && index >= limit.min) && (
+                <Componentes.Table.columna key={articulo.id}>
+                  <Componentes.Table.fila children={articulo.no_inventario} />
+                  <Componentes.Table.fila children={articulo.nombre} />
+                  <Componentes.Table.fila children={articulo.costo} />
+                  <Componentes.Table.fila>
+                    <Componentes.Labels.checkbox
+                      Value={selectedArticulos.includes(articulo.pk)}
+                      Onchange={() => handleCheckboxChange(articulo)}
+                    />
+                  </Componentes.Table.fila>
+                </Componentes.Table.columna>)
+              ))}
+            </Componentes.Table.table>
+            <Componentes.Inputs.Paginacion data={articulos} handleLimit={(value) => setLimit(value)} />
+          </>
         ) : (
           <div className="flex flex-col items-center mt-4">
             <Componentes.Inputs.TitleSubtitle 
-              titulo={"No hay Artículos que mostrar"} 
+              titulo={"No hay artículos para mostrar."} 
               contenido={"No se encontraron resultados"} 
             />
           </div>
