@@ -107,11 +107,13 @@ const ViewArticleInformation = () => {
             />
             <Components.Inputs.TitleSubtitle 
               titulo="Grupo"
-              contenido={articulo.grupo || "sin asignar"} 
+              contenido={articulo.Grupo === null ? ( "sin asignar")
+                :(articulo.Grupo.nombre)}
             />
             <Components.Inputs.TitleSubtitle 
               titulo="Area"
-              contenido={articulo.grupo || "sin asignar"} 
+              contenido={articulo.Area === null ? ( "sin asignar")
+                :(articulo.Area.codigo)}
             />
             {/* Mostrar imágenes del artículo */}
             {imagenes.length > 0 && (
@@ -127,7 +129,11 @@ const ViewArticleInformation = () => {
             </div>
           {responsable === null ? (
             <>
-              <h1>No se ha asignado un responsable</h1>
+            <Components.Inputs.TitleHeader text="Detalles de respodsable" />
+              <Components.Inputs.TitleSubtitle 
+                titulo="Responsable"
+                contenido={responsable || "sin asignar"} 
+              />
             </>
           ):(
             <>

@@ -101,8 +101,7 @@ const ViewArticleLoad = () => {
     }
     try {
       const result = await Peticion.Publicar(formData);
-      console.log('Published:', result);
-      navigate('/articles');
+      setSuccess("artculo exitosamente dado de alta.")
     } catch (err) {
       setError(err.message);
     }

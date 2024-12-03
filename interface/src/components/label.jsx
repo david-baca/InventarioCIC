@@ -144,7 +144,7 @@ const select = ({List, Placeholder, setValue, Value})=>{
   return(<>
     <div className="rounded p-1 relative flex border border-UP-Secundario w-[100%] ">
       <select value={Value} onChange={handleChange} className='w-full'>
-        <option value={null}>
+        <option value={0} key={0}>
           {Placeholder}
         </option>
         {List.map((item)=>(
