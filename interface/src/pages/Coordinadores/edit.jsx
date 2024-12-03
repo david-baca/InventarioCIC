@@ -80,6 +80,15 @@ const ViewUserEdit = () => {
         : [...prevPermisos, permiso];
     });
   };
+  
+
+  const handleActionEror = () => {
+    setError(null); 
+  };
+  const handleActionSuccess= () => {
+    setSuccess(null); 
+    navigate('../coordinadores');
+  };
 
   const handleEstadoChange = () => {
     setEstado((prevEstado) => (prevEstado === true ? false : true));
@@ -93,7 +102,7 @@ const ViewUserEdit = () => {
         disponible: estado,
       });
       setSuccess('Usuario actualizado exitosamente');
-      setTimeout(() => navigate('/panel'), 2000);
+      setTimeout(() => navigate('../coordinadores'), 2000);
     } catch (error) {
       setError('Hubo un error al actualizar el usuario');
     }
@@ -109,8 +118,8 @@ const ViewUserEdit = () => {
 
   return (
     <div className="min-h-screen  flex flex-col items-center p-4">
-      {success && <Components.Modals.success mensaje={success} />}
-      {error && <Components.Modals.error mensaje={error} />}
+      <Components.Modals.success mensaje={success} action={handleActionSuccess}/>
+      <Components.Modals.error mensaje={error} action={handleActionEror}/>
       <main className="w-full rounded-lg mt-6 p-6">
         <h2 className="flex items-center text-2xl font-bold bg-UP-Secundario text-UP-Blanco mb-4 pl-8 h-20 w-38 ">Administración de Permisos</h2>
         
