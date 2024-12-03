@@ -113,8 +113,8 @@ const ViewArticleLoad = () => {
       <Componentes.Modals.info mensaje={showInfo} action={handleActionInfo}/>
       <Componentes.Modals.error mensaje={error} action={handleActionEror}/>
       <Componentes.Inputs.TitleHeader text={"Alta de Artículo"}/>
-      <Componentes.Inputs.TitleSubtitle titulo={"Datos de un articulo"} 
-        contenido={"Rellene todos los campos para poder crear un articulo. "}/>
+      <Componentes.Inputs.TitleSubtitle titulo={"Datos de un artículo"} 
+        contenido={"Rellene todos los campos para poder crear un artículo. "}/>
       <form onSubmit={handlePublish} className="flex flex-col space-y-6">
         <Componentes.Labels.text Value={noInventario} Onchange={(value) => setNoInventario(value)} Placeholder={"No. Inventario"}/>
         <Componentes.Labels.text Value={nombre} Onchange={(value) => setNombre(value)} Placeholder={"Nombre"}/>
@@ -122,7 +122,7 @@ const ViewArticleLoad = () => {
         <Componentes.Labels.area Value={descripcion} Onchange={(value) => setDescripcion(value)} Placeholder={"Descripción"}/>
         <Componentes.Inputs.TitleSubtitle 
           titulo="Grupo (opcional) " 
-          contenido="Seleccione un grupo para asociarlo a su articulo" 
+          contenido="Seleccione un grupo para asociarlo a su artículo" 
         />
         <Componentes.Labels.select 
           List={dataGrupos} 

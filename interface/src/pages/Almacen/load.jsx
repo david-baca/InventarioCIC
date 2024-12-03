@@ -110,11 +110,11 @@ const ViewAreaLoad = () => {  // Cambié el nombre de "ViewGrupLoad" a "ViewArea
       <Componentes.Modals.error mensaje={error} action={handleActionEror} />
       <form onSubmit={handleSubmit} className="space-y-6">
         <Componentes.Inputs.TitleHeader text={"Carga de Área"} />
-        <Componentes.Inputs.TitleSubtitle titulo={"Información del Área"} contenido={"Ingrese los detalles correspondientes al alta de la nueva área."} />
+        <Componentes.Inputs.TitleSubtitle titulo={"Información del Área"} contenido={"Ingrese los detalles correspondientes para el alta de la nueva área."} />
         <Componentes.Labels.text Value={codigo} Onchange={setCodigo} Placeholder={"Nombre del Área"} />
         <Componentes.Labels.area Value={descripcion} Onchange={setDescripcion} Placeholder={"Descripción del Área"} />
         <div className='flex items-center w-[100%]'>
-          <Componentes.Inputs.TitleSubtitle titulo={"Seleccionar Artículos"} contenido={"Seleccione los artículos que desea asociar a este área."} />
+          <Componentes.Inputs.TitleSubtitle titulo={"Seleccionar Artículos"} contenido={"Seleccione los artículos que desea asociar con esta área."} />
           <Componentes.Buscador query={query} OnChange={handleSearchChange} />
         </div>
         
@@ -146,7 +146,7 @@ const ViewAreaLoad = () => {  // Cambié el nombre de "ViewGrupLoad" a "ViewArea
         ) : (
           <div className="flex flex-col items-center mt-4">
             <Componentes.Inputs.TitleSubtitle 
-              titulo={"No hay Artículos que mostrar"} 
+              titulo={"No hay artículos para mostrar."} 
               contenido={"No se encontraron resultados"} 
             />
           </div>
