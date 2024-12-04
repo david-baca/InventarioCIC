@@ -16,7 +16,7 @@ router.get('/search/:query', asignacionController.buscarAsignaciones);
 
 // Dar de baja una asignación con middleware
 router.patch('/:id/baja',uploadPdf.single("file"), asignacionController.darDeBajaAsignacion);
-router.patch('/:id/baja-img',uploadImg.array('imagenes', 5), asignacionController.darDeBajaAsignacion);
+router.patch('/baja-img',uploadImg.array('imagenes', 5), asignacionController.cambiarImagenes);
 
 // Obtener detalles de una asignación con middleware
 router.get('/:id', asignacionMiddlewares.middleGetAsignacionDetails, asignacionController.obtenerDetallesAsignacion);

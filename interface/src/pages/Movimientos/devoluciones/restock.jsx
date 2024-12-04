@@ -37,7 +37,17 @@ const Peticion = () => {
       throw new Error(error.response?.data?.error || 'Error in API interaction');
     }
   };
-  return { Publicar,ObtenerDetallesArticulo,ObtenerDetallesReponsable };
+  const discardImg = async (data) => {
+    try {
+      const response = await instance.patch(`/asignaciones/baja-img`, data);
+      return response.data;
+    } catch (error) {
+      console.error(error.response?.data?.error || error.message);
+      throw new Error(error.response?.data?.error || 'Error in API interaction');
+    }
+  };
+  
+  return { discardImg,Publicar,ObtenerDetallesArticulo,ObtenerDetallesReponsable };
 };
 
 const ViewRestok = () => {
@@ -138,6 +148,18 @@ const ViewRestok = () => {
       console.log(articulo)
       const response = await peticion.Publicar({data:formData,
         id:articulo.responsable.Asignaciones[0].pk});
+      try{
+        if(imagenes.length>0){
+        const formData = new FormData();
+        for (let i = 0; i < imagenes.length; i++) {
+          formData.append('imagenes', imagenes[i]);
+        } 
+        formData.append("id", articulo.pk);
+        const x = await peticion.discardImg(formData);
+        }
+      }catch(e){
+
+      }
       setSuccess("devolución realizada con éxito.");
     }catch(e){
       console.log(e)

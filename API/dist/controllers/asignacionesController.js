@@ -1,6 +1,6 @@
 // src/controllers/asignacionController.js
 const asignacionView = require('../views/asignacionesView');
-const { Documentos, Asignaciones, Articulos, Responsables, Historial } = require('../model');
+const { Documentos, Asignaciones, Articulos, Responsables, Historial, Condiciones, Imagenes } = require('../model');
 const { Op } = require('sequelize');
 // Definir las relaciones solo para esta consulta, sin modificar los modelos globalmente
 Asignaciones.belongsTo(Articulos, { foreignKey: 'Articulos_pk' });
@@ -115,7 +115,24 @@ exports.darDeBajaAsignacion = async (req, res) => {
 
 exports.cambiarImagenes = async (req, res) => {
     try {
-        
+        const { id } = req.body;
+        const articulo = await Articulos.findByPk(id)
+        //desactivamos las consiciones actuales del articulo
+        const condicion = await Condiciones.findOne({ where: { Articulos_pk: articulo.pk, disponible: 1 } })
+        if(condicion) await condicion.update({ disponible: 0 });
+        const nuevaCondicion = await Condiciones.create({
+            Articulos_pk: articulo.pk,
+            fecha: new Date(),
+            disponible: 1,
+        });
+        if (req.files && req.files.length > 0) {
+            const imagenesData = req.files.map(file => ({
+                imagen: file.path,
+                Condiciones_pk: nuevaCondicion.pk,
+            }));
+            await Imagenes.bulkCreate(imagenesData);
+        }
+        return res.status(200).json({ message: 'Artículo editado con éxito' });
     } catch (error) {
         console.error('Error al dar de baja la asignación:', error);
         return res.status(500).json({ error: 'Error al dar de baja la asignación.' });
