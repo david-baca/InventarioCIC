@@ -45,12 +45,12 @@ const ViewUserEdit = () => {
   const { obtenerUsuario, actualizarUsuario } = peticionUsuarios();
 
   const permisosDisponibles = {
-    Articulo: [1, 2, 3],
+    Artículo: [1, 2, 3],
     Grupos: [4, 5, 6],
     Responsable: [7, 8, 9],
     Movimientos: [10, 11, 12],
-    Reporte: [13, 14],
-    Historial: [15],
+    Reporte: [13, 14, 16],
+    Historial: [15, 17, 18],
   };
 
   useEffect(() => {
@@ -166,14 +166,18 @@ const ViewUserEdit = () => {
         <div className="mb-4">
           <h3 className="text-lg font-bold mb-2">Editar Permisos:</h3>
           <div className="flex items-center justify-around bg-UP-Secundario text-UP-Blanco mb-4  h-10">
-            <h2>Permiso</h2>
+            <h2 className='w-1/6'>Permiso</h2>
             <h2>Visualisacion</h2>
             <h2>Creacion</h2>
             <h2>Edicion</h2>
           </div>
           {Object.entries(permisosDisponibles).map(([categoria, listaPermisos]) => (
             <div key={categoria} className="justify-around mb-2 table-auto w-full text-UP-Opaco flex grid-flow-col gap-4">
-              <h4 className="font-semibold">{categoria}</h4>
+              
+              <div className="font-semibold w-1/6">
+                <h4 >{categoria}</h4>
+              </div>
+              
               {listaPermisos.map((permiso) => (
                 <label key={permiso} className="inline-flex items-center mr-4">
                   <Components.Labels.checkbox
