@@ -234,19 +234,6 @@ const ViewAssigned = () => {
             Terminar asignación
           </button>
         </div>
-
-
-
-    <div>
-      <h1>Vista de Asignación</h1>
-      <div>
-          <div>
-            <button onClick={generateAndPrint}>
-              Imprimir Documento de Asignación
-            </button>
-          </div>
-      </div>
-    </div>
     </>
   );
 };

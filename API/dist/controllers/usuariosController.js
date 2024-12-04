@@ -85,7 +85,7 @@ exports.mostrarUsuarios = async(req, res) => {
 
     try {
         const usuarios = await Usuarios.findAll({
-            attributes: ['pk', 'nombres', 'apellido_p', 'apellido_m', 'correo'],
+            attributes: ['pk', 'nombres', 'apellido_p', 'apellido_m', 'correo',"disponible"],
             include: {
                 model: Permisos,
                 as: "Permisos",

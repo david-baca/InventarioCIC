@@ -74,7 +74,7 @@ const ViewUser = () => {
                   <tr key={usuario.pk}>
                     <td className="border px-4 py-2">{`${usuario.nombres} ${usuario.apellido_p} ${usuario.apellido_m}`}</td>
                     <td className="border px-4 py-2">{usuario.correo}</td>
-                    <td className="border px-4 py-2">{usuario.estado ? 'Activo' : 'Inactivo'}</td>
+                    <td className="border px-4 py-2">{usuario.disponible ? 'Activo' : 'Inactivo'}</td>
                     <td className="border px-4 py-2">
 
                       <div className='flex place-items-center w-full'>

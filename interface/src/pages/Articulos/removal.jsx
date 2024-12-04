@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import Componentes from "../../components/";
+import { getFromLocalStorage } from '../../context/Credentials';
 
 const peticion = () => {
   const section = "articulos";
@@ -28,6 +29,7 @@ const peticion = () => {
 };
 
 const ViewArticleRenoval = () => {
+  const user = getFromLocalStorage()
   //config
   const Peticion = useMemo(() => peticion(), []);
   const navigate = useNavigate();
@@ -137,8 +139,8 @@ const ViewArticleRenoval = () => {
             </div>
           </form>
           <Componentes.Inputs.TitleSubtitle 
-            titulo={`baja del articulo ${articulo.nombre ? articulo.nombres : 'Desconocido'}`} 
-            contenido={`Yo, [user name], en mi calidad de [rol], declaro que en fecha ${new Date().toLocaleDateString()} se procede a dar de baja el articulo ${articulo.nombre ? articulo.nombres : 'Desconocido'}. Esta decisión se toma debido a [${motivo}], lo que impide su seguimiento en esta institución.`} 
+            titulo={`baja del articulo `} 
+            contenido={`Yo, ${user.usuario.nombres} en calidad de encergado del inventraio cic, declaro que en fecha ${new Date().toLocaleDateString()} se procede a dar de baja el articulo. Esta decisión se toma debido a [${motivo}], lo que impide su seguimiento en esta institución.`} 
           />
         </div>
       )}

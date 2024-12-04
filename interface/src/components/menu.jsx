@@ -7,7 +7,6 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Componentes from './';
 
-
 const options = [
   {
     name: "Artículos",
@@ -111,6 +110,8 @@ const OptionNav = ({ name, isSelected }) => (
 );
 
 const Menu = ({ children }) => {
+  const user = getFromLocalStorage()
+
   const [vistaGuardian, setVistaGuardian] = useState()
   const location = useLocation();
   const [isMenuVisible, setIsMenuVisible] = useState(false);
@@ -211,7 +212,7 @@ const Menu = ({ children }) => {
                 <img src={menu} className="w-[1rem] h-[1rem]" alt="Logo" />
               </button>
             )}
-            <h1 className='font-semibold font-montserrat text-xl sm:text-base md:text-lg lg:text-xl'>Bienvenido Fernando Castillo</h1>
+            <h1 className='font-semibold font-montserrat text-xl sm:text-base md:text-lg lg:text-xl'>Bienvenido {user.usuario.nombres}</h1>
             <button className='bottom-3 font-roboto font-medium' onClick={exit} >Cerrar sesión</button>
           </div>
           <div className='p-5 min-w-[100%] max-w-[100%] h-[90%] overflow-scroll flex flex-col gap-4'>
