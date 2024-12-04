@@ -1,5 +1,72 @@
 const { Articulos, Condiciones, Imagenes, Areas, Grupos, Asignaciones, Responsables } = require('../model');
 const { Op } = require('sequelize');
+const { saveAs } = require('file-saver');
+const ExcelJS = require('exceljs');
+
+exports.exportarArticulosExcel = async (req, res) => {
+    try {
+        // Obtener los artículos
+        const articulos = await Articulos.findAll({
+            where: { disponible: 1 },
+            attributes: ['pk', 'nombre', 'no_inventario', 'descripcion', 'costo'],
+        });
+
+        // Crear un nuevo workbook
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Artículos');
+
+        // Agregar encabezados
+        worksheet.columns = [
+            { header: 'ID', key: 'pk', width: 10 },
+            { header: 'Artículo', key: 'nombre', width: 30 },
+            { header: 'No. Inventario', key: 'no_inventario', width: 20 },
+            { header: 'Descripción', key: 'descripcion', width: 40 },
+            { header: 'Costo', key: 'costo', width: 15 },
+        ];
+
+        // Insertar filas con los datos de los artículos
+        articulos.forEach((articulo) => {
+            worksheet.addRow({
+                pk: articulo.pk,
+                nombre: articulo.nombre,
+                no_inventario: articulo.no_inventario,
+                descripcion: articulo.descripcion,
+                costo: parseFloat(articulo.costo).toFixed(2),
+            });
+        });
+
+        // Estilizar la cabecera
+        worksheet.getRow(1).eachCell((cell) => {
+            cell.font = { bold: true };
+            cell.alignment = { horizontal: 'center' };
+            cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FFFFCC' },
+            };
+        });
+
+        // Configurar los encabezados HTTP
+        res.setHeader(
+            'Content-Type',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        );
+        res.setHeader(
+            'Content-Disposition',
+            `attachment; filename=articulos_${new Date().toISOString().slice(0, 10)}.xlsx`
+        );
+
+        // Enviar el archivo como stream
+        await workbook.xlsx.write(res);
+        res.end();
+    } catch (error) {
+        console.error('Error al generar el archivo Excel:', error);
+        res.status(500).json({ error: 'No se pudo generar el archivo Excel' });
+    }
+};
+
+
+
 exports.buscarArticulosAll = async (req, res) => {
     try {
         const resultado = await Articulos.findAll({

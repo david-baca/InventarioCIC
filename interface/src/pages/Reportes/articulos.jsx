@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Componentes from "../../components";
 import axios from "axios";
+import ExcelJS from "exceljs";
+import { saveAs } from "file-saver";
 
 // Configuración de instancia de axios
 const baseApi = import.meta.env.VITE_BASE_API;
@@ -66,6 +68,24 @@ const ViewReportArticles = () => {
     navigate(`/reportes/articulo/${id}`);
   };
 
+  const handleDownloadExcel = async () => {
+    try {
+      const response = await fetch('/articulos/exportar/excel', {
+        method: 'GET',
+      });
+  
+      if (!response.ok) throw new Error('Error al generar el archivo Excel');
+  
+      const blob = await response.blob();
+      const fileName = `articulos_${new Date().toISOString().slice(0, 10)}.xlsx`;
+      saveAs(blob, fileName);
+    } catch (error) {
+      console.error('Error al descargar el archivo Excel:', error);
+      alert('No se pudo descargar el archivo.');
+    }
+  };
+  
+  
   return (
     <div className="p-4">
       <Componentes.Inputs.TitleHeader text={"Reportes de artículos"} />
@@ -84,6 +104,16 @@ const ViewReportArticles = () => {
           />
         </div>
       </div>
+
+      <div className="flex items-center justify-center w-full px-3 py-1 bg-green-600 text-white rounded-md shadow hover:bg-green-700 mb-4">
+  <button
+    onClick={handleDownloadExcel}
+    className="w-full flex items-center justify-center px-3 py-1 bg-green-600 text-white rounded-md shadow hover:bg-green-700"
+  >
+    Descargar artículos
+  </button>
+</div>
+
 
       {/* Mostrar errores o carga */}
       {loading && <p className="text-gray-600">Cargando artículos...</p>}

@@ -33,4 +33,8 @@ articulosRoutes.get('/sin/area/', articleController.articulosSinArea);
 articulosRoutes.get('/sin/area/:query', articleController.articulosSinArea);
 articulosRoutes.get('/sin/area/execption/:fk_execpcion', articleController.articulosSinArea);
 articulosRoutes.get('/sin/area/execption/:fk_execpcion/:query', articleController.articulosSinArea);
+
+// Endpoint para exportar artículos en formato Excel
+articulosRoutes.get('/exportar/excel', articleController.exportarArticulosExcel);
+
 module.exports = articulosRoutes;
