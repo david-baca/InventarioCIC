@@ -43,8 +43,8 @@ const ViewUserLoad = () => {
     Grupos: [4, 5, 6],
     Responsable: [7, 8, 9],
     Movimientos: [10, 11, 12],
-    Reporte: [13, 14, 0],
-    Historial: [15, 0, 0],
+    Reporte: [13, 14, 16],
+    Historial: [15, 17, 18],
   };
 
   const handleCheckboxChange = (newNumber) => {
@@ -138,16 +138,19 @@ const ViewUserLoad = () => {
 
         <h3 className="text-UP-Negro mb-6 text-2 font-bold">Selecciona los permisos del administrador</h3>
         <div className="flex items-center justify-around bg-UP-Secundario text-UP-Blanco mb-4  h-10  ">
-        <h2>Permiso</h2>
+        <h2 className='w-1/6'>Permiso</h2>
         <h2>Visualisacion</h2>
         <h2>Creacion</h2>
         <h2>Edicion</h2>
         </div>
-        <div className="overflow-x-auto mb-4">
+        <div >
           {Object.entries(permissions).map(([categoria, permisos]) => (
-            <div key={categoria} className="justify-around mb-2 table-auto w-full text-UP-Opaco flex grid-flow-col gap-4">
+            <div key={categoria} className="flex  justify-around mb-2 text-UP-Opaco">
               
-              <h4 className="font-semibold ">{categoria}</h4>
+              <div className="font-semibold w-1/6">
+                <h4 >{categoria}</h4>
+              </div>
+              
               
               {permisos.map((permiso) => (
                 
