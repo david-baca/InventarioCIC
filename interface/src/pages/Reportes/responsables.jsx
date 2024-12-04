@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Componentes from "../../components";
 import axios from "axios";
+import ExcelJS from "exceljs";
+import { saveAs } from "file-saver";
 
 // Configuración de instancia de axios
 const baseApi = import.meta.env.VITE_BASE_API;
@@ -21,12 +23,23 @@ const fetchResponsibles = async (query = "") => {
   }
 };
 
+// Función para obtener los artículos asignados a los responsables
+const fetchArticlesByResponsible = async (responsibleId) => {
+  try {
+    const response = await instance.get(`/responsables/${responsibleId}/articulos`);
+    return response.data;
+  } catch (error) {
+    console.error("Error al obtener artículos del responsable:", error);
+    throw new Error("No se pudieron cargar los artículos asignados.");
+  }
+};
+
 const ViewReportResponsibles = () => {
   const navigate = useNavigate();
   const [responsibles, setResponsibles] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 3;
 
@@ -66,6 +79,44 @@ const ViewReportResponsibles = () => {
     navigate(`/reportes/responsable/${id}`);
   };
 
+  const handleDownloadExcel = async () => {
+    try {
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet("Responsables");
+
+      // Definir encabezados
+      worksheet.columns = [
+        { header: "ID", key: "id" },
+        { header: "Nombre", key: "nombre" },
+        { header: "Correo", key: "correo" },
+        { header: "Artículos Asignados", key: "articulos" },
+        { header: "Valor Total", key: "valor_total" },
+      ];
+
+      // Obtener los datos de los responsables con los artículos asignados
+      for (const responsible of responsibles) {
+        const articles = await fetchArticlesByResponsible(responsible.pk);
+        const totalValue = articles.reduce((acc, article) => acc + article.valor, 0);
+
+        worksheet.addRow({
+          id: responsible.pk,
+          nombre: `${responsible.nombres} ${responsible.apellido_p} ${responsible.apellido_m}`,
+          correo: responsible.correo || "No disponible",
+          articulos: articles.map(article => article.nombre).join(", ") || "No asignados",
+          valor_total: totalValue.toFixed(2) || "0.00",
+        });
+      }
+
+      // Crear el archivo Excel
+      const buffer = await workbook.xlsx.writeBuffer();
+      const fileName = `responsables_${new Date().toISOString().slice(0, 10)}.xlsx`;
+      saveAs(new Blob([buffer]), fileName);
+    } catch (error) {
+      console.error('Error al generar el archivo Excel:', error);
+      alert('No se pudo descargar el archivo.');
+    }
+  };
+
   return (
     <div className="p-4">
       <Componentes.Inputs.TitleHeader text={"Reportes de responsables"} />
@@ -85,6 +136,16 @@ const ViewReportResponsibles = () => {
         </div>
       </div>
 
+      {/* Descargar responsables como Excel */}
+      <div className="flex items-center justify-center w-full px-3 py-1 bg-green-600 text-white rounded-md shadow hover:bg-green-700 mb-4">
+        <button
+          onClick={handleDownloadExcel}
+          className="w-full flex items-center justify-center px-3 py-1 bg-green-600 text-white rounded-md shadow hover:bg-green-700"
+        >
+          Descargar responsables
+        </button>
+      </div>
+
       {/* Mostrar errores o carga */}
       {loading && <p className="text-gray-600">Cargando responsables...</p>}
       {error && <p className="text-red-600">{error}</p>}
@@ -96,90 +157,31 @@ const ViewReportResponsibles = () => {
             <thead>
               <tr className="bg-red-800 text-white">
                 <th className="text-left py-3 px-4 font-semibold">Nombre Completo</th>
-                <th className="text-left py-3 px-4 font-semibold">Cantidad de Artículos</th>
-                <th className="text-left py-3 px-4 font-semibold">Valor Total</th>
-                <th className="text-left py-3 px-4 font-semibold">Acciones</th>
+                <th className="text-left py-3 px-4 font-semibold">Correo</th>
               </tr>
             </thead>
             <tbody>
-              {currentItems.map((responsible) => {
-                const valorTotal = responsible.Articulos?.reduce((total, articulo) => {
-                  const costo = parseFloat(articulo.costo);
-                  return total + (isNaN(costo) ? 0 : costo);
-                }, 0) || 0;
-
-                return (
-                  <tr className="border-t" key={responsible.pk}>
-                    <td className="py-3 px-4 text-sm">
-                      {`${responsible.nombres} ${responsible.apellido_p} ${responsible.apellido_m}`}
-                    </td>
-                    <td className="py-3 px-4 text-sm">
-                      {responsible.Articulos?.length || 0}
-                    </td>
-                    <td className="py-3 px-4 text-sm">
-                      ${valorTotal.toFixed(2)}
-                    </td>
-                    <td className="py-3 px-4 text-sm">
-                      <button
-                        onClick={() => handleRedirect(responsible.pk)}
-                        className="text-orange-500 hover:text-orange-600"
-                        title="Ver reporte del responsable"
-                      >
-                        Ver reporte
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
+              {currentItems.map((responsible) => (
+                <tr className="border-t" key={responsible.pk}>
+                  <td className="py-3 px-4 text-sm">
+                    {`${responsible.nombres} ${responsible.apellido_p} ${responsible.apellido_m}`}
+                  </td>
+                  <td className="py-3 px-4 text-sm">
+                    {responsible.correo || "No disponible"}
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
+
+          {/* Paginación */}
+          <div className="mt-4 flex justify-between items-center">
+            <button onClick={() => handlePageChange("prev")} disabled={currentPage === 1} className="btn-paginacion">Anterior</button>
+            <span>{`Página ${currentPage} de ${totalPages}`}</span>
+            <button onClick={() => handlePageChange("next")} disabled={currentPage === totalPages} className="btn-paginacion">Siguiente</button>
+          </div>
         </div>
       )}
-
-      {/* Mensaje si no hay datos */}
-      {!loading && !error && currentItems.length === 0 && (
-        <p className="text-gray-500 text-center">No hay datos disponibles</p>
-      )}
-
-      {/* Paginación */}
-      <div className="p-4 flex justify-between items-center mt-4 text-sm">
-        <span className="text-gray-600">
-          Mostrando {indexOfFirstItem + 1} a {Math.min(indexOfLastItem, responsibles.length)} de {responsibles.length}
-        </span>
-        <div className="flex space-x-4">
-          <button
-            onClick={() => handlePageChange("prev")}
-            disabled={currentPage === 1}
-            className={`px-4 py-2 border rounded ${
-              currentPage === 1
-                ? "text-gray-400 border-gray-300 cursor-not-allowed"
-                : "text-gray-600 border-gray-400 hover:text-gray-800 hover:border-gray-600"
-            }`}
-          >
-            Anterior
-          </button>
-          <button
-            onClick={() => handlePageChange("next")}
-            disabled={currentPage === totalPages}
-            className={`px-4 py-2 border rounded ${
-              currentPage === totalPages
-                ? "text-gray-400 border-gray-300 cursor-not-allowed"
-                : "text-gray-600 border-gray-400 hover:text-gray-800 hover:border-gray-600"
-            }`}
-          >
-            Siguiente
-          </button>
-        </div>
-      </div>
-      <div className="mt-6">
-  <button
-    onClick={() => navigate(-1)}
-    className="w-full flex items-center justify-center px-4 py-2 bg-orange-500 text-white rounded-md shadow hover:bg-orange-600"
-  >
-    <span className="mr-2">←</span> Regresar
-  </button>
-</div>
-
     </div>
   );
 };

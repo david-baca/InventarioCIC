@@ -1,115 +1,85 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import Componentes from "../../../components";
-import axios from 'axios';
+import axios from "axios";
 
-const Peticion =()=>{
+const Peticion = () => {
   const baseApi = import.meta.env.VITE_BASE_API;
   const instance = axios.create({
     baseURL: baseApi,
   });
-  // Función para obtener los artículos desde la API
+
   const ObtenerDetallesArticulo = async (no_inventario) => {
     try {
       const response = await instance.get(`/articulos/details/${encodeURIComponent(no_inventario)}`);
       return response.data;
     } catch (error) {
       console.error(error.response?.data?.error || error.message);
-      throw new Error(error.response?.data?.error || 'Error en la interacción con la API');
+      throw new Error(error.response?.data?.error || "Error al obtener el artículo");
     }
   };
+
   const ObtenerDetallesReponsable = async (id) => {
     try {
       const response = await instance.get(`/responsables/details/${id}`);
       return response.data;
     } catch (error) {
       console.error(error.response?.data?.error || error.message);
-      throw new Error(error.response?.data?.error || 'Error al obtener los detalles del responsable');
+      throw new Error(error.response?.data?.error || "Error al obtener el responsable");
     }
   };
 
-  const Asignar = async (formData) => {
+  const AsignarDocumento = async (fileData) => {
     try {
-      // Enviar los datos con el archivo al endpoint correspondiente
-      const response = await instance.post(`/asignaciones/crearAsignacion`, formData, {
+      const response = await instance.post(`/asignaciones/subirDocumento`, fileData, {
         headers: {
-          'Content-Type': 'multipart/form-data', // Asegúrate de usar el tipo de contenido correcto
+          "Content-Type": "multipart/form-data",
         },
       });
-      return response.data; // Retorna los datos de la respuesta
+      return response.data;
     } catch (error) {
       console.error(error.response?.data?.error || error.message);
-      throw new Error(error.response?.data?.error || 'Error al crear la asignación');
+      throw new Error(error.response?.data?.error || "Error al subir el documento");
     }
   };
-  
 
-  const urlToImage= async(url)=> {
-    try {
-      const response = await axios.get(url, { responseType: 'blob' }); // Obtener la imagen como Blob
-      const reader = new FileReader();
-  
-      return new Promise((resolve, reject) => {
-        reader.onloadend = () => {
-          resolve(reader.result);  // `reader.result` contiene la imagen en base64
-        };
-        reader.onerror = (error) => reject(error);
-  
-        reader.readAsDataURL(response.data); // Convertir el Blob a base64
-      });
-    } catch (error) {
-      console.error('Error al obtener la imagen: ', error);
-      return null;
-    }
-  };
-  return {Asignar,ObtenerDetallesArticulo, ObtenerDetallesReponsable, urlToImage}
-}
+  return { ObtenerDetallesArticulo, ObtenerDetallesReponsable, AsignarDocumento };
+};
 
 const ViewAssigned = () => {
   const { pkResponsable, pkArticulo } = useParams();
-  const [ imagenes, setImagenes ] = useState();
   const [responsable, setResponsable] = useState(null);
   const [articulo, setArticulo] = useState(null);
+  const [archivo, setArchivo] = useState(null);
+  const [imagenes, setImagenes] = useState("");
   const [loading, setLoading] = useState(false);
-  const peticion = Peticion() 
-  // Función para obtener los detalles del responsable
+  const peticion = Peticion();
+
   const loadResponsable = async () => {
-    setLoading(true);
     try {
       const data = await peticion.ObtenerDetallesReponsable(pkResponsable);
       setResponsable(data.responsable);
     } catch (error) {
       console.error("Error al obtener responsable:", error);
-    } finally {
-      setLoading(false);
     }
   };
 
-  // Función para obtener los detalles del artículo
   const loadArticulo = async () => {
-    setLoading(true);
     try {
       const data = await peticion.ObtenerDetallesArticulo(pkArticulo);
       setArticulo(data.articulo);
-      let datos = "";
-      // Asegurarse de que `data.articulo.Condiciones` y `data.articulo.Condiciones[0].Imagenes` no sean null ni undefined
+
+      let imagenesHTML = "";
       if (data?.articulo?.Condiciones?.[0]?.Imagenes) {
-        // Recorre las imágenes de manera segura
-        for (let i = 0; i < data.articulo.Condiciones[0].Imagenes.length; i++) {
-          // Verifica si la imagen no es null o undefined
-          if (data.articulo.Condiciones[0].Imagenes[i]?.imagen) {
-            // Almacena las imágenes válidas
-            datos= datos+(data.articulo.Condiciones[0].Imagenes[i].imagen)+"<br>";
+        for (let img of data.articulo.Condiciones[0].Imagenes) {
+          if (img?.imagen) {
+            imagenesHTML += `<img src="${img.imagen}" alt="Imagen artículo" style="max-width:100%"/><br>`;
           }
         }
       }
-      console.log(datos)
-      // Asigna el array de imágenes a un estado o variable
-      setImagenes(datos);
+      setImagenes(imagenesHTML);
     } catch (error) {
       console.error("Error al obtener artículo:", error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -118,66 +88,106 @@ const ViewAssigned = () => {
     loadArticulo();
   }, [pkResponsable, pkArticulo]);
 
-  // Función para generar y enviar a imprimir el documento
- const generateAndPrint = async () => {
-  if (!responsable || !articulo) {
-    alert("Datos incompletos para generar el documento.");
-    return;
-  }
+  const handleFileChange = (event) => {
+    setArchivo(event.target.files[0]);
+  };
 
-  const fecha = new Date();
-  const dia = fecha.getDate();
-  const mes = fecha.toLocaleString("es-ES", { month: "long" });
-  const año = fecha.getFullYear();
-
-  try {
-    // Cargar el archivo HTML de formato
-    const response = await fetch('/fromato.html');
-    const htmlText = await response.text();
-
-    // Reemplazar las variables dinámicas en el archivo HTML
-    let formattedHtml = htmlText
-      .replace('{{fecha}}', `${dia} de ${mes} de ${año}`)
-      .replace('{{nombre}}', responsable.nombres)
-      .replace('{{cargo}}', responsable.cargo)
-      .replace('{{responsable}}', responsable.nombres)  // O el nombre del responsable de la asignación
-      .replace('{{asignado}}', responsable.nombres)    // Asignado
-      .replace('{{no_inventario}}', articulo.no_inventario)
-      .replace('{{nombre_articulo}}', articulo.nombre)
-      .replace('{{descripcion}}', articulo.descripcion)
-      .replace('{{precio}}', articulo.precio)
-      .replace('{{imagen1}}', imagenes);
-
-    // Crear una nueva ventana para mostrar el contenido
-    const printWindow = window.open('', '', 'width=800,height=600');
-    printWindow.document.open();
-    printWindow.document.write(formattedHtml);
-    printWindow.document.close();
-
-    // Esperar que la página se haya cargado completamente antes de imprimir
-    printWindow.onload = () => {
-      printWindow.print();
+  const handleUpload = async () => {
+    if (!archivo) {
+      alert("Por favor, seleccione un archivo.");
+      return;
     }
-  }catch(err){
-    console.log(err)
-  }
-};
 
+    const formData = new FormData();
+    formData.append("archivo", archivo);
+    formData.append("responsableId", pkResponsable);
+    formData.append("articuloId", pkArticulo);
+
+    setLoading(true);
+    try {
+      await peticion.AsignarDocumento(formData);
+      alert("Archivo subido exitosamente");
+    } catch (error) {
+      console.error("Error al subir el archivo:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const generateAndPrint = async () => {
+    if (!responsable || !articulo) {
+      alert("Datos incompletos para generar el documento.");
+      return;
+    }
+
+    const fecha = new Date();
+    const dia = fecha.getDate();
+    const mes = fecha.toLocaleString("es-ES", { month: "long" });
+    const año = fecha.getFullYear();
+
+    try {
+      const response = await fetch("/fromato.html");
+      const htmlText = await response.text();
+
+      let formattedHtml = htmlText
+        .replace("{{fecha}}", `${dia} de ${mes} de ${año}`)
+        .replace("{{nombre}}", responsable.nombres)
+        .replace("{{cargo}}", responsable.cargo)
+        .replace("{{no_inventario}}", articulo.no_inventario)
+        .replace("{{nombre_articulo}}", articulo.nombre)
+        .replace("{{descripcion}}", articulo.descripcion)
+        .replace("{{precio}}", articulo.precio)
+        .replace("{{imagenes}}", imagenes);
+
+      const printWindow = window.open("", "", "width=800,height=600");
+      printWindow.document.write(formattedHtml);
+      printWindow.document.close();
+      printWindow.onload = () => printWindow.print();
+    } catch (err) {
+      console.error("Error al generar el documento:", err);
+    }
+  };
 
   return (
-    <div>
-      <h1>Vista de Asignación</h1>
-      <div>
-        {loading ? (
-          <p>Cargando...</p>
-        ) : (
+    <div className="p-6">
+      <Componentes.Inputs.TitleHeader text={"Importación de Responsiva - Asignación"} />
+
+      <div className="bg-white shadow-md rounded-md p-6 mb-6">
+        <h2 className="text-xl font-bold mb-4">Presentación de documento de asignación</h2>
+        <div className="flex items-center justify-between mb-6">
           <div>
-            <button onClick={generateAndPrint}>
-              Imprimir Documento de Asignación
-            </button>
+            <label htmlFor="fileInput" className="cursor-pointer bg-gray-300 px-4 py-2 rounded-md shadow text-gray-700">
+              Examinar...
+            </label>
+            <input
+              type="file"
+              id="fileInput"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+            <span className="ml-4 text-gray-500">
+              {archivo ? archivo.name : "No se ha seleccionado ningún archivo"}
+            </span>
           </div>
-        )}
+          <button className="bg-orange-500 text-white px-4 py-2 rounded-md shadow hover:bg-orange-600">
+            Descargar PDF
+          </button>
+        </div>
+        <button
+          className="bg-red-500 text-white w-full py-3 rounded-md shadow hover:bg-red-600"
+          onClick={handleUpload}
+          disabled={loading}
+        >
+          {loading ? "Subiendo archivo..." : "Terminar asignación"}
+        </button>
       </div>
+
+      <button
+        onClick={generateAndPrint}
+        className="bg-blue-500 text-white px-6 py-2 rounded-md shadow hover:bg-blue-600"
+      >
+        Imprimir Documento de Asignación
+      </button>
     </div>
   );
 };
