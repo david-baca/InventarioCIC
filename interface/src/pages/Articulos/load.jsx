@@ -24,7 +24,7 @@ const peticion = () => {
   };
   const GruposDisponibles = async (query) => {
     try {
-      const response = await instance.get(`/grupos/${query}`);
+      const response = await instance.get(`/grupos/${encodeURIComponent(query)}`);
       return response.data.grupos; // Ajusta según la respuesta esperada
     } catch (error) {
       console.error(error.response?.data?.error || error.message);

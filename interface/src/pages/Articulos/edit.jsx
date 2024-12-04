@@ -27,7 +27,7 @@ const peticion = () => {
   };
   const GruposDisponibles = async (query) => {
     try {
-      const response = await instance.get(`/grupos/${query}`);
+      const response = await instance.get(`/grupos/${encodeURIComponent(query)}`);
       return response.data.grupos; // Ajusta según la respuesta esperada
     } catch (error) {
       console.error(error.response?.data?.error || error.message);
@@ -116,7 +116,7 @@ const ViewArticleEdit = () => {
   const handleRequestImageDelete = (index) => {
     setImagenes(prev => prev.filter((_, i) => i !== index));
   };
-  //envio de datos form
+  //envio de datos form 
   const handleEdit = async (e) => {
     e.preventDefault();
     const formData = new FormData();

@@ -81,44 +81,41 @@ exports.crearAsignacion = async (req, res) => {
 
 // Dar de baja una asignación por ID
 exports.darDeBajaAsignacion = async (req, res) => {
-    console.log('Parametros de la URL:', req.params); // Verificar que el id está siendo recibido
-    const { id } = req.params; // Obtener el id de los parámetros de la URL
-    console.log('ID capturado:', id);
-
-    const { motivo, usuarioId } = req.body; // Obtener el motivo de baja y el usuario que realiza la acción
-    console.log('Motivo:', motivo);
-    console.log('Usuario ID:', usuarioId);
-
-    // Validar si el ID es numérico
-    if (isNaN(id)) {
-        return res.status(400).json({ error: 'El ID de la asignación es inválido.' });
-    }
-
     try {
-        // Buscar la asignación en la base de datos
+        const { id } = req.params; 
+        const { motivo } = req.body; 
         const asignacion = await Asignaciones.findOne({
             where: { pk: id }
         });
-
-        // Si no se encuentra la asignación
         if (!asignacion) {
             return res.status(404).json({ error: 'Asignación no encontrada.' });
         }
-
-        // Crear un registro en la tabla Historial con la baja
-        const historialRegistro = await Historial.create({
-            descripcion: motivo || 'Asignación dada de baja',
-            fecha_accion: new Date(),
-            Usuarios_pk: usuarioId, // El usuario que realiza la acción
-            disponible: false, // Indica que la asignación ha sido dada de baja
-            Asignaciones_pk: asignacion.pk // Relaciona el historial con la asignación
+        await Documentos.create({
+            doc_firma: req.file.path,
+            Asignaciones_pk: asignacion.pk,
+            disponible: false,
+            fecha: new Date(),
         });
-
-        // Respuesta de confirmación
+        await asignacion.update({ disponible:false });
+        const historialRegistro = await Historial.create({
+            descripcion: 'Asignación dada de baja'+motivo || 'Asignación dada de baja',
+            fecha_accion: new Date(),
+            Usuarios_pk: 1, 
+            disponible: 1,
+        });
         return res.json({
             message: 'Asignación dada de baja exitosamente y registrada en el historial.',
             historial: historialRegistro
         });
+    } catch (error) {
+        console.error('Error al dar de baja la asignación:', error);
+        return res.status(500).json({ error: 'Error al dar de baja la asignación.' });
+    }
+};
+
+exports.cambiarImagenes = async (req, res) => {
+    try {
+        
     } catch (error) {
         console.error('Error al dar de baja la asignación:', error);
         return res.status(500).json({ error: 'Error al dar de baja la asignación.' });

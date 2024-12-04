@@ -19,7 +19,7 @@ export const peticionCrear = () => {
   // API to search articles without a group assigned
   const BuscarOpciones = async (query) => {
     try {
-      const response = await instance.get(`articulos/sin/grupo/${query}`);
+      const response = await instance.get(`articulos/sin/grupo/${encodeURIComponent(query)}`);
       return response.data.articulos; // Adjust according to your API response
     } catch (error) {
       console.error(error.response?.data?.error || error.message);

@@ -12,7 +12,7 @@ const instance = axios.create({
 // Función para obtener los artículos desde la API
 const fetchArticles = async (query = "") => {
   try {
-    const endpoint = query ? `/articulos/search/${query}` : "/articulos/search/";
+    const endpoint = query ? `/articulos/search/${encodeURIComponent(query)}` : "/articulos/search/";
     const response = await instance.get(endpoint);
     return response.data;
   } catch (error) {

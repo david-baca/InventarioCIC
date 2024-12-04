@@ -12,7 +12,7 @@ const peticion = () => {
 
   const Buscar = async ({ query }) => {
     try {
-      const response = await instance.get(`/${section}/search/${query}`);
+      const response = await instance.get(`/${section}/search/${encodeURIComponent(query)}`);
       return response.data; // Suponiendo que response.data es el array esperado
     } catch (error) {
       console.error(error.response?.data?.error || error.message);

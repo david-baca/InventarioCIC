@@ -22,7 +22,7 @@ export const peticionCrear = () => {
   // API para buscar artículos sin área asignada
   const BuscarOpciones = async (query) => {
     try {
-      const response = await instance.get(`articulos/sin/area/${query}`);  // Cambiar ruta a /area
+      const response = await instance.get(`articulos/sin/area/${encodeURIComponent(query)}`);  // Cambiar ruta a /area
       return response.data.articulos; // Ajustar según la respuesta de la API
     } catch (error) {
       console.error(error.response?.data?.error || error.message);

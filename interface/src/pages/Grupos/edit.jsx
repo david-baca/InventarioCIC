@@ -21,7 +21,7 @@ export const peticionDetalles = () => {
   // API para buscar artículos sin un grupo asignado, excluyendo el grupo que estamos editando
   const BuscarOpciones = async (query, fk_execpcion) => {
     try {
-      const response = await instance.get(`articulos/sin/grupo/execption/${fk_execpcion}/${query}`);
+      const response = await instance.get(`articulos/sin/grupo/execption/${fk_execpcion}/${encodeURIComponent(query)}`);
       return response.data.articulos; // Ajusta según tu respuesta de API
     } catch (error) {
       console.error(error.response?.data?.error || error.message);

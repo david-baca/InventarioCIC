@@ -86,15 +86,17 @@ const ViewAssigned = () => {
     try {
       const data = await peticion.ObtenerDetallesArticulo(pkArticulo);
       setArticulo(data.articulo);
-      let datos = "";
+      let datos = "No hay fotos en esta asignacion";
+      const baseApi = import.meta.env.VITE_BASE_API;
       // Asegurarse de que `data.articulo.Condiciones` y `data.articulo.Condiciones[0].Imagenes` no sean null ni undefined
       if (data?.articulo?.Condiciones?.[0]?.Imagenes) {
+        let datos = "";
         // Recorre las imágenes de manera segura
         for (let i = 0; i < data.articulo.Condiciones[0].Imagenes.length; i++) {
           // Verifica si la imagen no es null o undefined
           if (data.articulo.Condiciones[0].Imagenes[i]?.imagen) {
             // Almacena las imágenes válidas
-            datos= datos+(data.articulo.Condiciones[0].Imagenes[i].imagen)+"<br>";
+            datos= datos+baseApi+(data.articulo.Condiciones[0].Imagenes[i].imagen)+"<br>";
           }
         }
       }

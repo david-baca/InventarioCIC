@@ -1,5 +1,5 @@
 const { Articulos, Condiciones, Imagenes, Areas, Grupos, Asignaciones, Responsables } = require('../model');
-const { Op } = require('sequelize');
+const { Sequelize, Op } = require('sequelize');
 exports.buscarArticulosAll = async (req, res) => {
     try {
         const resultado = await Articulos.findAll({
@@ -65,7 +65,7 @@ exports.crearArticulo = async (req, res) => {
         res.status(500).json({ error: 'Error al crear el artículo' });
     }
 };
-exports.editarArticulo = async (req, res) => {
+exports.editarArticulo = async (req, res) => { 
     const { id } = req.params;
     const { grupo, no_inventario, nombre, descripcion, costo, consumible} = req.body;
     try {
@@ -289,36 +289,91 @@ exports.articulosSinArea = async (req, res) => {
     }
 };
 exports.articulosSinRes = async (req, res) => {
-    //queremos saber los articulos que no estan asociddoa aun responsable
     const { query } = req.params; // Extraemos la excepción y el query
     try {
         // Primero obtenemos los artículos asignados
         const artAsing = await Asignaciones.findAll({
-            attributes: ['Articulos_pk'], // Sólo la columna de claves primarias de artículos
-            raw: true // Para obtener los resultados como un array de objetos planos
+            where: { disponible: 1 },
+            attributes: ['Articulos_pk'], // Solo la columna de claves primarias de artículos
+            raw: true // Para obtener los resultados como un array plano
         });
+
         // Extraemos solo las claves primarias de los artículos asignados
         const artAsingIds = artAsing.map(assing => assing.Articulos_pk);
+
         // Ahora obtenemos los artículos que no están asignados a ningún responsable
         const whereConditions = {
             disponible: 1,
-            where: {
-                pk: {
-                    [Op.notIn]: artAsingIds // Excluimos los artículos ya asignados
-                }
-            }
         };
+
+        // Si hay artículos asignados, los excluimos de la consulta
+        if (artAsingIds.length > 0) {
+            whereConditions.pk = { [Sequelize.Op.not]: artAsingIds }; // Excluye los artículos asignados
+        }
+        // Si hay un query de búsqueda, lo aplicamos
         if (query && query !== null) {
-            whereConditions[Op.or] = [
-                { nombre: { [Op.like]: `%${query}%` } },
-                { no_inventario: { [Op.like]: `%${query}%` } }
+            whereConditions[Sequelize.Op.or] = [
+                { nombre: { [Sequelize.Op.like]: `%${query}%` } },
+                { no_inventario: { [Sequelize.Op.like]: `%${query}%` } }
             ];
         }
+
+        // Ejecutamos la consulta
         const result = await Articulos.findAll({
             where: whereConditions
         });
+
+        // Retornamos los resultados
         res.json({ articulos: result });
     } catch (error) {
-        res.status(500).json({ error: 'Error al obtener artículos sin area' });
+        res.status(500).json({ error: 'Error al obtener artículos sin responsable: ' + error });
     }
 };
+exports.articulosRes = async (req, res) => {
+    const { pk, query } = req.params; // Extraemos la clave del responsable (pk) y el query de búsqueda
+    try {
+        // Primero obtenemos los artículos asignados a este responsable
+        const artAsing = await Asignaciones.findAll({
+            where: { disponible: 1, Responsables_pk: pk },
+            attributes: ['Articulos_pk'], // Solo la columna de claves primarias de artículos
+            raw: true // Para obtener los resultados como un array plano
+        });
+
+        // Si no hay artículos asignados, devolvemos null
+        if (artAsing.length === 0) {
+            return res.json({ articulos: [] }); // No hay artículos para este responsable
+        }
+
+        // Extraemos las claves primarias de los artículos asignados
+        const artAsingIds = artAsing.map(assing => assing.Articulos_pk);
+
+        // Condiciones de búsqueda para artículos asignados al responsable
+        const whereConditions = {
+            disponible: 1,
+        };
+
+        // Si hay artículos asignados, los incluimos en la consulta
+        if (artAsingIds.length > 0) {
+            whereConditions.pk = { [Sequelize.Op.in]: artAsingIds }; // Incluye los artículos asignados
+        }
+
+        // Si hay un query de búsqueda, lo aplicamos
+        if (query && query !== null) {
+            whereConditions[Sequelize.Op.or] = [
+                { nombre: { [Sequelize.Op.like]: `%${query}%` } },
+                { no_inventario: { [Sequelize.Op.like]: `%${query}%` } }
+            ];
+        }
+
+        // Ejecutamos la consulta
+        const result = await Articulos.findAll({
+            where: whereConditions
+        });
+
+        // Retornamos los resultados
+        res.json({ articulos: result });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al obtener artículos para el responsable: ' + error });
+    }
+};
+

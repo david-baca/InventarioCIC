@@ -2,13 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Componentes from "../../../components";
 import axios from 'axios';
-
+const Peticion =()=>{
 // Configuración de instancia de axios
 const baseApi = import.meta.env.VITE_BASE_API;
 const instance = axios.create({
   baseURL: baseApi,
 });
-
 // Función para obtener los responsables desde la API
 const fetchResponsables = async (query = '') => {
   try {
@@ -20,43 +19,42 @@ const fetchResponsables = async (query = '') => {
     return [];
   }
 };
-
+return {fetchResponsables}
+}
 const ViewRestok_ResponsibleSelect = () => {
   const navigate = useNavigate();
   const [responsables, setResponsables] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedResponsable, setSelectedResponsable] = useState(null); // Estado para la fila seleccionada
+  const [selectedResponsable, setSelectedResponsable] = useState(null); // Estado para el responsable seleccionado
   const itemsPerPage = 3;
+  const peticones = Peticion()
 
   // Cargar los responsables al cambiar el término de búsqueda
   useEffect(() => {
     const loadResponsables = async () => {
       setError(null);
       try {
-        const data = await fetchResponsables(searchTerm || '');
+        const data = await peticones.fetchResponsables(searchTerm || '');
         setResponsables(data);
       } catch (err) {
-        setError("No se pudieron cargar los responsables.");
+        setError("No se pudieron cargar los responsables."); 
       }
     };
     loadResponsables();
   }, [searchTerm]);
 
-  // Filtrar responsables según la búsqueda
-  const filteredResponsables = responsables.filter((responsable) =>
-    responsable.correo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    responsable.nombres.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    responsable.apellido_p.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    responsable.apellido_m.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Función para manejar el cambio de búsqueda
+  const handleSearchChange = (value) => {
+    setSearchTerm(value);
+  };
 
   // Paginación
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredResponsables.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredResponsables.length / itemsPerPage);
+  const currentItems = responsables.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(responsables.length / itemsPerPage);
 
   const handlePageChange = (direction) => {
     if (direction === 'next' && currentPage < totalPages) {
@@ -66,7 +64,7 @@ const ViewRestok_ResponsibleSelect = () => {
     }
   };
 
-  // Función para seleccionar la fila
+  // Función para seleccionar y resaltar la fila, y actualizar la URL
   const handleRowClick = (responsable) => {
     setSelectedResponsable(responsable);
   };
@@ -74,8 +72,7 @@ const ViewRestok_ResponsibleSelect = () => {
   // Función para manejar el clic en "Siguiente"
   const handleNext = () => {
     if (selectedResponsable) {
-      // Actualizamos la URL con el ID del responsable seleccionado
-      navigate(`/devoluciones/${selectedResponsable.pk}`);
+      navigate("./"+ selectedResponsable.pk);
     } else {
       alert("Por favor, selecciona un responsable antes de continuar.");
     }
@@ -83,92 +80,93 @@ const ViewRestok_ResponsibleSelect = () => {
 
   return (
     <>
-      <div className="flex flex-col w-full p-5 bg-gray-100">
-        {/* Encabezado de selección de responsable */}
-        <div className="bg-red-800 text-white text-lg font-bold p-4 rounded-t-md mb-4">
-          Selección de responsable
-        </div>
-        <div className="bg-white shadow-md p-4 rounded-b-md mb-6">
-          {/* Contenedor de texto y buscador en la parte superior derecha */}
-          <div className="flex justify-between items-center mb-4">
-            {/* Texto a la izquierda */}
-            <div className="flex-1">
-              <p className="text-gray-700">Estos son los Responsables actuales del sistema.</p>
-              <p className="text-sm text-gray-500">Seleccione el responsable al que desea asignar un artículo.</p>
-            </div>
-
-            {/* Buscador a la derecha */}
-            <div className="ml-4">
-              <input
-                type="text"
-                placeholder="Buscar"
-                className="px-2 py-1 border rounded-md w-full focus:outline-none"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
+      <Componentes.Inputs.TitleHeader text={"Selección de responsable"} />
+      <div className="p-4 mb-4">
+        <div className="flex justify-between items-center mb-4">
+          <div>
+            <Componentes.Inputs.TitleSubtitle
+              titulo={"Estos son los Responsables actuales del sistema."}
+              contenido={"Seleccione el responsable al que desea asignar un artículo."}
+            />
           </div>
+          <div className="w-1/3">
+            <Componentes.Buscador
+              query={searchTerm}
+              OnChange={handleSearchChange}
+              className="border border-gray-300 rounded-full px-3 py-2 w-full"
+            />
+          </div>
+        </div>
 
-          {/* Tabla de responsables */}
-          <div className="overflow-x-auto">
-            <table className="min-w-full bg-white border">
-              <thead>
-                <tr className="bg-red-800 text-white">
-                  <th className="text-left py-3 px-4 font-semibold">Correo</th>
-                  <th className="text-left py-3 px-4 font-semibold">Nombre Completo</th>
-                </tr>
-              </thead>
-              <tbody>
+        {/* Tabla de responsables */}
+        <div className="bg-gray-900 flex flex-col flex-wrap">
+          {error ? (
+            <div className="text-red-600">{error}</div>
+          ) : currentItems.length > 0 ? (
+            <Componentes.Table.table>
+                <Componentes.Table.columna>
+                  <Componentes.Table.encabezado>
+                    Correo
+                  </Componentes.Table.encabezado>
+                  <Componentes.Table.encabezado>
+                    Nombre Completo
+                  </Componentes.Table.encabezado>
+                </Componentes.Table.columna>
                 {currentItems.map((responsable) => (
                   <tr
-                    className={`border-t cursor-pointer ${
-                      selectedResponsable?.pk === responsable.pk ? 'bg-orange-500 text-white' : 'hover:bg-gray-100'
-                    }`}
                     key={responsable.pk}
                     onClick={() => handleRowClick(responsable)}
+                    className={`border-t border-gray-300 cursor-pointer ${
+                      selectedResponsable?.pk === responsable.pk ? 'bg-orange-500 text-white' : 'text-gray-600'
+                    }`}
                   >
-                    <td className="py-3 px-4 text-sm">{responsable.correo}</td>
-                    <td className="py-3 px-4 text-sm">{`${responsable.nombres} ${responsable.apellido_p} ${responsable.apellido_m}`}</td>
+                    <Componentes.Table.fila className="text-center py-2">
+                      {responsable.correo}
+                    </Componentes.Table.fila>
+                    <Componentes.Table.fila className="text-center py-2">
+                      {`${responsable.nombres} ${responsable.apellido_p} ${responsable.apellido_m}`}
+                    </Componentes.Table.fila>
                   </tr>
                 ))}
-              </tbody>
-            </table>
-          </div>
+            </Componentes.Table.table>
+          ) : (
+            <h1 className="text-gray-500 text-center">No hay datos disponibles</h1>
+          )}
+        </div>
 
-          {/* Paginación */}
-          <div className="flex flex-col sm:flex-row justify-between items-center mt-4 text-sm">
-            <span className="text-gray-600">
-              Mostrando {indexOfFirstItem + 1} a {Math.min(indexOfLastItem, filteredResponsables.length)} de {filteredResponsables.length}
-            </span>
-            <div className="flex space-x-4 mt-2 sm:mt-0">
-              <button 
-                onClick={() => handlePageChange("prev")} 
-                className={`text-gray-600 hover:text-gray-800 ${currentPage === 1 && "opacity-50 cursor-not-allowed"}`}
-                disabled={currentPage === 1}
-              >
-                Anterior
-              </button>
-              <button 
-                onClick={() => handlePageChange("next")} 
-                className={`text-gray-600 hover:text-gray-800 ${currentPage === totalPages && "opacity-50 cursor-not-allowed"}`}
-                disabled={currentPage === totalPages}
-              >
-                Siguiente
-              </button>
-            </div>
+        {/* Paginación */}
+        <div className="p-4 flex flex-col sm:flex-row justify-between items-center mt-4 text-sm">
+          <span className="text-gray-600">
+            Mostrando {indexOfFirstItem + 1} a {Math.min(indexOfLastItem, responsables.length)} de {responsables.length}
+          </span>
+          <div className="flex space-x-4 mt-2 sm:mt-0">
+            <button
+              onClick={() => handlePageChange("prev")}
+              className={`text-gray-600 hover:text-gray-800 ${currentPage === 1 && "opacity-50 cursor-not-allowed"}`}
+              disabled={currentPage === 1}
+            >
+              Anterior
+            </button>
+            <button
+              onClick={() => handlePageChange("next")}
+              className={`text-gray-600 hover:text-gray-800 ${currentPage === totalPages && "opacity-50 cursor-not-allowed"}`}
+              disabled={currentPage === totalPages}
+            >
+              Siguiente
+            </button>
           </div>
         </div>
 
-        {/* Botón siguiente que abarca todo el ancho */}
-        <div className="mt-6 w-full">
-          <button 
+        {/* Botón siguiente */}
+        <div className="flex justify-center mt-4">
+          <button
             onClick={handleNext}
             disabled={!selectedResponsable} // Deshabilitar si no hay selección
-            className={`w-full px-6 py-2 rounded-md shadow text-gray-700 ${
-              selectedResponsable 
-                ? "bg-orange-500 text-white hover:bg-orange-600" // Botón con responsable seleccionado
-                : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 cursor-not-allowed" // Botón sin selección
-            }`}
+            className={`w-full px-6 py-2 rounded-md shadow ${
+              selectedResponsable
+                ? "bg-orange-500 border-orange-500 text-white hover:bg-orange-600"
+                : "bg-white border-gray-300 text-gray-600"
+            } border`}
           >
             Siguiente
           </button>
@@ -177,5 +175,4 @@ const ViewRestok_ResponsibleSelect = () => {
     </>
   );
 };
-
 export default ViewRestok_ResponsibleSelect;

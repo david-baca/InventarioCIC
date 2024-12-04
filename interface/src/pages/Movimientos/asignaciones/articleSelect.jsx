@@ -11,7 +11,7 @@ const instance = axios.create({
 // Función para obtener los artículos desde la API
 const fetchArticles = async (query) => {
   try {
-    const response = await instance.get(`/articulos//sin/res/${query}`);
+    const response = await instance.get(`/articulos/sin/res/${encodeURIComponent(query)}`);
     console.log("Artículos obtenidos:", response.data);
     return response.data;
   } catch (error) {

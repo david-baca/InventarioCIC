@@ -10,7 +10,7 @@ export const peticion = () => {
 
   const Buscar = async (query) => {
     try {
-      const response = await instance.get(`/areas/${query}`); // Cambiar a áreas
+      const response = await instance.get(`/areas/${encodeURIComponent(query)}`); // Cambiar a áreas
       return response.data.areas; // Ajustar según la respuesta esperada
     } catch (error) {
       console.error(error.response?.data?.error || error.message);
