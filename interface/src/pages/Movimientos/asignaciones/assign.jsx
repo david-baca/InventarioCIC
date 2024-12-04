@@ -169,7 +169,7 @@ const ViewAssigned = () => {
               {archivo ? archivo.name : "No se ha seleccionado ningún archivo"}
             </span>
           </div>
-          <button className="bg-orange-500 text-white px-4 py-2 rounded-md shadow hover:bg-orange-600">
+          <button onClick={generateAndPrint} className="bg-orange-500 text-white px-4 py-2 rounded-md shadow hover:bg-orange-600">
             Descargar PDF
           </button>
         </div>
@@ -182,12 +182,12 @@ const ViewAssigned = () => {
         </button>
       </div>
 
-      <button
+      {/* <button
         onClick={generateAndPrint}
         className="bg-blue-500 text-white px-6 py-2 rounded-md shadow hover:bg-blue-600"
       >
         Imprimir Documento de Asignación
-      </button>
+      </button> */}
     </div>
   );
 };

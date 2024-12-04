@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import articulosImg from "../../../public/img/asignacion.png"
-import responsableImg from "../../../public/img/devolucion.png"
+import articulosImg from "../../../public/articulos.svg"
+import responsableImg from "../../../public/responsables.svg"
 const ViewReport = () => {
   const location = useLocation();
   return (
