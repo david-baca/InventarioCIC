@@ -38,9 +38,14 @@ exports.crearArticulo = async (req, res) => {
             descripcion:descripcion,
             costo:costo,
             consumible: consumible,
-            Grupos_pk: grupo,
+            Grupos_pk: null,
             disponible: 1,
         });
+        console.log(grupo)
+        if(grupo>0 && grupo!==null && grupo!==""){
+        await nuevoArticulo.update(
+            { Grupos_pk:grupo }
+        );}
         if (req.files && req.files.length > 0) {
             const nuevaCondicion = await Condiciones.create({
                 Articulos_pk: nuevoArticulo.pk,
@@ -69,8 +74,12 @@ exports.editarArticulo = async (req, res) => {
         // Actualizar los campos del artículo
         await articulo.update(
             { no_inventario, nombre, descripcion, costo, consumible, 
-            Grupos_pk:grupo }
+            Grupos_pk:null }
         );
+        if(grupo>0 && grupo!==null && grupo!==""){
+            await articulo.update(
+            { Grupos_pk:grupo }
+        );}
         //verificamos si es necesario cambiar las condiciones
         const { pathimg } = req.body;
         if(req.files.length > 0 || pathimg !== null){
@@ -112,7 +121,7 @@ exports.editarArticulo = async (req, res) => {
         //cargar condiciones viejas que se mentionene en esta nueva concidion
         return res.status(200).json({ message: 'Artículo editado con éxito' });
     } catch (error) {
-        return res.status(500).json({ error: 'Error al editar el artículo' });
+        return res.status(500).json({ error: 'Error al editar el artículo'+error });
     }
 };
 exports.darDeBajaArticulo = async (req, res) => {

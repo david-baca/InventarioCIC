@@ -44,8 +44,7 @@ exports.editUsuario = (req, res, next) => {
         let errores = [];
 
         if (!id) errores.push('Es necesario definir el (id) del usuario.');
-        if (!disponible) errores.push('Es necesario definir la (disponibilidad) del usuario.');
-
+        if (disponible===null&&disponible===undefined&&disponible==="") errores.push('Es necesario definir la (disponibilidad) del usuario.');
         if (errores.length > 0) {
             return res.status(400).json({ error: errores.join(' ') });
         }

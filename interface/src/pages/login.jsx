@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { Link } from 'react-router-dom';
 import Logo from "../../public/img/upqroo.png"
 import { useAuth } from '../context/AuthContext';
 import {saveToLocalStorage, getFromLocalStorage} from '../context/Credentials';
+import Componentes from "../components/";
 
 const peticionUsuarios = () => {
   const section = 'usuarios';
@@ -26,6 +26,10 @@ const peticionUsuarios = () => {
 
 
   return { obtenerUsuario};
+};
+
+const handleActionEror = () => {
+  setError(null); 
 };
 
 const ViewLogin = () => {
@@ -61,7 +65,8 @@ const ViewLogin = () => {
 
   return (
     <>
-      <div className="flex items-center justify-center min-h-screen bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('http://servicios.upqroo.edu.mx/estanciasestadias/public/assets/images/LogoCafe.jpg')" }}>
+      {/* <Componentes.Modals.error mensaje={error} action={handleActionEror}/> */}
+      <div className="flex items-center justify-center min-h-screen bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('http://servicios.upqroo.edu.mx/estanciasestadias/public/assets/images/LogoCafe.jpg')" }}> 
       <div className="bg-white p-8 rounded-lg shadow-md max-w-sm w-full text-center">
         <h2 className="text-lg font-semibold mb-2">Inventarios CIC</h2>
         <img src={Logo}/>

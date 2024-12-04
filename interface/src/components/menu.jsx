@@ -51,18 +51,53 @@ const options = [
   {
     name: "Movimientos",
     routes: [
-      { path: "/movimientos", codePermiso: 13 }
+      { path: "/movimientos", codePermiso: 13 },
+      { path: "/asignaciones/", codePermiso: 13 },
+      { path: "/asignaciones/:pkResponsable", codePermiso: 13 },
+      { path: "/asignaciones/:pkResponsable/:pkArticulo", codePermiso: 13 },
+      { path: "/devoluciones/", codePermiso: 13 },
+      { path: "/devoluciones/:pkResponsable", codePermiso: 13 },
+      { path: "/devoluciones/:pkResponsable/:pkArticulo", codePermiso: 13 }
+    ]
+  },
+  {
+    name: "Repotes",
+    routes: [
+      { path: "/reportes", codePermiso: 13 },
+      { path: "/reportes/articulo/:pk", codePermiso: 13 },
+      { path: "/reportes/articulos", codePermiso: 13 },
+      { path: "/reportes/responsable/:pk", codePermiso: 13 },
+      { path: "/reportes/responsables", codePermiso: 13 }
     ]
   },
   {
     name: "Coordinadores",
     routes: [
-      { path: "/coordinadores", codePermiso: 14 },
-      { path: "/coordinadores/edit/:pk", codePermiso: 15 },
-      { path: "/coordinadores/load", codePermiso: 15 }
+      { path: "/coordinadores", codePermiso: 99 },
+      { path: "/coordinadores/edit/:pk", codePermiso: 99 },
+      { path: "/coordinadores/load/", codePermiso: 99 }
+    ]
+  },
+  {
+    name: "Historial",
+    routes: [
+      { path: "/historial", codePermiso: 13 }
     ]
   }
 ]
+
+const createRouteRegex = (structure) => {
+  // Convierte la estructura en una expresión regular
+  const regexPattern = structure
+    .replace(/:[^\s/]+/g, '([^/]+)') 
+    .replace(/\//g, '\\/'); 
+  return new RegExp(`^${regexPattern}$`); 
+};
+
+const compareRoutes = (route, structure) => {
+  const routeRegex = createRouteRegex(structure); // Genera la expresión regular a partir de la estructura
+  return routeRegex.test(route); // Verifica si la ruta coincide con la estructura
+};
 
 const OptionNav = ({ name, isSelected }) => (
   <div className={`w-[100%] p-2 flex flex-row justify-start items-center 
@@ -115,12 +150,14 @@ const Menu = ({ children }) => {
     if(localCredetial !== null){
     // Recorre las opciones y verifica si el usuario tiene permisos para alguna ruta
     options.forEach(({ routes }) => {
-      for(let i = 0; i<routes.length; i++){
-        //console.log(routes[i].codePermiso[0])
-        //console.log(localCredetial)
-        for(let i2 = 0; i2<localCredetial.permisos.length; i2++){
-          if(localCredetial.permisos[i2].Funciones_pk == routes[i].codePermiso && routes[i].path == location.pathname){
-            bandera=true}
+      for (let i = 0; i < routes.length; i++) {
+        for (let i2 = 0; i2 < localCredetial.permisos.length; i2++) {
+          if (
+            localCredetial.permisos[i2].Funciones_pk == routes[i].codePermiso &&
+            compareRoutes(location.pathname, routes[i].path)
+          ) {
+            bandera = true;
+          }
         }
       }
     });
@@ -156,12 +193,12 @@ const Menu = ({ children }) => {
             <div className="py-5 flex flex-col gap-2.5 w-[100%]">
               <div className="text-UP-Negro">Apartados</div>
               {options.map(({ name, routes }) => {
-  return (
-    <Link key={name} to={routes[0].path}>
-      <OptionNav name={name} isSelected={routes.some(route => location.pathname.includes(route.path))} />
-    </Link>
-  );
-})}
+              return (
+                <Link key={name} to={routes[0].path}>
+                  <OptionNav name={name} isSelected={routes.some(route => location.pathname.includes(route.path))} />
+                </Link>
+              );
+            })}
             </div>
           </div>
         )}
@@ -184,8 +221,8 @@ const Menu = ({ children }) => {
            ) : (
            
            
-           //<h1>No tienes permiso de estar aquí ☺</h1>
-           children
+           <h1 className='flex items-center justify-center h-screen text-2xl font-bold text-UP-Primario'>No tienes permiso de estar aquí ☺</h1>
+           
            )}
             
           </div>

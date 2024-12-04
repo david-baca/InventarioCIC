@@ -117,7 +117,7 @@ const ViewAreaEdit = () => {
       <Componentes.Inputs.TitleSubtitle titulo={"Información del Área"} contenido={"Actualiza los detalles del área."} />
       <Componentes.Labels.text Value={codigo} Onchange={setCodigo} Placeholder={"Código del Área"} />
       <Componentes.Labels.area Value={descripcion} Onchange={setDescripcion} Placeholder={"Descripción del Área"} />
-      <Componentes.Inputs.TitleSubtitle titulo={"Seleccionar Artículos"} contenido={"Seleccione los artículos que desea asociar a este área."} />
+      <Componentes.Inputs.TitleSubtitle titulo={"Seleccionar Artículos"} contenido={"Seleccione los artículos que desea asociar a esta área."} />
       <div className="flex items-center w-[100%]">
         <Componentes.Buscador query={query} OnChange={handleSearchChange} />
       </div>
@@ -153,6 +153,7 @@ const ViewAreaEdit = () => {
             titulo={"No hay Artículos que mostrar"}
             contenido={"No se encontraron resultados"}
           />
+          <Componentes.Inputs.TitleSubtitle titulo={"No hay Artículos para mostrar"} contenido={"No se encontraron resultados"} />
         </div>
       )}
 
