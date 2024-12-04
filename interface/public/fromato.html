@@ -77,16 +77,15 @@
         <!-- Contenido principal -->
         <div class="contenido">
             <h2>ASUNTO: ASIGNACIÓN DE ARTÍCULO</h2>
-            <p>Cancún, Quintana Roo, a <span id="fecha"></span>.</p>
+            <p>Cancún, Quintana Roo, a <span>{{fecha}}</span>.</p>
 
-            <p><strong>NOMBRE:</strong> <span id="nombre"></span></p>
-            <p><strong>CARGO:</strong> <span id="cargo"></span></p>
+            <p><strong>NOMBRE:</strong> <span>{{nombre}}</span></p>
             <p><strong>PRESENTE</strong></p>
 
             <p>Por medio de la presente se hace constar la asignación de artículos de inventario entre las siguientes partes:</p>
 
             <p><strong>Responsable de asignación:</strong> _________.</p>
-            <p><strong>Asignado a:</strong> <span id="responsable"></span>.</p>
+            <p><strong>Asignado a:</strong> <span>{{responsable}}</span>.</p>
 
             <h3>DECLARACIONES</h3>
             <p><strong>Primera:</strong> El responsable de la asignación declara que los artículos asignados se encuentran en el estado que a continuación se detalla y son entregados al asignado en calidad de préstamo o asignación temporal, conforme a las políticas de la empresa.</p>
@@ -131,14 +130,14 @@
             <p><strong>Tercera:</strong> El asignado se compromete a utilizar los artículos asignados de acuerdo con su propósito y a reportar cualquier inconveniente o deterioro.</p>
             <p><strong>Cuarta:</strong> El asignado se compromete a devolver los artículos en las mismas condiciones en que fueron recibidos, salvo por el desgaste normal. La devolución deberá realizarse al responsable de la asignación o en el área designada.</p>
             <h3>DETALLES DEL ARTÍCULO</h3>
-            <p><strong>No. Inventario:</strong> <span id="no_inventario"></span></p>
-            <p><strong>Nombre:</strong> <span id="nombre_articulo"></span></p>
-            <p><strong>Descripción:</strong> <span id="descripcion"></span></p>
-            <p><strong>Precio:</strong> <span id="precio"></span></p>
+            <p><strong>No. Inventario:</strong> <span>{{no_inventario}}</span></p>
+            <p><strong>Nombre:</strong> <span>{{nombre_articulo}}</span></p>
+            <p><strong>Descripción:</strong> <span>{{descripcion}}</span></p>
+            <p><strong>Precio:</strong> <span>{{precio}}</span></p>
         
             <h3>EVIDENCIAS ADJUNTAS</h3>
             <p><strong>Fotos:</strong></p>
-            <p id="imagen1"></p>   
+            <p>{{imagen1}}</p>   
             <p><strong>Atentamente:</strong></p>
             <br>
             <br>
@@ -150,14 +149,14 @@
                 <div style="display: flex; flex-direction: column; width: 45%;
                  ">
                     <hr style="width: 100%; border: 1px solid #000;">
-                    <p id="userName" style="margin: 0; padding: 0;"></p>
-                    <p id="userLastname" style="margin: 0; padding: 0;"></p>
+                    <p style="margin: 0; padding: 0;">{{userName}}</p>
+                    <p style="margin: 0; padding: 0;">{{userLastname}}</p>
                     <p style="margin: 0; padding: 0;">responsable de asignacion</p>
                 </div>
                 <div style="display: flex; flex-direction: column; width: 45%;">
                     <hr style="width: 100%; border: 1px solid #000;">
-                    <p id="resName" style="margin: 0; padding: 0;"></p>
-                    <p id="resLastname" style="margin: 0; padding: 0;"></p>
+                    <p style="margin: 0; padding: 0;">{{resName}}</p>
+                    <p style="margin: 0; padding: 0;">{{resLastname}}</p>
                     <p style="margin: 0; padding: 0;">responsable del articulo</p>
                 </div>
             </div>   
@@ -176,7 +175,7 @@
 
 
 
-    <script>
+    <!-- <script>
         // JavaScript para reemplazar los valores dinámicos en el documento
         document.getElementById('fecha').textContent = '03 de diciembre de 2024'; // Se puede generar dinámicamente con JS
         document.getElementById('nombre').textContent = 'Juan Pérez';
@@ -190,6 +189,6 @@
         document.getElementById('userName').textContent = '$15,000 MXNjjjjjjjjjjjjjjjjjj';
         document.getElementById('userLastname').textContent = '$15,';
         document.getElementById('resName').textContent = '$15,000 MXN';
-    </script>
+    </script> -->
 </body>
 </html>

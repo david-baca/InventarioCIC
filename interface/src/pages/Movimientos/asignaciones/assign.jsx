@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { saveAs } from "file-saver";
-import PizZip from "pizzip";
-import Docxtemplater from "docxtemplater";
 import Componentes from "../../../components";
 import axios from 'axios';
 
@@ -70,15 +67,16 @@ const Peticion =()=>{
 
 const ViewAssigned = () => {
   const { pkResponsable, pkArticulo } = useParams();
+  const [ imagenes, setImagenes ] = useState();
   const [responsable, setResponsable] = useState(null);
   const [articulo, setArticulo] = useState(null);
   const [loading, setLoading] = useState(false);
-
+  const peticion = Peticion() 
   // Función para obtener los detalles del responsable
   const loadResponsable = async () => {
     setLoading(true);
     try {
-      const data = await obtenerResponsable(pkResponsable);
+      const data = await peticion.ObtenerDetallesReponsable(pkResponsable);
       setResponsable(data.responsable);
     } catch (error) {
       console.error("Error al obtener responsable:", error);
@@ -91,8 +89,23 @@ const ViewAssigned = () => {
   const loadArticulo = async () => {
     setLoading(true);
     try {
-      const data = await obtenerArticulo(pkArticulo);
+      const data = await peticion.ObtenerDetallesArticulo(pkArticulo);
       setArticulo(data.articulo);
+      let datos = "";
+      // Asegurarse de que `data.articulo.Condiciones` y `data.articulo.Condiciones[0].Imagenes` no sean null ni undefined
+      if (data?.articulo?.Condiciones?.[0]?.Imagenes) {
+        // Recorre las imágenes de manera segura
+        for (let i = 0; i < data.articulo.Condiciones[0].Imagenes.length; i++) {
+          // Verifica si la imagen no es null o undefined
+          if (data.articulo.Condiciones[0].Imagenes[i]?.imagen) {
+            // Almacena las imágenes válidas
+            datos= datos+(data.articulo.Condiciones[0].Imagenes[i].imagen)+"<br>";
+          }
+        }
+      }
+      console.log(datos)
+      // Asigna el array de imágenes a un estado o variable
+      setImagenes(datos);
     } catch (error) {
       console.error("Error al obtener artículo:", error);
     } finally {
@@ -106,107 +119,50 @@ const ViewAssigned = () => {
   }, [pkResponsable, pkArticulo]);
 
   // Función para generar y enviar a imprimir el documento
-  const generateAndPrint = () => {
-    if (!responsable || !articulo) {
-      alert("Datos incompletos para generar el documento.");
-      return;
-    }
+ const generateAndPrint = async () => {
+  if (!responsable || !articulo) {
+    alert("Datos incompletos para generar el documento.");
+    return;
+  }
 
-    const fecha = new Date();
-    const dia = fecha.getDate();
-    const mes = fecha.toLocaleString("es-ES", { month: "long" });
-    const año = fecha.getFullYear();
+  const fecha = new Date();
+  const dia = fecha.getDate();
+  const mes = fecha.toLocaleString("es-ES", { month: "long" });
+  const año = fecha.getFullYear();
 
-    // Crear una nueva ventana para el contenido HTML
+  try {
+    // Cargar el archivo HTML de formato
+    const response = await fetch('/fromato.html');
+    const htmlText = await response.text();
+
+    // Reemplazar las variables dinámicas en el archivo HTML
+    let formattedHtml = htmlText
+      .replace('{{fecha}}', `${dia} de ${mes} de ${año}`)
+      .replace('{{nombre}}', responsable.nombres)
+      .replace('{{cargo}}', responsable.cargo)
+      .replace('{{responsable}}', responsable.nombres)  // O el nombre del responsable de la asignación
+      .replace('{{asignado}}', responsable.nombres)    // Asignado
+      .replace('{{no_inventario}}', articulo.no_inventario)
+      .replace('{{nombre_articulo}}', articulo.nombre)
+      .replace('{{descripcion}}', articulo.descripcion)
+      .replace('{{precio}}', articulo.precio)
+      .replace('{{imagen1}}', imagenes);
+
+    // Crear una nueva ventana para mostrar el contenido
     const printWindow = window.open('', '', 'width=800,height=600');
-    
-    // Escribir el contenido del documento en la nueva ventana
-    printWindow.document.write(`
-      <html>
-        <head>
-          <title>Asignación de Artículo</title>
-          <style>
-            body {
-              font-family: Arial, sans-serif;
-              font-size: 12px;
-              margin: 20px;
-            }
-            h1 {
-              text-align: center;
-            }
-            .content {
-              margin-top: 20px;
-            }
-            .section {
-              margin-top: 10px;
-            }
-            .footer {
-              position: absolute;
-              bottom: 20px;
-              width: 100%;
-              text-align: center;
-              font-size: 12px;
-            }
-          </style>
-        </head>
-        <body>
-          <h1>Asignación de Artículo</h1>
-          <div class="content">
-            <p><strong>ASUNTO:</strong> ASIGNACION DE ARTICULO</p>
-            <p>Cancún, Quintana Roo, a ${dia} de ${mes} de ${año}.</p>
-            <p><strong>Nombre:</strong> ${responsable.nombres}</p>
-            <p><strong>Cargo:</strong> ${responsable.cargo}</p>
-            <p><strong>PRESENTE:</strong></p>
-            <p>Por medio de la presente se hace constar la asignación de artículos de inventario entre las siguientes partes:</p>
+    printWindow.document.open();
+    printWindow.document.write(formattedHtml);
+    printWindow.document.close();
 
-            <div class="section">
-              <p><strong>Responsable de asignación:</strong> _________.</p>
-              <p><strong>Asignado a:</strong> ${responsable.nombres}.</p>
-            </div>
-
-            <div class="section">
-              <p><strong>DECLARACIONES</strong></p>
-              <p><strong>Primera:</strong> El responsable de la asignación declara que los artículos asignados se encuentran en el estado que a continuación se detalla y son entregados al asignado en calidad de préstamo o asignación temporal, conforme a las políticas de la empresa.</p>
-              <p><strong>Segunda:</strong> El asignado se compromete a hacer uso responsable de los artículos asignados, garantizando su buen estado de conservación, salvo por el desgaste normal derivado del uso.</p>
-            </div>
-
-            <div class="section">
-              <p><strong>CLÁUSULAS</strong></p>
-              <p><strong>Primera:</strong> Se acuerda la asignación de los siguientes artículos, cuyo estado y condiciones se detallan a continuación.</p>
-              <p><strong>Segunda:</strong> El responsable de la asignación garantiza que los artículos se encuentran en el estado declarado al momento de la entrega.</p>
-              <p><strong>Tercera:</strong> El asignado se compromete a utilizar los artículos asignados de acuerdo con su propósito y a reportar cualquier inconveniente o deterioro.</p>
-              <p><strong>Cuarta:</strong> El asignado se compromete a devolver los artículos en las mismas condiciones en que fueron recibidos, salvo por el desgaste normal. La devolución deberá realizarse al responsable de la asignación o en el área designada.</p>
-            </div>
-
-            <div class="section">
-              <p><strong>DETALLES DEL ARTÍCULO</strong></p>
-              <p><strong>No. Inventario:</strong> ${articulo.no_inventario}</p>
-              <p><strong>Nombre:</strong> ${articulo.nombre}</p>
-              <p><strong>Descripción:</strong> ${articulo.descripcion}</p>
-              <p><strong>Precio:</strong> ${articulo.precio}</p>
-            </div>
-
-            <div class="section">
-              <p><strong>EVIDENCIAS ADJUNTAS</strong></p>
-              <p><strong>Fotos:</strong></p>
-              <p>${articulo.imagenes ? articulo.imagenes.map(img => <img src="${img}" alt="Imagen del artículo" style="width: 100px; height: 100px; margin: 5px;" />).join('') : "No hay fotos disponibles."}</p>
-            </div>
-          </div>
-          <div class="footer">
-            <p>Firma del Responsable: _________</p>
-            <p>Firma del Asignado: _________</p>
-          </div>
-        </body>
-      </html>
-    `);
-
-    printWindow.document.close(); // Cerrar el documento para que pueda renderizarse
-
-    // Esperar a que la página se haya cargado completamente antes de imprimir
+    // Esperar que la página se haya cargado completamente antes de imprimir
     printWindow.onload = () => {
       printWindow.print();
-    };
-  };
+    }
+  }catch(err){
+    console.log(err)
+  }
+};
+
 
   return (
     <div>
