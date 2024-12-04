@@ -288,4 +288,37 @@ exports.articulosSinArea = async (req, res) => {
         res.status(500).json({ error: 'Error al obtener artículos sin area' });
     }
 };
-
+exports.articulosSinRes = async (req, res) => {
+    //queremos saber los articulos que no estan asociddoa aun responsable
+    const { query } = req.params; // Extraemos la excepción y el query
+    try {
+        // Primero obtenemos los artículos asignados
+        const artAsing = await Asignaciones.findAll({
+            attributes: ['Articulos_pk'], // Sólo la columna de claves primarias de artículos
+            raw: true // Para obtener los resultados como un array de objetos planos
+        });
+        // Extraemos solo las claves primarias de los artículos asignados
+        const artAsingIds = artAsing.map(assing => assing.Articulos_pk);
+        // Ahora obtenemos los artículos que no están asignados a ningún responsable
+        const whereConditions = {
+            disponible: 1,
+            where: {
+                pk: {
+                    [Op.notIn]: artAsingIds // Excluimos los artículos ya asignados
+                }
+            }
+        };
+        if (query && query !== null) {
+            whereConditions[Op.or] = [
+                { nombre: { [Op.like]: `%${query}%` } },
+                { no_inventario: { [Op.like]: `%${query}%` } }
+            ];
+        }
+        const result = await Articulos.findAll({
+            where: whereConditions
+        });
+        res.json({ articulos: result });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al obtener artículos sin area' });
+    }
+};

@@ -20,7 +20,7 @@ const uploadPdf = multer({
     fileFilter: (req, file, cb) => {
       const ext = path.extname(file.originalname).toLowerCase();
       if (ext === '.pdf') {
-        cb(null, true);
+        cb(null, true); 
       } else {
         cb(new Error('Solo se permiten archivos PDF.'));
       }

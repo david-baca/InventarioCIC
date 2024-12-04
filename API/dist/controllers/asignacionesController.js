@@ -1,21 +1,10 @@
 // src/controllers/asignacionController.js
 const asignacionView = require('../views/asignacionesView');
 const { Documentos, Asignaciones, Articulos, Responsables, Historial } = require('../model');
-// const { PDFDocument } = require('pdf-lib');
-const { uploadPdf } = require('../config/uploadPdf');
-const fs = require('fs');
-const path = require('path');
-// const { Asignaciones } = require('../model')
-
-let asignaciones = []; // Simulación de base de datos en memoria
-
-// Buscar asignaciones por query
 const { Op } = require('sequelize');
-
 // Definir las relaciones solo para esta consulta, sin modificar los modelos globalmente
 Asignaciones.belongsTo(Articulos, { foreignKey: 'Articulos_pk' });
 Asignaciones.belongsTo(Responsables, { foreignKey: 'Responsables_pk' });
-
 exports.buscarAsignaciones = async (req, res) => {
     const { query } = req.params;
 
@@ -59,37 +48,33 @@ exports.buscarAsignaciones = async (req, res) => {
         return res.status(500).json({ error: error.message });
     }
 };
-
 // src/controllers/asignacionesController.js
-exports.crearAsignacion = async (req, res) => {
-    const { fk_Articulo, fk_Responsable } = req.body;
-
-    // Validar si el archivo y los datos de la asignación están presentes
-    if (!req.file || !fk_Articulo || !fk_Responsable) {
-        return res.status(400).json({ error: 'Todos los campos son obligatorios, incluyendo el archivo PDF.' });
-      }      
-
+exports.crearAsignacion = async (req, res) => {    
     try {
-        // Crear el registro del archivo en la tabla Documentos
-        const documento = await Documentos.create({
-            doc_firma: req.file.path, // Ruta del archivo subido
-            fecha: new Date(),
-        });
-
+        const { fk_Articulo, fk_Responsable } = req.body;
+        // Validar si el archivo y los datos de la asignación están presentes
+        if (!req.file || !fk_Articulo || !fk_Responsable) {
+            return res.status(400).json({ error: 'Todos los campos son obligatorios, incluyendo el archivo PDF.' });
+        } 
         // Crear la asignación
         const asignacion = await Asignaciones.create({
             Articulos_pk: fk_Articulo,
             Responsables_pk: fk_Responsable,
-            Documentos_pk: documento.pk, // Relación con el documento
             disponible: true,
             fecha_recibido: new Date(),
         });
-
+        // Crear el registro del archivo en la tabla Documentos
+        await Documentos.create({
+            doc_firma: req.file.path,
+            Asignaciones_pk: asignacion.pk,
+            disponible: true,
+            fecha: new Date(),
+        });
         // Responder con el mensaje de éxito y los datos de la asignación
         res.status(201).json({ message: 'Asignación creada exitosamente.', asignacion });
     } catch (error) {
         console.error("Error al crear la asignación:", error);
-        res.status(500).json({ error: 'Error al crear la asignación.' });
+        res.status(500).json({ error: 'Error al crear la asignación.', error });
     }
 };
 

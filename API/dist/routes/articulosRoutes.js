@@ -33,4 +33,7 @@ articulosRoutes.get('/sin/area/', articleController.articulosSinArea);
 articulosRoutes.get('/sin/area/:query', articleController.articulosSinArea);
 articulosRoutes.get('/sin/area/execption/:fk_execpcion', articleController.articulosSinArea);
 articulosRoutes.get('/sin/area/execption/:fk_execpcion/:query', articleController.articulosSinArea);
+
+articulosRoutes.get('/sin/res/', articleController.articulosSinArea);
+articulosRoutes.get('/sin/res/:query', articleController.articulosSinArea);
 module.exports = articulosRoutes;
