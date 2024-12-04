@@ -45,7 +45,7 @@ const ViewUserEdit = () => {
   const { obtenerUsuario, actualizarUsuario } = peticionUsuarios();
 
   const permisosDisponibles = {
-    Articulo: [1, 2, 3],
+    Artículo: [1, 2, 3],
     Grupos: [4, 5, 6],
     Responsable: [7, 8, 9],
     Movimientos: [10, 11, 12],

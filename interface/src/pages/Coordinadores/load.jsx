@@ -39,9 +39,9 @@ const ViewUserLoad = () => {
   const { Publicar } = peticionUsuarios();
 
   const permissions = {
-    Articulo: [1, 2, 3],
+    Artículo: [1, 2, 3],
     Grupos: [4, 5, 6],
-    Responsable: [7, 8, 9],
+    Responsables: [7, 8, 9],
     Movimientos: [10, 11, 12],
     Reporte: [13, 14, 16],
     Historial: [15, 17, 18],
