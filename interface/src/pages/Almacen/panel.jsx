@@ -95,7 +95,7 @@ const ViewArea = () => {  // Cambié el nombre de "ViewGrup" a "ViewArea"
         <>
         <Componentes.Table.table>
           <Componentes.Table.columna>
-            <Componentes.Table.encabezado>Nombre</Componentes.Table.encabezado>
+            <Componentes.Table.encabezado>Código</Componentes.Table.encabezado>
             <Componentes.Table.encabezado>Descripción</Componentes.Table.encabezado>
             <Componentes.Table.encabezado>Acciones</Componentes.Table.encabezado>
           </Componentes.Table.columna>

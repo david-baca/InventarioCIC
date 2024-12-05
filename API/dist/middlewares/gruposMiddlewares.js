@@ -9,6 +9,7 @@ exports.createGrupo = async (req, res, next) => {
         else if (nombre.length > 50) errores.push('El (nombre) del grupo no debe exceder los 50 caracteres.');
         if (!descripcion) errores.push('Es necesario definir la (descripcion) del grupo.');
         else if (descripcion.length > 250) errores.push('La (descripcion) del grupo no debe exceder los 250 caracteres.');
+        if (errores.length > 0)return res.status(400).json({ error: errores });
         if (articulos && articulos.length > 0) {
             let articulosAsociados = []; // Usamos un arreglo para almacenar los artículos asociados
         
@@ -31,6 +32,7 @@ exports.createGrupo = async (req, res, next) => {
             if (articulosAsociados.length > 0) {
                 errores.push('Algunos artículos ya están asociados a otro grupo.');
             }
+            
         }
     } catch (error) {
         return res.status(500).json({ error: 'Error en la validación del grupo'+error });

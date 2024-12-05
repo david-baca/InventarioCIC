@@ -129,7 +129,7 @@ const ViewArticleInformation = () => {
             </div>
           {responsable === null ? (
             <>
-            <Components.Inputs.TitleHeader text="Detalles de respodsable" />
+            <Components.Inputs.TitleHeader text="Detalles de responsable" />
               <Components.Inputs.TitleSubtitle 
                 titulo="Responsable"
                 contenido={responsable || "sin asignar"} 

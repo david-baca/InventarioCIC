@@ -9,7 +9,7 @@ export const peticionBaja = () => {
 
   const DarBaja = async (id, motivo) => {
     try {
-      const response = await instance.patch(`/areas/${id}/baja`, { motivo });
+      const response = await instance.patch(`/areas/baja/${id}`, { motivo });
       return response.data; // Ajusta según la respuesta esperada
     } catch (error) {
       console.log(error);

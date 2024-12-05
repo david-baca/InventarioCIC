@@ -62,6 +62,7 @@ const TitleSubtitle = ({ titulo, contenido }) => {
           onClick={()=>prev()}
           className={`text-gray-600 hover:text-gray-800 ${page == 1 && "opacity-50 cursor-not-allowed"}`}
           disabled={page == 1}
+          type="button"
         >
           Anterior
         </button>
@@ -69,6 +70,7 @@ const TitleSubtitle = ({ titulo, contenido }) => {
           onClick={()=>next()}
           className={`text-gray-600 hover:text-gray-800 ${page == pages && "opacity-50 cursor-not-allowed"}`}
           disabled={page == pages}
+          type="button"
         >
           Siguiente
         </button>

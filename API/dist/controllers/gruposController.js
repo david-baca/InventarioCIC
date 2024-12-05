@@ -57,7 +57,7 @@ exports.crearGrupo = async (req, res) => {
             }
         }
 
-        res.json(grupoView.datosGrupoCreado({message:"grupo exitosamente creado", grupo:nuevoGrupo}));
+        res.json(grupoView.datosGrupoCreado(nuevoGrupo));
     } catch (error) {
         res.status(500).json({ error: 'Error al crear el grupo' });
     }

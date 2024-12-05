@@ -18,6 +18,6 @@ areasRoutes.post('/', areaMiddlewares.createArea, areaController.crearArea);  //
 areasRoutes.put('/:id', areaMiddlewares.editArea, areaController.editarArea); // Editar área
 
 // Endpoint para dar de baja un área
-areasRoutes.patch('/:id/baja', areaMiddlewares.bajaArea, areaController.darDeBajaArea);  // Dar de baja área
+areasRoutes.patch('/baja/:id', areaMiddlewares.bajaArea, areaController.darDeBajaArea);  // Dar de baja área
 
 module.exports = areasRoutes;

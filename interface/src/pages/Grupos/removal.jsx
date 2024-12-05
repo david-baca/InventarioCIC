@@ -10,7 +10,7 @@ export const peticionBaja = () => {
 
   const DarBaja = async (id, motivo) => {
     try {
-      const response = await instance.patch(`/grupos/${id}/baja`, { motivo }); // Cambiar el endpoint a '/grupos/'
+      const response = await instance.patch(`/grupos/baja/${id}`, { motivo }); // Cambiar el endpoint a '/grupos/'
       return response.data; // Ajusta según la respuesta esperada
     } catch (error) {
       console.log(error);
