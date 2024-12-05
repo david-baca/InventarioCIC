@@ -1,18 +1,23 @@
 // src/routes/areaRoutes.js
 const express = require('express');
-const router = express.Router();
-const areaController = require('../controllers/areasController');
-
-// Endpoint para crear una nueva área 
-router.post('/', areaController.crearArea);
-
-// Endpoint para editar un área
-router.put('/:id', areaController.editarArea);
+const areasRoutes = express.Router();
+const areaMiddlewares = require('../middlewares/areasMiddlewares');  // Middleware para Áreas
+const areaController = require('../controllers/areasController');    // Controlador para Áreas
 
 // Endpoint para buscar áreas
-router.get('/search/:query', areaController.buscarAreas);
+areasRoutes.get('/', areaController.buscarAreas);                          // Buscar áreas por código o descripción
+areasRoutes.get('/:query', areaController.buscarAreas);                    // Buscar áreas por código o descripción
+
+// Endpoint para obtener detalles de un área
+areasRoutes.get('/details/:pk', areaController.detallesArea);              // Detalles de un área específico
+
+// Endpoint para crear un nuevo área
+areasRoutes.post('/', areaMiddlewares.createArea, areaController.crearArea);  // Crear área
+
+// Endpoint para editar un área
+areasRoutes.put('/:id', areaMiddlewares.editArea, areaController.editarArea); // Editar área
 
 // Endpoint para dar de baja un área
-router.patch('/:id/baja', areaController.darDeBajaArea);
+areasRoutes.patch('/baja/:id', areaMiddlewares.bajaArea, areaController.darDeBajaArea);  // Dar de baja área
 
-module.exports = router;
+module.exports = areasRoutes;

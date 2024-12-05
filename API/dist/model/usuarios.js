@@ -13,7 +13,6 @@ const Usuarios = sequelize.define('Usuarios', {
     allowNull: false,
     validate: {
       len: [3, 100],  // longitud minima.
-      isAlpha: true,   // solo letras.
     },
   },
   apellido_p: {
@@ -35,6 +34,7 @@ const Usuarios = sequelize.define('Usuarios', {
   correo: {
     type: DataTypes.STRING(250),
     allowNull: false,
+    unique: true,
   },
   master: {
     type: DataTypes.BOOLEAN,

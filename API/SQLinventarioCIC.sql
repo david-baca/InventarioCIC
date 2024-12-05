@@ -11,6 +11,7 @@ SET @OLD_SQL_MODE = @@SQL_MODE, SQL_MODE = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABL
 -- Crear tabla Responsables
 CREATE TABLE IF NOT EXISTS `inventariocic`.`Responsables` (
   `pk` INT NOT NULL AUTO_INCREMENT,
+  `correo` VARCHAR(100) NOT NULL,
   `nombres` VARCHAR(100) NOT NULL,
   `apellido_p` VARCHAR(50) NOT NULL,
   `apellido_m` VARCHAR(50) NOT NULL,
@@ -45,7 +46,7 @@ COLLATE = utf8mb4_spanish_ci;
 -- Crear tabla Articulos
 CREATE TABLE IF NOT EXISTS `inventariocic`.`Articulos` (
   `pk` INT NOT NULL AUTO_INCREMENT,
-  `no_inventario` VARCHAR(100) NOT NULL,
+  `no_inventario` VARCHAR(100) NOT NULL UNIQUE,
   `nombre` VARCHAR(100) NOT NULL,
   `costo` DECIMAL(10,2) NOT NULL,
   `descripcion` VARCHAR(250) NOT NULL,
@@ -145,7 +146,7 @@ CREATE TABLE IF NOT EXISTS `inventariocic`.`Usuarios` (
   `nombres` VARCHAR(100) NOT NULL,
   `apellido_p` VARCHAR(50) NOT NULL,
   `apellido_m` VARCHAR(50) NOT NULL,
-  `correo` VARCHAR(250) NOT NULL,
+  `correo` VARCHAR(250) NOT NULL UNIQUE,
   `master` TINYINT(1) NOT NULL,
   `disponible` TINYINT(1) NOT NULL,
   PRIMARY KEY (`pk`)
@@ -160,11 +161,9 @@ CREATE TABLE IF NOT EXISTS `inventariocic`.`Permisos` (
   INDEX `fk_Permisos_Usuarios_idx` (`Usuarios_pk`),
   INDEX `fk_Permisos_Funciones_idx` (`Funciones_pk`),
   CONSTRAINT `fk_Permisos_Usuarios`
-    FOREIGN KEY (`Usuarios_pk`) REFERENCES `inventariocic`.`Usuarios` (`pk`)
-    ON DELETE NO ACTION ON UPDATE NO ACTION,
+    FOREIGN KEY (`Usuarios_pk`) REFERENCES `inventariocic`.`Usuarios` (`pk`),
   CONSTRAINT `fk_Permisos_Funciones`
     FOREIGN KEY (`Funciones_pk`) REFERENCES `inventariocic`.`Funciones` (`pk`)
-    ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE = InnoDB
 DEFAULT CHARSET = utf8mb4
 COLLATE = utf8mb4_spanish_ci;

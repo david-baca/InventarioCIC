@@ -5,7 +5,7 @@ const multer = require('multer');
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, 'uploads/images'); // Carpeta donde se guardarán las imágenes
-    },
+    }, 
     filename: (req, file, cb) => {
         cb(null, `${Date.now()}-${file.originalname}`); // Nombre único para la imagen
     },
@@ -13,6 +13,7 @@ const storage = multer.diskStorage({
 
 const uploadImg = multer({
     storage: storage,
+    //2mg
     limits: { fileSize: 2 * 1024 * 1024 }, // Máximo 2MB por imagen
 });
 

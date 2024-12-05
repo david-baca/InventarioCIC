@@ -1,64 +1,65 @@
 // Middleware para validar los datos de creación de un nuevo usuario
-exports.middleCreateUsuario = (req, res, next) => {
+exports.createUsuario = (req, res, next) => {
     try {
-        const { nombre, email, password, rol_id } = req.body;
-        let errores = [];
+        const { nombre, apellido_p, apellido_m, correo} = req.body;
+        const nombreValido = /^[A-Za-z\s]+$/;
+        const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        let errores = []
 
         if (!nombre) errores.push('Es necesario definir el (nombre) del usuario.');
-        if (!email) errores.push('Es necesario definir el (email) del usuario.');
-        if (!password) errores.push('Es necesario definir el (password) del usuario.');
-        if (!rol_id) errores.push('Es necesario definir el (rol_id) del usuario.');
+        if (!apellido_p) errores.push('Es necesario definir el (apellido paterno) del usuario.');
+        if (!apellido_m) errores.push('Es necesario definir el (apellido materno) del usuario.');
+        if (!correo) errores.push('Es necesario definir el (email) del usuario.');
+        if (errores.length > 0) {
+            return res.status(400).json({ error: errores.join(' ') });
+        }
+
+        if (nombre.length > 100) {errores.push("El nombre no puede exceder los 100 caracteres.");}
+        if (apellido_p.length > 50) {errores.push("El apellido paterno no puede exceder los 50 caracteres.");}
+        if (apellido_m.length > 50) {errores.push("El apellido materno no puede exceder los 50 caracteres.");}
+
+        if (errores.length > 0) {
+            return res.status(400).json({ error: errores.join(' ') });
+        }
+
+        if (!nombre || !nombreValido.test(nombre)){errores.push("El nombre solo puede contener letras y espacios.");}
+        if (!apellido_p || !nombreValido.test(apellido_p)){errores.push("El apellido paterno solo puede contener letras y espacios.");}
+        if (!apellido_m || !nombreValido.test(apellido_m)){errores.push("El apellido materno solo puede contener letras y espacios.");}
+        if (!correo || !emailValido.test(correo)) {errores.push("El formato de correo electrónico no es válido.");}
 
         if (errores.length > 0) {
             return res.status(400).json({ error: errores.join(' ') });
         }
     } catch (error) {
-        return res.status(500).json({ error: 'Error en la validación del usuario' });
+        return res.status(500).json({ error: 'Error en la validación del usuario' + error});
     }
     next();
 };
 
 // Middleware para validar los datos de edición de un usuario existente
-exports.middleEditUsuario = (req, res, next) => {
+exports.editUsuario = (req, res, next) => {
     try {
-        const { id, nombre, email, password, rol_id } = req.body;
+        const { id } = req.params;
+        const { disponible,} = req.body;
         let errores = [];
 
         if (!id) errores.push('Es necesario definir el (id) del usuario.');
-        if (!nombre) errores.push('Es necesario definir el (nombre) del usuario.');
-        if (!email) errores.push('Es necesario definir el (email) del usuario.');
-        if (!rol_id) errores.push('Es necesario definir el (rol_id) del usuario.');
-        if (password && password.length < 6) errores.push('El (password) debe tener al menos 6 caracteres.');
-
+        if (disponible===null&&disponible===undefined&&disponible==="") errores.push('Es necesario definir la (disponibilidad) del usuario.');
         if (errores.length > 0) {
             return res.status(400).json({ error: errores.join(' ') });
         }
+        
     } catch (error) {
         return res.status(500).json({ error: 'Error en la validación de la edición del usuario' });
     }
     next();
 };
 
-// Middleware para validar la baja de un usuario
-exports.middleBajaUsuario = (req, res, next) => {
-    try {
-        const { id, motivo } = req.body;
-        let errores = [];
 
-        if (!id) errores.push('Es necesario definir el (id) del usuario.');
-        if (!motivo) errores.push('Es necesario definir el (motivo) para dar de baja al usuario.');
 
-        if (errores.length > 0) {
-            return res.status(400).json({ error: errores.join(' ') });
-        }
-    } catch (error) {
-        return res.status(500).json({ error: 'Error en la validación de la baja del usuario' });
-    }
-    next();
-};
 
-// Middleware para validar la búsqueda de un usuario
-exports.middleSearchUsuario = (req, res, next) => {
+// Middleware para validar los datos de la api de google
+exports.balidateUsuario = (req, res, next) => {
     try {
         const { query } = req.params;
         if (!query) {
