@@ -9,6 +9,7 @@ const responsablesRoutes = require('./dist/routes/responsablesRoutes');
 const gruposRoutes = require('./dist/routes/gruposRoutes');
 const areasRoutes = require('./dist/routes/areasRoutes');
 const asignacionesRoutes = require('./dist/routes/asignacionesRoutes');
+const historialRoutes = require('./dist/routes/historialRoutes');
 const sequelize = require('./dist/config/database');
 const app = express();
 const port_front = process.env.ORIGIN_PORT_FRONT || 3720;
@@ -29,6 +30,7 @@ app.use('/responsables', responsablesRoutes);
 app.use('/grupos', gruposRoutes);
 app.use('/areas', areasRoutes);
 app.use('/asignaciones', asignacionesRoutes);
+app.use('/historico', historialRoutes);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 
