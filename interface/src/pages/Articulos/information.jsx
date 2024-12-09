@@ -1,26 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
+import peticion from '../../services/articulosService';
 import Components from '../../components';
 import {QRCodeSVG} from 'qrcode.react';
-
-const peticion = () => {
-  const section = "articulos";
-  const baseApi = import.meta.env.VITE_BASE_API;
-  const instance = axios.create({ baseURL: baseApi });
-  
-  const ObtenerDetalles = async (no_inventario) => {
-    try {
-      const response = await instance.get(`/${section}/details/${encodeURIComponent(no_inventario)}`);
-      return response.data;
-    } catch (error) {
-      console.error(error.response?.data?.error || error.message);
-      throw new Error(error.response?.data?.error || 'Error en la interacción con la API');
-    }
-  };
-
-  return { ObtenerDetalles };
-};
 
 const ViewArticleInformation = () => {
   // Configuración

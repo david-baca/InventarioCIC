@@ -1,27 +1,7 @@
-import axios from 'axios';
+import peticion from '../../services/articulosService';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Componentes from "../../components/";
-// Objeto que contiene las peticiones de esta página
-const peticion = () => {
-  const section = "articulos";
-  const baseApi = import.meta.env.VITE_BASE_API;
-  const instance = axios.create({
-    baseURL: baseApi,
-  });
-
-  const Buscar = async ({ query }) => {
-    try {
-      const response = await instance.get(`/${section}/search/${encodeURIComponent(query)}`);
-      return response.data; // Suponiendo que response.data es el array esperado
-    } catch (error) {
-      console.error(error.response?.data?.error || error.message);
-      throw new Error(error.response?.data?.error || 'Error en la interacción con la API');
-    }
-  };
-
-  return { Buscar };
-};
 
 const ViewArticle = () => {
   const navigate = useNavigate();

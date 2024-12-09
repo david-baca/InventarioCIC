@@ -1,26 +1,7 @@
-import axios from 'axios';
+import peticion from '../../services/areasService';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Componentes from "../../components";
-
-// Función de petición para buscar áreas
-export const peticion = () => {
-  const baseApi = import.meta.env.VITE_BASE_API;
-  const instance = axios.create({ baseURL: baseApi });
-
-  const Buscar = async (query) => {
-    try {
-      const response = await instance.get(`/areas/${encodeURIComponent(query)}`); // Cambiar a áreas
-      return response.data.areas; // Ajustar según la respuesta esperada
-    } catch (error) {
-      console.error(error.response?.data?.error || error.message);
-      throw new Error(error.response?.data?.error || 'Error en la búsqueda de áreas');
-    }
-  };
-
-  return { Buscar };
-};
-
 
 const ViewArea = () => {  // Cambié el nombre de "ViewGrup" a "ViewArea"
   const navigate = useNavigate();

@@ -1,42 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
+import peticionDetalles from '../../services/areasService';
 import Componentes from '../../components';
 
-// Función de petición para obtener detalles de un área
-export const peticionDetalles = () => {
-  const baseApi = import.meta.env.VITE_BASE_API;
-  const instance = axios.create({ baseURL: baseApi });
-  const ObtenerDetalles = async (id) => {
-    try {
-      const response = await instance.get(`/areas/details/${id}`);
-      return response.data; // Ajusta según la respuesta esperada
-    } catch (error) {
-      console.error(error.response?.data?.error || error.message);
-      throw new Error(error.response?.data?.error || 'Error al obtener detalles del área');
-    }
-  };
-  // API para buscar artículos sin un área asignada, excluyendo el área que estamos editando
-  const BuscarOpciones = async (query, fk_execpcion) => {
-    try {
-      const response = await instance.get(`articulos/sin/area/execption/${fk_execpcion}/${encodeURIComponent(query)}`);
-      return response.data.articulos; // Ajusta según tu respuesta de API
-    } catch (error) {
-      console.error(error.response?.data?.error || error.message);
-      throw new Error(error.response?.data?.error || 'Error en la búsqueda de artículos');
-    }
-  };
-  const Editar = async (id, data) => {
-    try {
-      const response = await instance.put(`/areas/${id}`, data);
-      return response.data; // Ajusta según la respuesta esperada
-    } catch (error) {
-      console.error(error.response?.data?.error || error.message);
-      throw new Error(error.response?.data?.error || 'Error al editar el área');
-    }
-  };
-  return { ObtenerDetalles, BuscarOpciones, Editar };
-};
 const ViewAreaEdit = () => {
   const { pk } = useParams();  // Obtiene el ID del área desde la URL
   const navigate = useNavigate();
