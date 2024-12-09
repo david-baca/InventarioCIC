@@ -1,43 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
+import peticion from '../../services/responsablesService';
 import Componentes from "../../components/";
-
-// Petición estructurada igual que en "artículos"
-const peticion = () => {
-  const section = "responsables";
-  const baseApi = import.meta.env.VITE_BASE_API;
-  const instance = axios.create({
-    baseURL: baseApi,
-  });
-
-  const ObtenerDetalles = async (id) => {
-    try {
-      const response = await instance.get(`/${section}/details/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error(error.response?.data?.error || error.message);
-      throw new Error(error.response?.data?.error || 'Error al obtener los detalles del responsable');
-    }
-  };
-
-  const EditarResponsable = async (id, data) => {
-    try {
-      const response = await instance.put(`/${section}/${id}`, data);
-      return response.data;
-    } catch (error) {
-      console.error(error.response?.data?.error || error.message);
-      throw new Error(error.response?.data?.error || 'Error al editar el responsable');
-    }
-  };
-
-  return { ObtenerDetalles, EditarResponsable };
-};
 
 const ViewResponsableEdit = () => {
   const navigate = useNavigate();
   const { pk } = useParams(); // Obtener el ID del responsable desde la URL
   const Peticion = peticion();
+  const [motivo, setMotivo] = useState('');
 
   // Estados para los campos del formulario
   const [responsable, setResponsable] = useState({
@@ -73,7 +43,7 @@ const ViewResponsableEdit = () => {
   const handleEdit = async (e) => {
     e.preventDefault();
     try {
-      const result = await Peticion.EditarResponsable(pk, responsable);
+      const result = await Peticion.EditarResponsable(pk, {motivo, ...responsable});
       setSuccess(result.message);
     } catch (err) {
       setError(err.message);
@@ -120,7 +90,11 @@ const ViewResponsableEdit = () => {
           Onchange={(value) => setResponsable({ ...responsable, correo: value })}
           Placeholder={"Correo"}
         />
-
+<Componentes.Inputs.TitleSubtitle
+            titulo="Nota de Edición" 
+            contenido="Las notas sirven para justificar el porqué se editó el responsable."
+      />
+      <Componentes.Labels.area Onchange={(value) =>setMotivo(value)} Value={motivo} Placeholder={"Motivo"}/>
         {/* Botones */}
         <div className="flex flex-row w-[100%] gap-4">
           <Componentes.Botones.Cancelar

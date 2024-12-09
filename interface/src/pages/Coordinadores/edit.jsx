@@ -1,37 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Components from '../../components';
-import axios from 'axios';
-
-const peticionUsuarios = () => {
-  const section = 'usuarios';
-  const baseApi = import.meta.env.VITE_BASE_API;
-  const instance = axios.create({
-    baseURL: baseApi,
-  });
-
-  const obtenerUsuario = async (id) => {
-    try {
-      const response = await instance.get(`/${section}/details/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error(error.response?.data?.error || error.message);
-      throw new Error('Error al obtener los datos del usuario');
-    }
-  };
-
-  const actualizarUsuario = async (id, data) => {
-    try {
-      const response = await instance.put(`/${section}/${id}`, data);
-      return response.data;
-    } catch (error) {
-      console.error(error.response?.data?.error || error.message);
-      throw new Error('Error al actualizar el usuario');
-    }
-  };
-
-  return { obtenerUsuario, actualizarUsuario };
-};
+import peticionUsuarios from '../../services/usuariosService';
 
 const ViewUserEdit = () => {
   const { pk } = useParams();

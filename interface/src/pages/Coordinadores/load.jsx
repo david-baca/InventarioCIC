@@ -1,29 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import peticionUsuarios from '../../services/usuariosService';
 import Componentes from "../../components/";
-
-const peticionUsuarios = () => {
-  const section = 'usuarios';
-  const baseApi = import.meta.env.VITE_BASE_API;
-  const instance = axios.create({
-    baseURL: baseApi,
-  });
-
-  const Publicar = async (data) => {
-    try {
-      const response = await instance.post(`/${section}`, data, {
-        
-      });
-      return response.data;
-    } catch (error) {
-      console.error(error.response?.data?.error || error.message);
-      throw new Error(error.response?.data?.error || 'Error en la interacción con la API');
-    }
-  };
-
-  return { Publicar };
-};
 
 const ViewUserLoad = () => {
   const [nombre, setNombre] = useState('');

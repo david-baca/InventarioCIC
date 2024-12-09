@@ -34,7 +34,7 @@ exports.buscarResponsable=async(req,res)=>{
 }
 
 exports.crearResponsable = async (req, res) => {
-    const { nombres, apellido_p, apellido_m, correo } = req.body;
+    const { nombres, apellido_p, apellido_m, correo, localUser } = req.body;
     try { 
         const nuevoResponsable = await Responsables.create({
             nombres:nombres,
@@ -42,6 +42,12 @@ exports.crearResponsable = async (req, res) => {
             apellido_m:apellido_m,
             correo: correo,
             disponible:1
+        });
+        await Historial.create({
+            descripcion: "Se creo un responsable con nombre "+nuevoResponsable.nombres,
+            fecha_accion: new Date(),
+            Usuarios_pk: localUser, 
+            disponible: 1,
         });
         res.json(responsableView.datosResponsableCreado(nuevoResponsable));
     } catch (error) {
@@ -51,7 +57,7 @@ exports.crearResponsable = async (req, res) => {
 
 exports.editarResponsable = async (req, res) => {
     const { id } = req.params;
-    const { nombres, apellido_p, apellido_m, correo } = req.body;
+    const { nombres, apellido_p, apellido_m, correo,localUser, motivo } = req.body;
     try {
         const responsable = await Responsables.findByPk(id);
         if (!responsable) {
@@ -59,6 +65,12 @@ exports.editarResponsable = async (req, res) => {
         }
 
         await responsable.update({ correo, nombres, apellido_p, apellido_m });
+        await Historial.create({
+            descripcion: "Se edito un responsable con nombre "+responsable.nombres+" "+motivo,
+            fecha_accion: new Date(),
+            Usuarios_pk: localUser, 
+            disponible: 1,
+        });
         res.json(responsableView.confirmacionEdicion(responsable));
     } catch (error) {
         res.status(500).json({ error: 'Error al editar el responsable' });
@@ -129,12 +141,19 @@ try {
 
 exports.darDeBajaResponsable = async (req, res) => {
     const { id } = req.params;
+    const { localUser, motivo } = req.body;
     try {
         const responsable = await Responsables.findByPk(id);
         if (!responsable) {
             return res.status(404).json(responsableView.errorResponsable('Responsable no encontrado'));
         }
         await responsable.update({ disponible: 0 }); // Marcar como no disponible
+        await Historial.create({
+            descripcion: "Se efectuo una baja de un responsable con nombre"+responsable.nombres+" "+motivo,
+            fecha_accion: new Date(),
+            Usuarios_pk: localUser, 
+            disponible: 1,
+        });
         res.json(responsableView.confirmacionBaja(responsable));
     } catch (error) {
         res.status(500).json({ error: 'Error al dar de baja el responsable' });

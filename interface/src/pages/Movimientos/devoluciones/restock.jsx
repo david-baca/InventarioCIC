@@ -1,54 +1,8 @@
 import { useState,useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
+import Peticion from '../../../services/asignacionesService';
 import Componentes from "../../../components";
 import {getFromLocalStorage} from '../../../context/Credentials';
-
-const Peticion = () => {
-  const section = "articulos";
-  const baseApi = import.meta.env.VITE_BASE_API;
-  const instance = axios.create({
-    baseURL: baseApi,
-  });
-  const ObtenerDetallesArticulo = async (no_inventario) => {
-    try {
-      const response = await instance.get(`/articulos/details/${encodeURIComponent(no_inventario)}`);
-      return response.data;
-    } catch (error) {
-      console.error(error.response?.data?.error || error.message);
-      throw new Error(error.response?.data?.error || 'Error en la interacción con la API');
-    }
-  };
-  const ObtenerDetallesReponsable = async (id) => {
-    try {
-      const response = await instance.get(`/responsables/details/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error(error.response?.data?.error || error.message);
-      throw new Error(error.response?.data?.error || 'Error al obtener los detalles del responsable');
-    }
-  };
-  const Publicar = async ({id,data}) => {
-    try {
-      const response = await instance.patch(`/asignaciones/${id}/baja`, data);
-      return response.data;
-    } catch (error) {
-      console.error(error.response?.data?.error || error.message);
-      throw new Error(error.response?.data?.error || 'Error in API interaction');
-    }
-  };
-  const discardImg = async (data) => {
-    try {
-      const response = await instance.patch(`/asignaciones/baja-img`, data);
-      return response.data;
-    } catch (error) {
-      console.error(error.response?.data?.error || error.message);
-      throw new Error(error.response?.data?.error || 'Error in API interaction');
-    }
-  };
-  
-  return { discardImg,Publicar,ObtenerDetallesArticulo,ObtenerDetallesReponsable };
-};
 
 const ViewRestok = () => {
   const { pkResponsable, pkArticulo } = useParams();

@@ -1,142 +1,59 @@
-const responsableView = require('../views/responsablesView');
-const { Responsables, Asignaciones, Articulos, Documentos } = require('../model'); // Asegúrate de tener el modelo Responsables importado
-const { Op, Sequelize } = require('sequelize');
-exports.buscarResponsable=async(req,res)=>{
-    const { pk } = req.params;
-    try {
-        const responsable = await Responsables.findOne({
-            where: { pk: pk },
-            include: [
-                {
-                    where: { disponible: 1 },
-                    required: false,
-                    model: Asignaciones,
-                    as: 'Asignaciones',
-                    include:[{
-                        model:Articulos,
-                        as: 'Articulo',
-                    }],
-                    include:[{
-                        model:Documentos,
-                        as: 'Documentos',
-                    }]
-                }
-            ]
-        });
-        // Check if any articles were found
-        if (responsable === null) {
-            return res.status(404).json({ error: 'responsable no encontrado' });
+import axios from 'axios';
+import {getFromLocalStorage} from '../context/Credentials';
+const responsablesService = () => {
+    const credetial = getFromLocalStorage()
+    const localUser = credetial.usuario.pk
+    const baseApi = import.meta.env.VITE_BASE_API;
+    const instance = axios.create({ baseURL: baseApi });
+    const section = "responsables";
+    const ObtenerDetalles = async (id) => {
+        try {
+          const response = await instance.get(`/${section}/details/${id}`);
+          return response.data;
+        } catch (error) {
+          console.error(error.response?.data?.error || error.message);
+          throw new Error(error.response?.data?.error || 'Error al obtener los detalles del responsable');
         }
-        res.json({ responsable });
+    };
+    const EditarResponsable = async (id, data) => {
+    try {
+        const response = await instance.put(`/${section}/${id}`, {...data, localUser});
+        return response.data;
     } catch (error) {
-        res.status(500).json({ error: 'Error al obtener los detalles del responsable: ' + error.message });
+        console.error(error.response?.data?.error || error.message);
+        throw new Error(error.response?.data?.error || 'Error al editar el responsable');
     }
-}
-
-exports.crearResponsable = async (req, res) => {
-    const { nombres, apellido_p, apellido_m, correo } = req.body;
-    try { 
-        const nuevoResponsable = await Responsables.create({
-            nombres:nombres,
-            apellido_p:apellido_p,
-            apellido_m:apellido_m,
-            correo: correo,
-            disponible:1
+    };
+    const Publicar = async (data) => {
+    try {
+        const response = await instance.post(`/${section}`, {...data, localUser}, {
+        headers: {
+            'Content-Type': 'application/json', // Usamos 'application/json' ya que no estamos subiendo archivos
+        },
         });
-        res.json(responsableView.datosResponsableCreado(nuevoResponsable));
+        return response.data;
     } catch (error) {
-        res.status(500).json({ error: 'Error al crear el responsable' });
+        console.error(error.response?.data?.error || error.message);
+        throw new Error(error.response?.data?.error || 'Error en la interacción con la API');
     }
-};
-
-exports.editarResponsable = async (req, res) => {
-    const { id } = req.params;
-    const { nombres, apellido_p, apellido_m, correo } = req.body;
+    };
+    const Buscar = async ({ query }) => {
     try {
-        const responsable = await Responsables.findByPk(id);
-        if (!responsable) {
-            return res.status(404).json(responsableView.errorResponsable('Responsable no encontrado'));
-        }
-
-        await responsable.update({ correo, nombres, apellido_p, apellido_m });
-        res.json(responsableView.confirmacionEdicion(responsable));
+        const response = await instance.get(`/${section}/search/${query}`);
+        return response.data; // Suponiendo que response.data es el array esperado
     } catch (error) {
-        res.status(500).json({ error: 'Error al editar el responsable' });
+        console.error(error.response?.data?.error || error.message);
+        throw new Error(error.response?.data?.error || 'Error en la interacción con la API');
     }
-};
-
-exports.buscarResponsables = async (req, res) => {
-    const query = req.params.query || ''; // Usa un query vacío si no se proporciona
+    };
+    const EliminarResponsable = async (id, data) => {
     try {
-        const resultado = await Responsables.findAll({
-            where: {
-                [Op.or]: [
-                    { nombres: { [Op.like]: `%${query}%` } },
-                    { apellido_p: { [Op.like]: `%${query}%` } },
-                    { apellido_m: { [Op.like]: `%${query}%` } },
-                    { correo: { [Op.like]: `%${query}%` } }
-                ],
-                disponible: 1 // Solo buscar responsables disponibles
-            },include: [
-                {
-                    where: { disponible: 1 },
-                    required: false,
-                    model: Asignaciones,
-                    as: 'Asignaciones',
-                    include:[{
-                        model:Articulos,
-                        as: 'Articulo',
-                    }],
-                    include:[{
-                        model:Documentos,
-                        as: 'Documentos',
-                    }]
-                },
-            ]
-        });
-        res.json(resultado);
+        const response = await instance.patch(`/${section}/baja/${id}`, {data, localUser});
+        return response.data;
     } catch (error) {
-        res.status(500).json({ error: 'Error en la búsqueda de responsables'});
+        throw new Error(error.response?.data?.error || 'Error en la interacción con la API');
     }
+    };
+    return { EliminarResponsable, Buscar, Publicar, ObtenerDetalles, EditarResponsable };
 };
-
-exports.buscarResponsablesAll = async (req, res) => {
-try {
-    const resultado = await Responsables.findAll({
-        where: {disponible: 1},
-        include: [
-            {
-                where: { disponible: 1 },
-                required: false,
-                model: Asignaciones,
-                as: 'Asignaciones',
-                include:[{
-                    model:Articulos,
-                    as: 'Articulo',
-                }],
-                include:[{
-                    model:Documentos,
-                    as: 'Documentos',
-                }]
-            }
-        ]
-    });
-    res.json(resultado);
-} catch (error) {
-    res.status(500).json({ error: 'Error en la búsqueda de responsables'+error });
-}
-};
-
-exports.darDeBajaResponsable = async (req, res) => {
-    const { id } = req.params;
-    try {
-        const responsable = await Responsables.findByPk(id);
-        if (!responsable) {
-            return res.status(404).json(responsableView.errorResponsable('Responsable no encontrado'));
-        }
-        await responsable.update({ disponible: 0 }); // Marcar como no disponible
-        res.json(responsableView.confirmacionBaja(responsable));
-    } catch (error) {
-        res.status(500).json({ error: 'Error al dar de baja el responsable' });
-    }
-};
+export default responsablesService

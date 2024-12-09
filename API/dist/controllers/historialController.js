@@ -16,6 +16,9 @@ exports.buscarHistoricos = async (req, res) => {
                 model:Usuarios,
                 as: 'Usuario',
             }],
+            order: [
+                ['fecha_accion', 'DESC'], // Reemplaza 'fecha' con el campo adecuado de tu modelo
+            ],
         });
         res.json(resultado);
     } catch (error) {

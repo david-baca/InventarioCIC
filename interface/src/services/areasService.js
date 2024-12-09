@@ -1,8 +1,10 @@
 import axios from 'axios';
+import {getFromLocalStorage} from '../context/Credentials';
 const areaService = () => {
+    const credetial = getFromLocalStorage()
+    const localUser = credetial.usuario.pk
     const baseApi = import.meta.env.VITE_BASE_API;
     const instance = axios.create({ baseURL: baseApi });
-    const section = "areas"
     const ObtenerDetalles = async (id) => {
       try {
         const response = await instance.get(`/areas/details/${id}`);
@@ -22,7 +24,7 @@ const areaService = () => {
     };
     const Editar = async (id, data) => {
       try {
-        const response = await instance.put(`/areas/${id}`, data);
+        const response = await instance.put(`/areas/${id}`, {...data, localUser});
         return response.data; // Ajusta según la respuesta esperada
       } catch (error) {
         console.error(error.response?.data?.error || error.message);
@@ -31,7 +33,7 @@ const areaService = () => {
     };
     const Crear = async (data) => {
         try {
-          const response = await instance.post('/areas', data);  // Ruta cambiada a /areas
+          const response = await instance.post('/areas', {...data,localUser});  // Ruta cambiada a /areas
           return response.data; // Ajustar según la respuesta de la API
         } catch (error) {
           console.error(error.response?.data?.error || error.message);
@@ -49,7 +51,7 @@ const areaService = () => {
     };
     const DarBaja = async (id, motivo) => {
         try {
-          const response = await instance.patch(`/areas/baja/${id}`, { motivo });
+          const response = await instance.patch(`/areas/baja/${id}`, {motivo, localUser});
           return response.data; // Ajusta según la respuesta esperada
         } catch (error) {
           console.log(error);

@@ -1,29 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import peticion from '../../services/responsablesService';
 import Componentes from "../../components/";
-
-const peticion = () => {
-  const section = "responsables"; // Se mantiene el endpoint 'responsables'
-  const baseApi = import.meta.env.VITE_BASE_API;
-  const instance = axios.create({
-    baseURL: baseApi,
-  });
-  const Publicar = async (data) => {
-    try {
-      const response = await instance.post(`/${section}`, data, {
-        headers: {
-          'Content-Type': 'application/json', // Usamos 'application/json' ya que no estamos subiendo archivos
-        },
-      });
-      return response.data;
-    } catch (error) {
-      console.error(error.response?.data?.error || error.message);
-      throw new Error(error.response?.data?.error || 'Error en la interacción con la API');
-    }
-  };
-  return { Publicar };
-};
 
 const ViewResponsableLoad = () => {
   const navigate = useNavigate();

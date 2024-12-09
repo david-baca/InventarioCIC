@@ -108,7 +108,7 @@ exports.buscarAsignacionesResponsables = async (req, res) => {
 // src/controllers/asignacionesController.js
 exports.crearAsignacion = async (req, res) => {    
     try {
-        const { fk_Articulo, fk_Responsable } = req.body;
+        const { fk_Articulo, fk_Responsable, localUser } = req.body;
         // Validar si el archivo y los datos de la asignación están presentes
         if (!req.file || !fk_Articulo || !fk_Responsable) {
             return res.status(400).json({ error: 'Todos los campos son obligatorios, incluyendo el archivo PDF.' });
@@ -127,6 +127,12 @@ exports.crearAsignacion = async (req, res) => {
             Asignaciones_pk: asignacion.pk,
             disponible: true,
         });
+        await Historial.create({
+            descripcion: "Se realizo una asignacion con el documento nombrado "+req.file.path,
+            fecha_accion: new Date(),
+            Usuarios_pk: localUser, 
+            disponible: 1,
+        });
         // Responder con el mensaje de éxito y los datos de la asignación
         res.status(201).json({ message: 'Asignación creada exitosamente.', asignacion });
     } catch (error) {
@@ -138,7 +144,13 @@ exports.crearAsignacion = async (req, res) => {
 exports.darDeBajaAsignacion = async (req, res) => {
     try {
         const { id } = req.params; 
-        const { motivo } = req.body; 
+        const { motivo, localUser } = req.body; 
+        const historialRegistro = await Historial.create({
+            descripcion: 'Asignación dada de baja '+motivo || 'Asignación dada de baja',
+            fecha_accion: new Date(),
+            Usuarios_pk: localUser, 
+            disponible: 1,
+        });
         const asignacion = await Asignaciones.findOne({
             where: { pk: id }
         });
@@ -151,12 +163,6 @@ exports.darDeBajaAsignacion = async (req, res) => {
             disponible: false,
         });
         await asignacion.update({ fecha_devolucion: new Date(), disponible:false });
-        const historialRegistro = await Historial.create({
-            descripcion: 'Asignación dada de baja '+motivo || 'Asignación dada de baja',
-            fecha_accion: new Date(),
-            Usuarios_pk: 1, 
-            disponible: 1,
-        });
         return res.json({
             message: 'Asignación dada de baja exitosamente y registrada en el historial.',
             historial: historialRegistro

@@ -1,37 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
+import peticion from '../../services/responsablesService';
 import Componentes from '../../components';
-
-// Funciones para la petición
-const peticion = () => {
-  const section = "responsables"; // Cambiamos la sección a "responsables"
-  const baseApi = import.meta.env.VITE_BASE_API;
-  const instance = axios.create({ baseURL: baseApi });
-
-  // Obtener detalles del responsable
-  const ObtenerDetalles = async (id) => {
-    try {
-      const response = await instance.get(`/${section}/details/${encodeURIComponent(id)}`);
-      return response.data;
-    } catch (error) {
-      console.error(error.response?.data?.error || error.message);
-      throw new Error(error.response?.data?.error || 'Error en la interacción con la API');
-    }
-  };
-
-  // Dar de baja al responsable
-  const EliminarResponsable = async (id, data) => {
-    try {
-      const response = await instance.patch(`/${section}/baja/${id}`, data);
-      return response.data;
-    } catch (error) {
-      throw new Error(error.response?.data?.error || 'Error en la interacción con la API');
-    }
-  };
-
-  return { ObtenerDetalles, EliminarResponsable };
-};
 
 const ViewResponsableRenoval = () => {
   // Configuración de peticiones
@@ -74,10 +44,8 @@ const ViewResponsableRenoval = () => {
   // Manejo del formulario de baja
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = { motivo };
-
     try {
-      const result = await Peticion.EliminarResponsable(pk, formData);
+      const result = await Peticion.EliminarResponsable(pk, motivo);
       setSuccess('Responsable dado de baja exitosamente');
     } catch (err) {
       setError(err.message);

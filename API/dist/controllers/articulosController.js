@@ -1,4 +1,4 @@
-const { Articulos, Condiciones, Imagenes, Areas, Grupos, Asignaciones, Responsables } = require('../model');
+const { Articulos, Condiciones, Imagenes, Areas, Grupos, Asignaciones, Responsables, Historial } = require('../model');
 const { Sequelize, Op } = require('sequelize');
 exports.buscarArticulosAll = async (req, res) => {
     try {
@@ -31,7 +31,7 @@ exports.buscarArticulos = async (req, res) => {
 }; 
 exports.crearArticulo = async (req, res) => {
     try {
-        const { no_inventario, nombre, descripcion, costo, consumible, grupo} = req.body;
+        const {localUser,no_inventario, nombre, descripcion, costo, consumible, grupo} = req.body;
         const nuevoArticulo = await Articulos.create({
             no_inventario:no_inventario,
             nombre:nombre,
@@ -60,6 +60,12 @@ exports.crearArticulo = async (req, res) => {
             });
             await Imagenes.bulkCreate(imagenesData);
         }
+        await Historial.create({
+            descripcion: "Se creo un articulo con numero de inventario "+nuevoArticulo.no_inventario,
+            fecha_accion: new Date(),
+            Usuarios_pk: localUser, 
+            disponible: 1,
+        });
         res.json({ message: 'Artículo creado exitosamente', articulo: nuevoArticulo });
     } catch (error) {
         res.status(500).json({ error: 'Error al crear el artículo' });
@@ -67,10 +73,10 @@ exports.crearArticulo = async (req, res) => {
 };
 exports.editarArticulo = async (req, res) => { 
     const { id } = req.params;
-    const { grupo, no_inventario, nombre, descripcion, costo, consumible} = req.body;
+    const { grupo, no_inventario, nombre, descripcion, costo, consumible, localUser, motivo} = req.body;
     try {
         //buscamos articulo
-        articulo = await Articulos.findByPk(id)
+        const articulo = await Articulos.findByPk(id)
         // Actualizar los campos del artículo
         await articulo.update(
             { no_inventario, nombre, descripcion, costo, consumible, 
@@ -118,6 +124,12 @@ exports.editarArticulo = async (req, res) => {
                 });
             }
         }
+        await Historial.create({
+            descripcion: "Se creo un articulo con numero de inventario "+articulo.no_inventario+" "+motivo,
+            fecha_accion: new Date(),
+            Usuarios_pk: localUser, 
+            disponible: 1,
+        });
         //cargar condiciones viejas que se mentionene en esta nueva concidion
         return res.status(200).json({ message: 'Artículo editado con éxito' });
     } catch (error) {
@@ -126,6 +138,7 @@ exports.editarArticulo = async (req, res) => {
 };
 exports.darDeBajaArticulo = async (req, res) => {
     const { id } = req.params;
+    const { localUser, motivo } = req.body;
     try {
         //buscamos articulo
         articulo = await Articulos.findByPk(id)
@@ -167,11 +180,17 @@ exports.darDeBajaArticulo = async (req, res) => {
                 });
             }
         }
-        articulo = await Articulos.update({ 
+        const articulo = await Articulos.update({ 
             disponible: 0,
             Grupos_pk: null,
             Area_pk: null
             }, { where: { pk:id } });
+        await Historial.create({
+            descripcion: "Se efectuo una baja de un articulo con numero de inventario "+articulo.no_inventario+" "+motivo,
+            fecha_accion: new Date(),
+            Usuarios_pk: localUser, 
+            disponible: 1,
+        });
         res.json({ message: 'Artículo dado de baja exitosamente'});
     } catch (error) {
         res.status(500).json({ error: 'Error al dar de baja el artículo' });

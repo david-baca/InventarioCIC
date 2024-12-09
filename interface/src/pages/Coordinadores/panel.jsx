@@ -1,27 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Componentes from '../../components/';
-import axios from 'axios';
-
-
-export const peticionUsuarios = () => {
-  const baseApi = import.meta.env.VITE_BASE_API;
-  const instance = axios.create({ baseURL: baseApi });
-
-  const obtenerUsuarios = async () => {
-    try {
-      const response = await instance.get(`/usuarios/all`);  //el endpoint
-      return response.data;  
-    } catch (error) {
-      console.error(error.response?.data?.error || error.message);
-      throw new Error(error.response?.data?.error || 'Error al cargar usuarios');
-    }
-  };
-
-  return { obtenerUsuarios };
-};
-
-
+import peticionUsuarios from '../../services/usuariosService';
 
 const ViewUser = () => {
   const navigate = useNavigate();
