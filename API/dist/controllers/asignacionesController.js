@@ -1,36 +1,33 @@
 // src/controllers/asignacionController.js
+require('dotenv').config();
 const asignacionView = require('../views/asignacionesView');
+const XlsxPopulate = require('xlsx-populate');
 const { Documentos, Asignaciones, Articulos, Responsables, Historial, Condiciones, Imagenes } = require('../model');
 const { Op } = require('sequelize');
 // Definir las relaciones solo para esta consulta, sin modificar los modelos globalmente
 Asignaciones.belongsTo(Articulos, { foreignKey: 'Articulos_pk' });
 Asignaciones.belongsTo(Responsables, { foreignKey: 'Responsables_pk' });
+
 exports.buscarAsignaciones = async (req, res) => {
     const { query } = req.params;
-
     // Validar si el query está vacío
-    if (!query.trim()) {
-        return res.status(400).json({ error: 'El término de búsqueda no puede estar vacío.' });
-    }
-
     try {
+        const whereConditions = {};
+        if (query && query !== null) {
+            whereConditions[Op.or] = [
+                { nombre: { [Op.like]: `%${query}%` } },
+                { no_inventario: { [Op.like]: `%${query}%` } }
+            ];
+        }
         // Realizar la búsqueda en la base de datos usando Sequelize
         const resultado = await Asignaciones.findAll({
-            where: {
-                disponible: true, // Solo mostrar asignaciones con 'disponible = true'
-                [Op.or]: [
-                    { Articulos_pk: { [Op.like]: `%${query}%` } },
-                    { Responsables_pk: { [Op.like]: `%${query}%` } }
-                ]
-            },
+            where: whereConditions,
             include: [
                 {
                     model: Articulos, // Incluir detalles del artículo
-                    attributes: ['nombre'], // Solo traer el nombre del artículo
                 },
                 {
                     model: Responsables, // Incluir detalles del responsable
-                    attributes: ['nombres'], // Solo traer el nombre del responsable
                 }
             ]
         });
@@ -61,14 +58,14 @@ exports.crearAsignacion = async (req, res) => {
             Articulos_pk: fk_Articulo,
             Responsables_pk: fk_Responsable,
             disponible: true,
-            fecha_recibido: new Date(),
+            fecha_asignacion: new Date(),
+            fecha_devolucion: null,
         });
         // Crear el registro del archivo en la tabla Documentos
         await Documentos.create({
             doc_firma: req.file.path,
             Asignaciones_pk: asignacion.pk,
             disponible: true,
-            fecha: new Date(),
         });
         // Responder con el mensaje de éxito y los datos de la asignación
         res.status(201).json({ message: 'Asignación creada exitosamente.', asignacion });
@@ -77,8 +74,6 @@ exports.crearAsignacion = async (req, res) => {
         res.status(500).json({ error: 'Error al crear la asignación.', error });
     }
 };
-
-
 // Dar de baja una asignación por ID
 exports.darDeBajaAsignacion = async (req, res) => {
     try {
@@ -94,9 +89,8 @@ exports.darDeBajaAsignacion = async (req, res) => {
             doc_firma: req.file.path,
             Asignaciones_pk: asignacion.pk,
             disponible: false,
-            fecha: new Date(),
         });
-        await asignacion.update({ disponible:false });
+        await asignacion.update({ fecha_devolucion: new Date(), disponible:false });
         const historialRegistro = await Historial.create({
             descripcion: 'Asignación dada de baja'+motivo || 'Asignación dada de baja',
             fecha_accion: new Date(),
@@ -112,7 +106,6 @@ exports.darDeBajaAsignacion = async (req, res) => {
         return res.status(500).json({ error: 'Error al dar de baja la asignación.' });
     }
 };
-
 exports.cambiarImagenes = async (req, res) => {
     try {
         const { id } = req.body;
@@ -138,7 +131,6 @@ exports.cambiarImagenes = async (req, res) => {
         return res.status(500).json({ error: 'Error al dar de baja la asignación.' });
     }
 };
-
 // Obtener detalles de una asignación por ID
 exports.obtenerDetallesAsignacion = async (req, res) => {
     const { id } = req.params;
@@ -184,16 +176,13 @@ exports.obtenerDetallesAsignacion = async (req, res) => {
         return res.status(500).json({ error: 'Error al obtener los detalles de la asignación.' });
     }
 };
-
 // Registro de asignaciones por Artículo
 exports.registroAsignacionesPorArticulo = async (req, res) => {
     const { fk_Articulo } = req.params;
-
     // Validar que el artículo está presente
     if (!fk_Articulo) {
         return res.status(400).json({ error: 'El artículo es inválido o no se proporcionó.' });
     }
-
     try {
         // Buscar asignaciones relacionadas con el artículo en la base de datos
         const asignaciones = await Asignaciones.findAll({
@@ -201,18 +190,15 @@ exports.registroAsignacionesPorArticulo = async (req, res) => {
             include: [
                 {
                     model: Articulos, // Incluir los detalles del artículo
-                    as: 'Articulo',
-                    attributes: ['nombre', 'descripcion']
+                    as: 'Articulo'
                 },
                 {
                     model: Responsables, // Incluir los detalles del responsable
                     as: 'Responsable',
-                    attributes: ['nombres', 'apellido_p', 'apellido_m']
                 },
                 {
                     model: Documentos, // Incluir los documentos relacionados
-                    as: 'Documentos',
-                    attributes: ['doc_firma', 'fecha']
+                    as: 'Documentos'
                 }
             ]
         });
@@ -225,8 +211,116 @@ exports.registroAsignacionesPorArticulo = async (req, res) => {
         // Devolver la lista de asignaciones en formato JSON
         return res.json(asignaciones);
     } catch (error) {
-        console.error('Error al obtener asignaciones por artículo:', error);
         return res.status(500).json({ error: 'Error al obtener asignaciones por artículo.' });
+    }
+};
+
+exports.registroArticuloExcel = async (req, res) => {
+    try {
+        const { fk_Articulo } = req.params;
+        // Validar que el artículo está presente
+        if (!fk_Articulo) return res.status(400).json({ error: 'El artículo es inválido o no se proporcionó.' });
+        // Buscar asignaciones relacionadas con el artículo en la base de datos
+        const asignaciones = await Asignaciones.findAll({
+            where: { Articulos_pk: fk_Articulo }, // Filtrar por el número del artículo
+            include: [
+                {
+                    model: Articulos, // Incluir los detalles del artículo
+                    as: 'Articulo'
+                },
+                {
+                    model: Responsables, // Incluir los detalles del responsable
+                    as: 'Responsable',
+                },
+                {
+                    model: Documentos, // Incluir los documentos relacionados
+                    as: 'Documentos'
+                }
+            ],
+            raw: true
+        });
+        // Si no se encuentran asignaciones para ese artículo
+        if (!asignaciones || asignaciones.length === 0) return res.status(404).json({ error: 'No se encontraron asignaciones para este artículo.' });
+        // Crear un nuevo archivo de Excel con xlsx-populate
+        // Formatear datos para el Excel
+        console.log(asignaciones)
+    
+        // Formatear datos para el Excel
+        let formattedData = [];
+        const baseApi = process.env.BASE_API
+        asignaciones.forEach((asignacion) => {
+            const documentoAsignacion = asignacion['Documentos.pk'] && asignacion['Documentos.doc_firma'] ? asignacion['Documentos.doc_firma'] : "sin documento";
+            const documentoRecepcion = asignacion['Documentos.Asignaciones_pk'] && asignacion['Documentos.doc_firma'] ? asignacion['Documentos.doc_firma'] : "sin documento";
+            const fechaAsignacion = new Date(asignacion.fecha_asignacion);
+            const fechaDevolucion = new Date(asignacion.fecha_devolucion);
+            formattedData.push({
+                'Fecha de Asignación': fechaAsignacion.toLocaleTimeString('es-ES', {
+                    day: '2-digit',   // Día con 2 dígitos
+                    month: '2-digit', // Mes con 2 dígitos
+                    year: 'numeric',
+                    hour: '2-digit',  // Hora con 2 dígitos
+                    minute: '2-digit',// Minutos con 2 dígitos
+                    hour12: false,    // Formato de 24 horas
+                  }),
+                'Fecha de Devolución': fechaDevolucion.toLocaleTimeString('es-ES', {
+                    day: '2-digit',   // Día con 2 dígitos
+                    month: '2-digit', // Mes con 2 dígitos
+                    year: 'numeric',
+                    hour: '2-digit',  // Hora con 2 dígitos
+                    minute: '2-digit',// Minutos con 2 dígitos
+                    hour12: false,    // Formato de 24 horas
+                  }),
+                'Nombre del Responsable': `${asignacion['Responsable.nombres']} ${asignacion['Responsable.apellido_p']} ${asignacion['Responsable.apellido_m']}`,
+                'Correo Responsable': asignacion['Responsable.correo'],
+                'Documento de Asignación': baseApi+documentoAsignacion,
+                'Documento de Recepción': baseApi+documentoRecepcion
+            });
+        });
+
+        console.log(formattedData);
+
+        const generateExcel = async () => {
+            const workbook = await XlsxPopulate.fromBlankAsync();
+            const sheetGeneral = workbook.addSheet('General');
+            //eliminar la hoja por defecto 
+            workbook.deleteSheet('Sheet1');
+            // Agregar encabezados
+            const headersGeneral = [
+                'Fecha de Asignación',
+                'Fecha de Devolución',
+                'Nombre del Responsable',
+                'Correo Responsable',
+                'Documento de Asignación',
+                'Documento de Recepción',
+            ];
+            headersGeneral.forEach((header, index) => {
+                sheetGeneral.cell(1, index + 1).value(header);
+            });
+            // Agregar datos
+            formattedData.forEach((item, rowIndex) => {
+                Object.keys(item).forEach((key, colIndex) => {
+                    sheetGeneral.cell(rowIndex + 2, colIndex + 1).value(item[key]);
+                });
+            });
+            // Ajustar el ancho de las columnas
+            const columnWidths = [20, 40, 50, 15, 15, 50];
+            columnWidths.forEach((width, index) => {
+                sheetGeneral.column(index + 1).width(width);
+            });
+            // Convertir el libro en un buffer
+            const buffer = await workbook.outputAsync();
+            // Configurar la respuesta para descarga de archivo
+            res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            res.setHeader('Content-Disposition', 'attachment; filename=Reporte.xlsx');
+            // Enviar el buffer como respuesta
+            res.end(buffer);
+        }
+
+        // Generar y enviar el archivo
+        generateExcel();
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error al generar el archivo Excel');
     }
 };
 

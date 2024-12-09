@@ -96,7 +96,7 @@ exports.buscarResponsables = async (req, res) => {
         });
         res.json(resultado);
     } catch (error) {
-        res.status(500).json({ error: 'Error en la búsqueda de responsables' });
+        res.status(500).json({ error: 'Error en la búsqueda de responsables'});
     }
 };
 
@@ -123,7 +123,7 @@ try {
     });
     res.json(resultado);
 } catch (error) {
-    res.status(500).json({ error: 'Error en la búsqueda de responsables' });
+    res.status(500).json({ error: 'Error en la búsqueda de responsables'+error });
 }
 };
 

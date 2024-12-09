@@ -14,10 +14,6 @@ const Documentos = sequelize.define('Documentos', {
     type: DataTypes.STRING(250),
     allowNull: false,
   },
-  fecha: {
-    type: DataTypes.DATE,
-    allowNull: false,
-  },
   Asignaciones_pk: {
     type: DataTypes.INTEGER,
     references: {

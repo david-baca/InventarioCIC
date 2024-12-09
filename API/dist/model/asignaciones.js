@@ -8,9 +8,13 @@ const Asignaciones = sequelize.define('Asignaciones', {
     primaryKey: true,
     autoIncrement: true,
   },
-  fecha_recibido: {
+  fecha_asignacion: {
     type: DataTypes.DATE,
     allowNull: false,
+  }, 
+  fecha_devolucion: {
+    type: DataTypes.DATE,
+    allowNull: true,
   },
   Responsables_pk: {
     type: DataTypes.INTEGER,

@@ -3,6 +3,8 @@ import imgExcel from "../../public/img/dowloadExcel.svg";
 import imgDownload from "../../public/img/download.svg";
 import imgTrash from "../../public/img/trash.svg";
 import imgPencil from "../../public/img/pencil.svg";
+import imgBack from "../../public/img/back.svg";
+import imgHop from "../../public/img/hop.svg";
 const Continuar = ({ text, onClick, isActive }) => {
   return (
     <button
@@ -121,11 +123,16 @@ const Edit = () => {
   );
 };
 
-const ExcelDownload = () => {
+const ExcelDownload = ({Onclick}) => {
   return (
     <>
-    <button className="w-full border border-gray-300 text-black py-2 flex items-center justify-center gap-2 rounded-full hover:bg-gray-100 transition duration-300">
-      <img src={imgExcel} alt="Descargar Excel" className="h-6 w-6" /> 
+    <button className="w-fit p-2 border border-gray-300 
+    text-black flex items-center 
+    justify-center gap-2 rounded-full 
+    hover:bg-gray-100 transition duration-300"
+    onClick={Onclick}
+    type="button">
+      <img src={imgExcel} className='h-6'/> 
       Descargar reporte completo
     </button>
     </>
@@ -142,6 +149,13 @@ const Hover = () => {
     </div>
   );
 };
+
+const Saltar = ({Onclick}) =>{
+  return(<button type='buttom' onClick={Onclick}
+   className='className="text-white p-2 flex items-center justify-center gap-2 rounded-full border-2 hover:border-UP-Auxiliar transition duration-300 hover:animate-pulse"'>
+    <img src={imgHop} className="h-6 w-6" /> 
+  </button>)
+  }
 
 const ToggleSwitch = () => {
   const [isSelected, setIsSelected] = useState(false);
@@ -195,7 +209,8 @@ const Botones = {
   Hover,
   ToggleSwitch,
   iconPencil,
-  iconTrash
+  iconTrash,
+  Saltar
 }
 
 export default Botones;

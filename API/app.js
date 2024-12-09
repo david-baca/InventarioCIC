@@ -15,7 +15,7 @@ const port_front = process.env.ORIGIN_PORT_FRONT || 3720;
 // Configuración básica de CORS para permitir todas las solicitudes
 app.use(cors({
     origin: `*`, // Permitir solicitudes solo desde este dominio
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE", // Métodos HTTP permitidos
+    methods: ["GET,HEAD,PUT,PATCH,POST,DELETE"], // Métodos HTTP permitidos
     allowedHeaders: ['Content-Type', 'Authorization'], // Encabezados permitidos en las solicitudes
   }));
 // Middleware
