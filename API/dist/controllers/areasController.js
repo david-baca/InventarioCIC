@@ -53,7 +53,7 @@ exports.crearArea = async (req, res) => {
             }
         }
         await Historial.create({
-            descripcion: "Se creo un área con numero de inventario "+nuevaArea.codigo,
+            descripcion: "Se creo un área con codigo "+nuevaArea.codigo,
             fecha_accion: new Date(),
             Usuarios_pk: localUser, 
             disponible: 1,

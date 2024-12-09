@@ -1,5 +1,5 @@
 const grupoView = require('../views/gruposView');
-const { Grupos, Articulos } = require('../model'); // Asegúrate de tener el modelo Grupos importado
+const { Grupos, Articulos, Historial } = require('../model'); // Asegúrate de tener el modelo Grupos importado
 const { Op, where } = require('sequelize');
 // Buscar grupos
 exports.buscarGrupos = async (req, res) => {
@@ -38,7 +38,7 @@ exports.detallesGrupo = async (req, res) => {
 };
 // Crear un nuevo grupo 
 exports.crearGrupo = async (req, res) => {
-    const { nombre, descripcion, articulos } = req.body; // Captura la lista de artículos
+    const { localUser,nombre, descripcion, articulos } = req.body; // Captura la lista de artículos
     try {
         const nuevoGrupo = await Grupos.create({ nombre, descripcion });
 
@@ -56,7 +56,12 @@ exports.crearGrupo = async (req, res) => {
                 }
             }
         }
-
+        await Historial.create({
+            descripcion: "Se creo un grupo con nombre "+nuevoGrupo.nombre,
+            fecha_accion: new Date(),
+            Usuarios_pk: localUser, 
+            disponible: 1,
+        });
         res.json(grupoView.datosGrupoCreado(nuevoGrupo));
     } catch (error) {
         res.status(500).json({ error: 'Error al crear el grupo' });
@@ -67,7 +72,7 @@ exports.crearGrupo = async (req, res) => {
 exports.editarGrupo = async (req, res) => {
     console.log("entra en editar grupo");
     const { id } = req.params;
-    const { nombre, descripcion, articulos } = req.body; // Captura la lista de artículos (pks)
+    const { nombre, descripcion, articulos, localUser, motivo } = req.body; // Captura la lista de artículos (pks)
     
     try {
         const grupo = await Grupos.findByPk(id);
@@ -97,7 +102,12 @@ exports.editarGrupo = async (req, res) => {
         console.log("Paso 3");
         // Retorna la respuesta con el grupo actualizado
         res.json(grupoView.confirmacionEdicion({message:"grupo exitosamente editado", grupo:grupo}));
-
+        await Historial.create({
+            descripcion: "Se edito un grupo con nombre"+grupo.nombre+" "+motivo,
+            fecha_accion: new Date(),
+            Usuarios_pk: localUser, 
+            disponible: 1,
+        });
     } catch (error) {
         res.status(500).json({ error: 'Error al editar el grupo'+ error });
     }
@@ -107,12 +117,19 @@ exports.editarGrupo = async (req, res) => {
 // Dar de baja un grupo
 exports.darDeBajaGrupo = async (req, res) => {
     const { id } = req.params;
+    const { localUser, motivo } = req.body;
     try {
         const grupo = await Grupos.findByPk(id);
         if (!grupo) {
             return res.status(404).json(grupoView.errorGrupo('Grupo no encontrado'));
         }
         await grupo.update({ disponible: 0 }); // Marcar como no disponible
+        await Historial.create({
+            descripcion: "Se efectuo una baja de un grupo con nombre"+grupo.nombre+" "+motivo,
+            fecha_accion: new Date(),
+            Usuarios_pk: localUser, 
+            disponible: 1,
+        });
         res.json(grupoView.confirmacionBaja(grupo));
     } catch (error) {
         res.status(500).json({ error: 'Error al dar de baja el grupo' });
