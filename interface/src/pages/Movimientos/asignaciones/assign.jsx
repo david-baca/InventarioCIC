@@ -1,49 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate, Navigate } from "react-router-dom";
 import Componentes from "../../../components";
-import axios from 'axios';
+import Peticion from '../../../services/asignacionesService';
 import {getFromLocalStorage} from '../../../context/Credentials';
-
-const Peticion =()=>{
-  const baseApi = import.meta.env.VITE_BASE_API;
-  const instance = axios.create({
-    baseURL: baseApi,
-  });
-  // Función para obtener los artículos desde la API
-  const ObtenerDetallesArticulo = async (no_inventario) => {
-    try {
-      const response = await instance.get(`/articulos/details/${encodeURIComponent(no_inventario)}`);
-      return response.data;
-    } catch (error) {
-      console.error(error.response?.data?.error || error.message);
-      throw new Error(error.response?.data?.error || 'Error en la interacción con la API');
-    }
-  };
-  const ObtenerDetallesReponsable = async (id) => {
-    try {
-      const response = await instance.get(`/responsables/details/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error(error.response?.data?.error || error.message);
-      throw new Error(error.response?.data?.error || 'Error al obtener los detalles del responsable');
-    }
-  };
-  const Asignar = async (formData) => {
-    try {
-      // Enviar los datos con el archivo al endpoint correspondiente
-      const response = await instance.post(`/asignaciones/crearAsignacion`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data', // Asegúrate de usar el tipo de contenido correcto
-        },
-      });
-      return response.data; // Retorna los datos de la respuesta
-    } catch (error) {
-      console.error(error.response?.data?.error || error.message);
-      throw new Error(error.response?.data?.error || 'Error al crear la asignación');
-    }
-  };
-  return {Asignar,ObtenerDetallesArticulo,ObtenerDetallesReponsable}
-}
 
 const ViewAssigned = () => {
   const { pkResponsable, pkArticulo } = useParams();

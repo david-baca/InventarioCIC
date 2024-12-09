@@ -1,25 +1,7 @@
-import axios from 'axios';
+import peticion from '../../services/gruposService';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Componentes from "../../components";
-
-// Función de petición para buscar grupos
-export const peticion = () => {
-  const baseApi = import.meta.env.VITE_BASE_API;
-  const instance = axios.create({ baseURL: baseApi });
-
-  const Buscar = async (query) => {
-    try {
-      const response = await instance.get(`/grupos/${query}`);
-      return response.data.grupos; // Ajusta según la respuesta esperada
-    } catch (error) {
-      console.error(error.response?.data?.error || error.message);
-      throw new Error(error.response?.data?.error || 'Error en la búsqueda de grupos');
-    }
-  };
-
-  return { Buscar };
-};
 
 // Vista del Panel de Grupos
 const ViewGrup = () => {

@@ -7,6 +7,7 @@ const ViewAreaEdit = () => {
   const { pk } = useParams();  // Obtiene el ID del área desde la URL
   const navigate = useNavigate();
   const [area, setArea] = useState(null);
+  const [motivo, setMotivo] = useState('');
   const [codigo, setCodigo] = useState('');
   const [descripcion, setDescripcion] = useState('');
   const [articulos, setArticulos] = useState([]);  // Artículos sin área
@@ -70,7 +71,7 @@ const ViewAreaEdit = () => {
     e.preventDefault();
     try {
       await Peticion.Editar(pk,
-        { codigo, descripcion, articulos: [...selectedArticulos] })
+        { motivo, codigo, descripcion, articulos: [...selectedArticulos] })
       navigate('/almacen'); // Navega a la vista de almacenamiento después de guardar
     } catch (err) {
       setError(err.message);
@@ -124,7 +125,12 @@ const ViewAreaEdit = () => {
       )}
 
       {error && <Componentes.Modals.error mensaje={error} action={() => setError(null)} />}
-
+      <Componentes.Inputs.TitleSubtitle
+            titulo="Nota de Edición" 
+            contenido="Las notas sirven para justificar el porqué se editó el área."
+      />
+      <Componentes.Labels.area Onchange={(value) =>setMotivo(value)} Value={motivo} Placeholder={"Motivo"}/>
+          
       {/* Botones siempre presentes */}
       <div className="flex flex-row w-[100%] justify-center mt-4 gap-4">
         <Componentes.Botones.Cancelar text={"Cancelar"} onClick={() => navigate('/almacen')} />

@@ -1,5 +1,8 @@
 import axios from 'axios';
+import {getFromLocalStorage} from '../context/Credentials';
 const articuloService = () => {
+    const credetial = getFromLocalStorage()
+    const localUser = credetial.usuario.pk
     const baseApi = import.meta.env.VITE_BASE_API;
     const instance = axios.create({ baseURL: baseApi });
     const section = "articulos"
@@ -14,6 +17,7 @@ const articuloService = () => {
     };
     const EditarArticulo = async (data, id) => {
     try {
+        data.append('localUser', localUser);
         const response = await instance.put(`/${section}/${id}`, data);
         return response.data;
     } catch (error) {
@@ -32,6 +36,7 @@ const articuloService = () => {
     };
     const Publicar = async (data) => {
         try {
+          data.append('localUser', localUser);
           const response = await instance.post(`/${section}`, data, {
             headers: {
               'Content-Type': 'multipart/form-data',
@@ -54,6 +59,7 @@ const articuloService = () => {
     };
     const EliminarArticulo = async (id, data) => {
     try {
+        data.append('localUser', localUser);
         const response = await instance.patch(`/${section}/baja/${id}`, data,);
         return response.data;
     } catch (error) {

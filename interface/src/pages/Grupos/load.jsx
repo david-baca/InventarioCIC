@@ -1,33 +1,7 @@
-import axios from 'axios';
+import peticionCrear from '../../services/gruposService';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Componentes from "../../components/";
-
-// API call functions
-export const peticionCrear = () => {
-  const baseApi = import.meta.env.VITE_BASE_API;
-  const instance = axios.create({ baseURL: baseApi });
-  const Crear = async (data) => {
-    try {
-      const response = await instance.post('/grupos', data);
-      return response.data; // Adjust according to the API response
-    } catch (error) {
-      console.error(error.response?.data?.error || error.message);
-      throw new Error(error.response?.data?.error || 'Error al crear el grupo');
-    }
-  };
-  // API to search articles without a group assigned
-  const BuscarOpciones = async (query) => {
-    try {
-      const response = await instance.get(`articulos/sin/grupo/${encodeURIComponent(query)}`);
-      return response.data.articulos; // Adjust according to your API response
-    } catch (error) {
-      console.error(error.response?.data?.error || error.message);
-      throw new Error(error.response?.data?.error || 'Error en la búsqueda de artículos');
-    }
-  };
-  return { Crear, BuscarOpciones };
-};
 
 const ViewGrupLoad = () => {
   const navigate = useNavigate();

@@ -1,51 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
+import peticionDetalles from '../../services/gruposService';
 import Componentes from '../../components';
-
-// Función de petición para obtener detalles de un grupo
-export const peticionDetalles = () => {
-  const baseApi = import.meta.env.VITE_BASE_API;
-  const instance = axios.create({ baseURL: baseApi });
-
-  const ObtenerDetalles = async (id) => {
-    try {
-      const response = await instance.get(`/grupos/details/${id}`);
-      return response.data; // Ajusta según la respuesta esperada
-    } catch (error) {
-      console.error(error.response?.data?.error || error.message);
-      throw new Error(error.response?.data?.error || 'Error al obtener detalles del grupo');
-    }
-  };
-
-  // API para buscar artículos sin un grupo asignado, excluyendo el grupo que estamos editando
-  const BuscarOpciones = async (query, fk_execpcion) => {
-    try {
-      const response = await instance.get(`articulos/sin/grupo/execption/${fk_execpcion}/${encodeURIComponent(query)}`);
-      return response.data.articulos; // Ajusta según tu respuesta de API
-    } catch (error) {
-      console.error(error.response?.data?.error || error.message);
-      throw new Error(error.response?.data?.error || 'Error en la búsqueda de artículos');
-    }
-  };
-
-  const Editar = async (id, data) => {
-    try {
-      const response = await instance.put(`/grupos/${id}`, data);
-      return response.data; // Ajusta según la respuesta esperada
-    } catch (error) {
-      console.error(error.response?.data?.error || error.message);
-      throw new Error(error.response?.data?.error || 'Error al editar el grupo');
-    }
-  };
-
-  return { ObtenerDetalles, BuscarOpciones, Editar };
-};
 
 const ViewGrupEdit = () => {
   const { pk } = useParams();  // Obtiene el ID del grupo desde la URL
   const navigate = useNavigate();
   const [grupo, setGrupo] = useState(null);
+  const [motivo, setMotivo] = useState('');
   const [nombre, setNombre] = useState('');
   const [descripcion, setDescripcion] = useState('');
   const [articulos, setArticulos] = useState([]);  // Artículos sin grupo
@@ -131,7 +93,7 @@ const ViewGrupEdit = () => {
     e.preventDefault();
     try {
       const response =await Peticion.Editar(pk, 
-      { nombre, descripcion, articulos: [...selectedArticulos] })
+      { motivo,nombre, descripcion, articulos: [...selectedArticulos] })
       setSuccess(response.message)
     } catch (err) {
       setError(err.message);
@@ -191,7 +153,11 @@ const ViewGrupEdit = () => {
       )}
 
       {error && <Componentes.Modals.error mensaje={error} action={() => setError(null)} />}
-
+      <Componentes.Inputs.TitleSubtitle
+            titulo="Nota de Edición" 
+            contenido="Las notas sirven para justificar el porqué se editó el grupo."
+      />
+      <Componentes.Labels.area Onchange={(value) =>setMotivo(value)} Value={motivo} Placeholder={"Motivo"}/>
       <div className="flex flex-row w-[100%] gap-4">
         <Componentes.Botones.Cancelar text={"Cancelar"} onClick={() => navigate('/grups')} />
         <Componentes.Botones.ConfirmarVerde text={"Guardar Cambios"} />

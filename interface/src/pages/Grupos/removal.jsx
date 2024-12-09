@@ -1,25 +1,7 @@
-import axios from 'axios';
+import peticionBaja from '../../services/gruposService';
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Componentes from '../../components'; // Asegúrate de importar los componentes correctamente
-
-// Función de petición para dar de baja un grupo
-export const peticionBaja = () => {
-  const baseApi = import.meta.env.VITE_BASE_API;
-  const instance = axios.create({ baseURL: baseApi });
-
-  const DarBaja = async (id, motivo) => {
-    try {
-      const response = await instance.patch(`/grupos/baja/${id}`, { motivo }); // Cambiar el endpoint a '/grupos/'
-      return response.data; // Ajusta según la respuesta esperada
-    } catch (error) {
-      console.log(error);
-      throw new Error(error.response?.data?.error || error.response?.data?.message || 'Error al dar de baja el grupo');
-    }
-  };
-
-  return { DarBaja };
-};
 
 // Vista de Baja de Grupos
 const ViewGrupRenoval = () => {
