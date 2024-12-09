@@ -1,143 +1,135 @@
-import { useState, useEffect } from 'react';
-import { useLocation, Link, useNavigate, } from 'react-router-dom';
-// import { FaFileExcel } from 'react-icons/fa'; // Icono de Excel
+import { useState, useEffect, React } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
+import Componentes from "../../components";
+import axios from 'axios';
+// import { FaFileExcel, FaArrowLeft } from 'react-icons/fa';
+const peticion = () => {
+  const section = "historico";
+  const baseApi = import.meta.env.VITE_BASE_API;
+  const instance = axios.create({
+    baseURL: baseApi,
+  });
 
-const ViewHistory = ({ children }) => {
-  const location = useLocation();
-  const [data, setData] = useState([
-    { fecha: "30/9/2024 15:45", usuario: "Fernando Castillo", accion: "Crear Reporte", descripcion: "El (Rol) (Nombre usuario) creo (Nombre de la acción)" },
-    { fecha: "30/9/2024 12:45", usuario: "Fernando Castillo", accion: "Añadió responsable", descripcion: "El (Rol) (Nombre usuario) (Nombre de la acción) a (Nombre del responsable)" },
-    { fecha: "27/9/2024 11:12", usuario: "Fernando Castillo", accion: "Añadió Articulo", descripcion: "El (Rol) (Nombre usuario) (Nombre de la acción) el artículo (Nombre del artículo)" },
-    { fecha: "27/9/2024 11:12", usuario: "Gonzalez Guzman", accion: "Elimino Articulo", descripcion: "El (Rol) (Nombre usuario) (Nombre de la acción) el artículo (Nombre del artículo)" },
-    { fecha: "27/9/2024 11:12", usuario: "Cristian Adamir", accion: "Asigno Articulo", descripcion: "El (Rol) (Nombre usuario) (Nombre de la acción) el artículo (Nombre del artículo)" },
-  ]);
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(3);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterAction, setFilterAction] = useState("Todas");
-
-  const handleSearch = (event) => {
-    setSearchTerm(event.target.value);
-  };
-
-  const handleFilterChange = (event) => {
-    setFilterAction(event.target.value);
-  };
-
-  const handleDownload = () => {
-    alert("Descargar reporte en Excel");
-  };
-
-  const filteredData = data
-    .filter(item => 
-      item.usuario.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      (filterAction === "Todas" || item.accion.includes(filterAction))
-    );
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
-
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-
-  const handlePageChange = (direction) => {
-    if (direction === "next" && currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    } else if (direction === "prev" && currentPage > 1) {
-      setCurrentPage(currentPage - 1);
+  const Buscar = async ({ query }) => {
+    try {
+      const response = await instance.get(`/${section}/search/${encodeURIComponent(query)}`);
+      return response.data; // Suponiendo que response.data es el array esperado
+    } catch (error) {
+      console.error(error.response?.data?.error || error.message);
+      throw new Error(error.response?.data?.error || 'Error en la interacción con la API');
     }
   };
 
+  return { Buscar };
+};
+// Componente principal de la vista de reporte de artículo
+const ViewHistory = () => {
+  const navigate = useNavigate();
+  const [data, setData] = useState([]);
+  const [query, setQuery] = useState('');
+  const [error, setError] = useState();
+  const [showInfo, setShowInfo] = useState(); 
+  const [success, setSuccess] = useState(); 
+  const [limit, setLimit] = useState({}); 
+  const handleActionInfo = () => {
+    setShowInfo(null); 
+  };
+  const handleActionEror = () => {
+    setError(null); 
+  };
+  const handleActionSuccess= () => {
+    setSuccess(null);
+    navigate('/reportes');
+  };
+
+  useEffect(() => {
+    const cargarData = async () => {
+      const Peticion = peticion();
+      setError(null);
+      setData([]);
+
+      try {
+        const result = await Peticion.Buscar({ query });
+        setData(result);
+      } catch (err) {
+        setError(err.message);
+      }
+    };
+    cargarData();
+  }, [query]);
+
+  const handleSearchChange = (value) => {
+    setQuery(value);
+
+    // Si hay un timeout previo, lo limpiamos
+    if (debounceTimeout) {
+      clearTimeout(debounceTimeout);
+    }
+
+    // Establecemos un nuevo timeout para la búsqueda después de 500ms
+    const newTimeout = setTimeout(() => {
+      cargarData(value); // Llamamos a cargarData después de 500ms
+    }, 500);
+
+    setDebounceTimeout(newTimeout);
+  };
+  const handleHop = (pk) => {
+    navigate(`/reportes/responsable/${pk}`)
+  };
   return (
-        <>
-        {/* Sección de Administración de Historial */}
-        <div className='p-5 w-full bg-gray-100 rounded-md'>
-          <div className="bg-red-800 text-white text-lg font-bold p-4 rounded-t-md">
-            Administración de Historial
-          </div>
-          <div className="bg-white shadow-md p-4 rounded-b-md">
-            <p className="text-gray-700 mb-4">Estos son las actividades que han realizado en el Inventario.</p>
-            <p className="text-sm text-gray-500 mb-6">Los cambios se hacen en tiempo real.</p>
-            
-            <button 
-              onClick={handleDownload} 
-              className="flex items-center mb-4 px-4 py-2 bg-green-600 text-white rounded-md shadow hover:bg-green-700"
-            >
-              {/* <FaFileExcel className="mr-2" /> */}
-              Descargar reporte completo
-            </button>
-            
-            <div className="flex flex-col sm:flex-row items-center sm:justify-between mb-4 gap-2">
-              <input
-                type="text"
-                placeholder="Buscar por nombre"
-                className="px-4 py-2 w-full sm:w-auto border rounded-md focus:outline-none focus:ring-2 focus:ring-red-400"
-                value={searchTerm}
-                onChange={handleSearch}
-              />
-              <select 
-                className="px-4 py-2 w-full sm:w-auto border rounded-md focus:outline-none focus:ring-2 focus:ring-red-400" 
-                value={filterAction}
-                onChange={handleFilterChange}
-              >
-                <option value="Todas">Todas las acciones</option>
-                <option value="Añadio">Añadio</option>
-                <option value="Creo">Creo</option>
-                <option value="Elimino">Elimino</option>
-                <option value="Asigno">Asigno</option>
-              </select>
-            </div>
-
-            {/* Tabla de historial */}
-            <div className="overflow-x-auto">
-              <table className="min-w-full bg-white border">
-                <thead>
-                  <tr className="bg-red-800 text-white">
-                    <th className="text-left py-3 px-4 font-semibold">Fecha</th>
-                    <th className="text-left py-3 px-4 font-semibold">Usuario</th>
-                    <th className="text-left py-3 px-4 font-semibold">Acción</th>
-                    <th className="text-left py-3 px-4 font-semibold">Descripción</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {currentItems.map((item, index) => (
-                    <tr className="border-t" key={index}>
-                      <td className="py-3 px-4 text-sm">{item.fecha}</td>
-                      <td className="py-3 px-4 text-sm">{item.usuario}</td>
-                      <td className="py-3 px-4 text-sm">{item.accion}</td>
-                      <td className="py-3 px-4 text-sm">{item.descripcion}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Paginación */}
-            <div className="flex flex-col sm:flex-row justify-between items-center mt-4 text-sm">
-              <span className="text-gray-600">
-                Mostrando {indexOfFirstItem + 1} a {Math.min(indexOfLastItem, filteredData.length)} de {filteredData.length}
-              </span>
-              <div className="flex space-x-4 mt-2 sm:mt-0">
-                <button 
-                  onClick={() => handlePageChange("prev")} 
-                  className={`text-gray-600 hover:text-gray-800 ${currentPage === 1 && "opacity-50 cursor-not-allowed"}`}
-                  disabled={currentPage === 1}
-                >
-                  Anterior
-                </button>
-                <button 
-                  onClick={() => handlePageChange("next")} 
-                  className={`text-gray-600 hover:text-gray-800 ${currentPage === totalPages && "opacity-50 cursor-not-allowed"}`}
-                  disabled={currentPage === totalPages}
-                >
-                  Siguiente
-                </button>
-              </div>
-            </div>
-          </div>
+    <>
+<Componentes.Modals.success mensaje={success} action={handleActionSuccess}/>
+    <Componentes.Modals.info mensaje={showInfo} action={handleActionInfo}/>
+    <Componentes.Modals.error mensaje={error} action={handleActionEror}/>
+      <Componentes.Inputs.TitleHeader text={"Reportes de responsables"} />
+      <div className='flex items-center flex-wrap md:flex-nowrap'>
+        <div className='flex items-center w-[100%]'>
+        <Componentes.Inputs.TitleSubtitle
+          titulo={"Estos son todos los responsables con asignaciones."}
+          contenido={"selecciona alguno para ver su reporte."}
+        />
         </div>
-        </>
+        <div className='flex items-center w-[100%] flex-wrap sm:flex-nowrap'>
+          <Componentes.Buscador query={query} OnChange={handleSearchChange} />
+        </div>
+      </div>
+        {data.length > 0 ? (
+          <>
+          <Componentes.Table.table>
+            <Componentes.Table.columna>
+              <Componentes.Table.encabezado>
+                Index
+              </Componentes.Table.encabezado>
+              <Componentes.Table.encabezado>
+                Descripcion
+              </Componentes.Table.encabezado>
+              <Componentes.Table.encabezado>
+                Fecha de accion
+              </Componentes.Table.encabezado>
+              <Componentes.Table.encabezado>
+                Usuario
+              </Componentes.Table.encabezado>
+            </Componentes.Table.columna>
+            {data.map((element,index) => 
+              ((index <= limit.max && index >= limit.min) && (
+                <Componentes.Table.columna key={element.pk}>
+                  <Componentes.Table.fila children={index}/>
+                  <Componentes.Table.fila children={element.descripcion}/>
+                  <Componentes.Table.fila children={element.fecha_accion}/>
+                  <Componentes.Table.fila children={element.Usuario.nombres}/>
+                </Componentes.Table.columna>
+              )
+            ))}
+          </Componentes.Table.table>
+          <Componentes.Inputs.Paginacion data={data} handleLimit={(value)=>setLimit(value)}/>
+          </>
+        ) : (
+          <div className='flex justify-center h-full items-center'>
+            <Componentes.Inputs.TitleSubtitle titulo={"No hay Artículos que mostrar"}
+            contenido={"No se encontraron resultados"}/>
+          </div>
+          )}
+    </>
   );
 };
 

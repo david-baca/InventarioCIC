@@ -1,37 +1,7 @@
-import axios from 'axios';
+import peticionCrear from '../../services/areasService';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Componentes from "../../components/";
-
-// Funciones de llamada API
-export const peticionCrear = () => {
-  const baseApi = import.meta.env.VITE_BASE_API;
-  const instance = axios.create({ baseURL: baseApi });
-
-  // API para crear área
-  const Crear = async (data) => {
-    try {
-      const response = await instance.post('/areas', data);  // Ruta cambiada a /areas
-      return response.data; // Ajustar según la respuesta de la API
-    } catch (error) {
-      console.error(error.response?.data?.error || error.message);
-      throw new Error(error.response?.data?.error || 'Error al crear el área');
-    }
-  };
-
-  // API para buscar artículos sin área asignada
-  const BuscarOpciones = async (query) => {
-    try {
-      const response = await instance.get(`articulos/sin/area/${encodeURIComponent(query)}`);  // Cambiar ruta a /area
-      return response.data.articulos; // Ajustar según la respuesta de la API
-    } catch (error) {
-      console.error(error.response?.data?.error || error.message);
-      throw new Error(error.response?.data?.error || 'Error en la búsqueda de artículos');
-    }
-  };
-
-  return { Crear, BuscarOpciones };
-};
 
 const ViewAreaLoad = () => {  // Cambié el nombre de "ViewGrupLoad" a "ViewAreaLoad"
   const navigate = useNavigate();

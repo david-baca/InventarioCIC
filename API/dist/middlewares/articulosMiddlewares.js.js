@@ -49,10 +49,10 @@ exports.editArticle = async (req, res, next) => {
         const articulo = await Articulos.findByPk(id);
         if (!articulo)errores.push('No se encontró el artículo a editar')
         // Validar que el artículo no está asociado a una asignación
-        const asignacion = await Asignaciones.findOne({ where: { Articulos_pk: id } });
+        const asignacion = await Asignaciones.findOne({ where: { Articulos_pk: id, disponible: true} });
         if (asignacion) errores.push('El artículo está asignado a un responsable (debe devolver el artículo para editar)');
         //validar que el numero de inventraio no sea uno existente
-        const bandera = await Articulos.findOne({where:{no_inventario:no_inventario}});
+        const bandera = await Articulos.findOne({where:{no_inventario:no_inventario, disponible: true}});
         if (bandera !== null && bandera.pk !== articulo.pk) errores.push('Ya existe el número de inventario: ' + no_inventario);
         if (errores.length > 0) return res.status(400).json({ error: errores });
     } catch (error) {
@@ -73,7 +73,7 @@ exports.bajaArticle = async (req, res, next) => {
         if (!motivo) errores.push('Es necesario definir el (motivo)');
         if (motivo && motivo.length > 250)errores.push('El motivo no debe exceder 250 caracteres.');
         // Validar que el artículo no está asociado a una asignación
-        const asignacion = await Asignaciones.findOne({ where: { Articulos_pk: id } });
+        const asignacion = await Asignaciones.findOne({ where: { Articulos_pk: id, disponible: true } });
         if (asignacion)errores.push('El artículo se asignó a un responsable (debe devolver el artículo para su baja)');
         if (errores.length > 0)return res.status(400).json({ error: errores.join(' ') });
     } catch (error) {

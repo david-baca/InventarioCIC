@@ -90,7 +90,7 @@ const ViewAssigned = () => {
       const baseApi = import.meta.env.VITE_BASE_API;
       // Asegurarse de que `data.articulo.Condiciones` y `data.articulo.Condiciones[0].Imagenes` no sean null ni undefined
       if (data?.articulo?.Condiciones?.[0]?.Imagenes) {
-        let datos = "";
+        datos = "";
         // Recorre las imágenes de manera segura
         for (let i = 0; i < data.articulo.Condiciones[0].Imagenes.length; i++) {
           // Verifica si la imagen no es null o undefined
@@ -132,15 +132,15 @@ const ViewAssigned = () => {
     // Reemplazar las variables dinámicas en el archivo HTML
     let formattedHtml = htmlText
       .replace('{{fecha}}', `${dia} de ${mes} de ${año}`)
-      .replace('{{nombre}}', responsable.nombres)
-      .replace('{{responsable}}', responsable.nombres)  // O el nombre del responsable de la asignación
+      .replace('{{nombre}}',  `${responsable.nombres} ${responsable.apellido_p} ${responsable.apellido_m}`)
+      .replace('{{responsable}}', `${responsable.nombres} ${responsable.apellido_p} ${responsable.apellido_m}`)  // O el nombre del responsable de la asignación
       .replace('{{asignado}}', responsable.nombres)    // Asignado
       .replace('{{no_inventario}}', articulo.no_inventario)
       .replace('{{nombre_articulo}}', articulo.nombre)
       .replace('{{descripcion}}', articulo.descripcion)
       .replace('{{precio}}', articulo.costo)
       .replace('{{imagen1}}', imagenes)
-      .replace('{{userName}}', dataLocal.usuario.nombres)
+      .replace('{{userName}}', `${dataLocal.usuario.nombres} ${dataLocal.usuario.apellido_p} ${dataLocal.usuario.apellido_m}`)
       .replace('{{userName}}', dataLocal.usuario.nombres)
       .replace('{{userLastname}}', dataLocal.usuario.apellido_p+" "+dataLocal.usuario.apellido_m)
       .replace('{{resName}}', responsable.nombres)

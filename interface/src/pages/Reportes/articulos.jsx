@@ -1,181 +1,138 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect, React } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import Componentes from "../../components";
-import axios from "axios";
+import axios from 'axios';
+// import { FaFileExcel, FaArrowLeft } from 'react-icons/fa';
+const peticion = () => {
+  const section = "asignaciones";
+  const baseApi = import.meta.env.VITE_BASE_API;
+  const instance = axios.create({
+    baseURL: baseApi,
+  });
 
-// Configuración de instancia de axios
-const baseApi = import.meta.env.VITE_BASE_API;
-const instance = axios.create({
-  baseURL: baseApi,
-});
-
-// Función para obtener los artículos desde la API
-const fetchArticles = async (query = "") => {
-  try {
-    const endpoint = query ? `/articulos/search/${encodeURIComponent(query)}` : "/articulos/search/";
-    const response = await instance.get(endpoint);
-    return response.data;
-  } catch (error) {
-    console.error("Error al buscar artículos:", error);
-    throw new Error("No se pudieron cargar los artículos.");
-  }
-};
-
-const ViewReportArticles = () => {
-  const navigate = useNavigate();
-  const [articles, setArticles] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true); // Indicador de carga
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 3;
-
-  // Cargar los artículos al montar el componente o cambiar la búsqueda
-  useEffect(() => {
-    const loadArticles = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const data = await fetchArticles(searchTerm);
-        setArticles(data);
-      } catch (err) {
-        setError(err.message || "No se pudieron cargar los artículos.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadArticles();
-  }, [searchTerm]);
-
-  // Paginación
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = articles.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(articles.length / itemsPerPage);
-
-  const handlePageChange = (direction) => {
-    if (direction === "next" && currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    } else if (direction === "prev" && currentPage > 1) {
-      setCurrentPage(currentPage - 1);
+  const Buscar = async ({ query }) => {
+    try {
+      const response = await instance.get(`/${section}/articulos/search/${encodeURIComponent(query)}`);
+      return response.data; // Suponiendo que response.data es el array esperado
+    } catch (error) {
+      throw new Error(error.response?.data?.error || 'Error en la interacción con la API');
     }
   };
 
-  // Redirigir a la ruta del reporte del artículo
-  const handleRedirect = (id) => {
-    navigate(`/reportes/articulo/${id}`);
+  return { Buscar };
+};
+// Componente principal de la vista de reporte de artículo
+const ViewReportArticles = () => {
+  const navigate = useNavigate();
+  const [data, setData] = useState([]);
+  const [query, setQuery] = useState('');
+  const [error, setError] = useState();
+  const [showInfo, setShowInfo] = useState(); 
+  const [success, setSuccess] = useState(); 
+  const [limit, setLimit] = useState({}); 
+  const handleActionInfo = () => {
+    setShowInfo(null); 
+  };
+  const handleActionEror = () => {
+    setError(null); 
+  };
+  const handleActionSuccess= () => {
+    setSuccess(null);
+    navigate('/reportes');
   };
 
-  return (
-    <div className="p-4">
-      <Componentes.Inputs.TitleHeader text={"Reportes de artículos"} />
+  useEffect(() => {
+    const cargarData = async () => {
+      const Peticion = peticion();
+      setError(null);
+      setData([]);
 
-      {/* Buscador */}
-      <div className="flex justify-between items-center mb-4">
+      try {
+        const result = await Peticion.Buscar({ query });
+        setData(result);
+      } catch (err) {
+        setError(err.message);
+      }
+    };
+    cargarData();
+  }, [query]);
+
+  const handleSearchChange = (value) => {
+    setQuery(value);
+
+    // Si hay un timeout previo, lo limpiamos
+    if (debounceTimeout) {
+      clearTimeout(debounceTimeout);
+    }
+
+    // Establecemos un nuevo timeout para la búsqueda después de 500ms
+    const newTimeout = setTimeout(() => {
+      cargarData(value); // Llamamos a cargarData después de 500ms
+    }, 500);
+
+    setDebounceTimeout(newTimeout);
+  };
+  const handleHop = (pk) => {
+    navigate(`/reportes/articulo/${pk}`)
+  };
+  return (
+    <>
+<Componentes.Modals.success mensaje={success} action={handleActionSuccess}/>
+    <Componentes.Modals.info mensaje={showInfo} action={handleActionInfo}/>
+    <Componentes.Modals.error mensaje={error} action={handleActionEror}/>
+      <Componentes.Inputs.TitleHeader text={"Reportes de artículos"} />
+      <div className='flex items-center flex-wrap md:flex-nowrap'>
+        <div className='flex items-center w-[100%]'>
         <Componentes.Inputs.TitleSubtitle
           titulo={"Estos son los artículos del inventario."}
           contenido={"Seleccione alguno para ver su reporte detallado."}
         />
-        <div className="w-1/3">
-          <Componentes.Buscador
-            query={searchTerm}
-            OnChange={(value) => setSearchTerm(value)}
-            className="border border-gray-300 rounded-full px-3 py-2 w-full"
-          />
+        </div>
+        <div className='flex items-center w-[100%] flex-wrap sm:flex-nowrap'>
+          <Componentes.Buscador query={query} OnChange={handleSearchChange} />
         </div>
       </div>
-
-      {/* Mostrar errores o carga */}
-      {loading && <p className="text-gray-600">Cargando artículos...</p>}
-      {error && <p className="text-red-600">{error}</p>}
-
-      {/* Tabla de artículos */}
-      {!loading && !error && currentItems.length > 0 && (
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border">
-            <thead>
-              <tr className="bg-red-800 text-white">
-                <th className="text-left py-3 px-4 font-semibold">Artículo</th>
-                <th className="text-left py-3 px-4 font-semibold">Costo</th>
-                <th className="text-left py-3 px-4 font-semibold">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-  {currentItems.map((article) => {
-    // Asegurar que el costo sea un número
-    const costoNumerico = parseFloat(article.costo);
-
-    return (
-      <tr className="border-t" key={article.pk}>
-        <td className="py-3 px-4 text-sm">{article.nombre}</td>
-        <td className="py-3 px-4 text-sm">
-          {!isNaN(costoNumerico) ? `$${costoNumerico.toFixed(2)}` : "N/A"}
-        </td>
-        <td className="py-3 px-4 text-sm">
-          <button
-            onClick={() => handleRedirect(article.pk)}
-            className="text-orange-500 hover:text-orange-600"
-            title="Ver reporte del artículo"
-          >
-            Ver reporte
-          </button>
-        </td>
-      </tr>
-    );
-  })}
-</tbody>
-
-          </table>
-        </div>
-      )}
-
-      {/* Mensaje si no hay datos */}
-      {!loading && !error && currentItems.length === 0 && (
-        <p className="text-gray-500 text-center">No hay datos disponibles</p>
-      )}
-
-      {/* Paginación */}
-      <div className="p-4 flex justify-between items-center mt-4 text-sm">
-        <span className="text-gray-600">
-          Mostrando {indexOfFirstItem + 1} a {Math.min(indexOfLastItem, articles.length)} de {articles.length}
-        </span>
-        <div className="flex space-x-4">
-          <button
-            onClick={() => handlePageChange("prev")}
-            disabled={currentPage === 1}
-            className={`px-4 py-2 border rounded ${
-              currentPage === 1
-                ? "text-gray-400 border-gray-300 cursor-not-allowed"
-                : "text-gray-600 border-gray-400 hover:text-gray-800 hover:border-gray-600"
-            }`}
-          >
-            Anterior
-          </button>
-          <button
-            onClick={() => handlePageChange("next")}
-            disabled={currentPage === totalPages}
-            className={`px-4 py-2 border rounded ${
-              currentPage === totalPages
-                ? "text-gray-400 border-gray-300 cursor-not-allowed"
-                : "text-gray-600 border-gray-400 hover:text-gray-800 hover:border-gray-600"
-            }`}
-          >
-            Siguiente
-          </button>
-        </div>
-      </div>
-
-      <div className="mt-6">
-  <button
-    onClick={() => navigate(-1)}
-    className="w-full flex items-center justify-center px-4 py-2 bg-orange-500 text-white rounded-md shadow hover:bg-orange-600"
-  >
-    <span className="mr-2">←</span> Regresar
-  </button>
-</div>
-
-    </div>
+        {data.length > 0 ? (
+          <>
+          <Componentes.Table.table>
+            <Componentes.Table.columna>
+              <Componentes.Table.encabezado>
+                No. Inventario:
+              </Componentes.Table.encabezado>
+              <Componentes.Table.encabezado>
+                Nombre:
+              </Componentes.Table.encabezado>
+              <Componentes.Table.encabezado>
+                Costo:
+              </Componentes.Table.encabezado>
+              <Componentes.Table.encabezado>
+                Acciones:
+              </Componentes.Table.encabezado>
+            </Componentes.Table.columna>
+            {data.map((element,index) => 
+              ((index <= limit.max && index >= limit.min) && (
+                <Componentes.Table.columna key={element.pk}>
+                  <Componentes.Table.fila children={element.no_inventario}/>
+                  <Componentes.Table.fila children={element.nombre}/>
+                  <Componentes.Table.fila children={element.costo}/>
+                  <Componentes.Table.fila>
+                    <Componentes.Botones.Saltar Onclick={() =>handleHop(element.pk)}/>
+                  </Componentes.Table.fila>
+                </Componentes.Table.columna>
+              )
+            ))}
+          </Componentes.Table.table>
+          <Componentes.Inputs.Paginacion data={data} handleLimit={(value)=>setLimit(value)}/>
+          </>
+        ) : (
+          <div className='flex justify-center h-full items-center'>
+            <Componentes.Inputs.TitleSubtitle titulo={"No hay Artículos que mostrar"}
+            contenido={"No se encontraron resultados"}/>
+          </div>
+          )}
+    </>
   );
 };
 
 export default ViewReportArticles;
+

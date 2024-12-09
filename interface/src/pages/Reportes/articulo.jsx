@@ -1,77 +1,149 @@
-import React from 'react';
-import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { useState, useEffect, React } from 'react';
+import { useNavigate, Link, useLocation, useParams } from 'react-router-dom';
+import Componentes from "../../components";
+import axios from 'axios';
 // import { FaFileExcel, FaArrowLeft } from 'react-icons/fa';
+const peticion = () => {
+  const section = "asignaciones";
+  const baseApi = import.meta.env.VITE_BASE_API;
+  const instance = axios.create({
+    baseURL: baseApi,
+  });
 
+  const Buscar = async ({ pk }) => {
+    try {
+      const response = await instance.get(`/${section}/articulo/${pk}`);
+      return response.data; // Suponiendo que response.data es el array esperado
+    } catch (error) {
+      console.error(error.response?.data?.error || error.message);
+      throw new Error(error.response?.data?.error || 'Error en la interacción con la API');
+    }
+  };
+
+  const Report = async ({ pk }) => {
+    try {
+      const response = await instance.post(`/${section}/articuloReport/${pk}`,
+        {},
+        {
+          responseType: 'blob'
+        }
+      );
+      return response
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  return { Buscar, Report };
+};
 // Componente principal de la vista de reporte de artículo
 const ViewReportArticle = () => {
+  const { pk } = useParams();
   const navigate = useNavigate();
-  const location = useLocation();
+  const [data, setData] = useState([]);
+  const [error, setError] = useState();
+  const [showInfo, setShowInfo] = useState(); 
+  const [success, setSuccess] = useState(); 
+  const [limit, setLimit] = useState({}); 
+  const handleActionInfo = () => {
+    setShowInfo(null); 
+  };
+  const handleActionEror = () => {
+    setError(null); 
+  };
+  const handleActionSuccess= () => {
+    setSuccess(null);
+    navigate('/reportes');
+  };
 
-  const articleRecords = [
-    { id: 1, entregadoPor: 'Juan Pérez', responsable: 'Ana Gómez', fecha: '2023-08-01', accion: 'Usado', motivo: 'N/A' },
-    { id: 2, entregadoPor: 'María García', responsable: 'Carlos Ruiz', fecha: '2023-08-15', accion: 'Devuelto', motivo: 'Batería defectuosa' },
-    { id: 3, entregadoPor: 'Carlos Rodríguez', responsable: 'Ana Gómez', fecha: '2023-08-15', accion: 'Usado', motivo: 'N/A' },
-  ];
+  useEffect(() => {
+    const cargarData = async () => {
+      const Peticion = peticion();
+      setError(null);
+      setData([]);
 
+      try {
+        const result = await Peticion.Buscar({ pk });
+        setData(result);
+      } catch (err) {
+        setError(err.message);
+      }
+    };
+    cargarData();
+  }, [pk]);
+
+  const handleDowload=async()=>{
+    const peticiones = peticion();
+    try {
+      const response = await peticiones.Report({ pk });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download','hola.xlsx');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error("Error en la descarga: ", error.message);
+    }
+  };
   return (
     <>
-        {/* Sección de reporte de artículo */}
-        <div className='flex flex-col w-full p-5 bg-gray-100'>
-          {/* Encabezado del reporte */}
-          <div className="bg-red-800 text-white text-lg font-bold p-4 rounded-t-md mb-4">
-            Reporte de artículo
-          </div>
-          <div className="bg-white shadow-md p-4 rounded-b-md mb-6">
-            <p className="text-gray-700 mb-2">Este es el registro del artículo.</p>
-            <p className="text-sm text-gray-500 mb-4">Usos y devoluciones del artículo.</p>
-
-            {/* Botón de descarga de artículo */}
-            <button 
-              onClick={() => alert("Descargar reporte de artículo")}
-              className="flex items-center justify-center w-full px-4 py-2 bg-green-600 text-white rounded-md shadow hover:bg-green-700 mb-4"
-            >
-              {/* <FaFileExcel className="mr-2" /> */}
-              Descargar artículo
-            </button>
-
-            {/* Tabla de registros del artículo */}
-            <div className="overflow-x-auto">
-              <table className="min-w-full bg-white border">
-                <thead>
-                  <tr className="bg-red-800 text-white">
-                    <th className="text-left py-3 px-4 font-semibold">Entregado por</th>
-                    <th className="text-left py-3 px-4 font-semibold">Responsable</th>
-                    <th className="text-left py-3 px-4 font-semibold">Fecha</th>
-                    <th className="text-left py-3 px-4 font-semibold">Acción</th>
-                    <th className="text-left py-3 px-4 font-semibold">Motivo</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {articleRecords.map((record) => (
-                    <tr className="border-t" key={record.id}>
-                      <td className="py-3 px-4 text-sm">{record.entregadoPor}</td>
-                      <td className="py-3 px-4 text-sm">{record.responsable}</td>
-                      <td className="py-3 px-4 text-sm">{record.fecha}</td>
-                      <td className="py-3 px-4 text-sm">{record.accion}</td>
-                      <td className="py-3 px-4 text-sm">{record.motivo}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Botón de regresar */}
-          <div className="mt-6 flex justify-center">
-            <button 
-              onClick={() => navigate(-1)}
-              className="flex items-center px-4 py-2 bg-orange-500 text-white rounded-md shadow hover:bg-orange-600"
-            >
-              {/* <FaArrowLeft className="mr-2" /> */}
-              Regresar
-            </button>
-          </div>
+<Componentes.Modals.success mensaje={success} action={handleActionSuccess}/>
+    <Componentes.Modals.info mensaje={showInfo} action={handleActionInfo}/>
+    <Componentes.Modals.error mensaje={error} action={handleActionEror}/>
+      <Componentes.Inputs.TitleHeader text={"Reporte de artículo"} />
+      <div className='flex items-center flex-wrap md:flex-nowrap'>
+        <div className='flex items-center w-[100%]'>
+          <Componentes.Inputs.TitleSubtitle titulo={"Este es el registro del artículo."}
+            contenido={"Usos y devoluciones del artículo."} />
         </div>
+        
+          <Componentes.Botones.ExcelDownload Onclick={()=>handleDowload()}/>
+        
+      </div>
+        {data.length > 0 ? (
+          <>
+          <Componentes.Table.table>
+            <Componentes.Table.columna>
+              <Componentes.Table.encabezado>
+                Responsable
+              </Componentes.Table.encabezado>
+              <Componentes.Table.encabezado>
+                Articulo
+              </Componentes.Table.encabezado>
+              <Componentes.Table.encabezado>
+                Fecha de entrega
+              </Componentes.Table.encabezado>
+              <Componentes.Table.encabezado>
+                Fecha de devolucion
+              </Componentes.Table.encabezado>
+            </Componentes.Table.columna>
+            {data.map((element,index) => 
+              ((index <= limit.max && index >= limit.min) && (
+                <Componentes.Table.columna key={element.pk}>
+                  <Componentes.Table.fila>
+                    {element.Responsable.nombres} {element.Responsable.apellido_p} {element.Responsable.apellido_m}
+                    </Componentes.Table.fila>
+                  <Componentes.Table.fila >
+                    {element.Articulo.nombre}</Componentes.Table.fila>
+                  <Componentes.Table.fila >
+                    {element.fecha_asignacion}</Componentes.Table.fila>
+                  <Componentes.Table.fila>
+                    {element.fecha_devolucion}
+                  </Componentes.Table.fila>
+                </Componentes.Table.columna>
+              )
+            ))}
+          </Componentes.Table.table>
+          <Componentes.Inputs.Paginacion data={data} handleLimit={(value)=>setLimit(value)}/>
+          </>
+        ) : (
+          <div className='flex justify-center h-full items-center'>
+            <Componentes.Inputs.TitleSubtitle titulo={"No hay Artículos que mostrar"}
+            contenido={"No se encontraron resultados"}/>
+          </div>
+          )}
     </>
   );
 };

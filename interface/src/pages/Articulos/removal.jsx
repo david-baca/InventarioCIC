@@ -1,32 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
+import peticion from '../../services/articulosService';
 import Componentes from "../../components/";
 import { getFromLocalStorage } from '../../context/Credentials';
-
-const peticion = () => {
-  const section = "articulos";
-  const baseApi = import.meta.env.VITE_BASE_API;
-  const instance = axios.create({ baseURL: baseApi });
-  const ObtenerDetalles = async (no_inventario) => {
-    try {
-      const response = await instance.get(`/${section}/details/${encodeURIComponent(no_inventario)}`);
-      return response.data;
-    } catch (error) {
-      console.error(error.response?.data?.error || error.message);
-      throw new Error(error.response?.data?.error || 'Error en la interacción con la API');
-    }
-  };
-  const EliminarArticulo = async (id, data) => {
-    try {
-      const response = await instance.patch(`/${section}/baja/${id}`, data,);
-      return response.data;
-    } catch (error) {
-      throw new Error(error.response?.data?.error || 'Error en API interaction');
-    }
-  };
-  return { ObtenerDetalles, EliminarArticulo };
-};
 
 const ViewArticleRenoval = () => {
   const user = getFromLocalStorage()

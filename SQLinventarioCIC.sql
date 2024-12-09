@@ -1,12 +1,16 @@
--- Crear base de datos si no existe
-CREATE DATABASE IF NOT EXISTS `inventariocic`
-DEFAULT CHARACTER SET utf8mb4
-COLLATE utf8mb4_spanish_ci;
+-- MySQL Workbench Synchronization
+-- Generated: 2024-06-30 16:49
+-- Model: New Model
+-- Version: 1.0
+-- Project: Name of the project
+-- Author: David
 
--- Desactivar las restricciones temporales
 SET @OLD_UNIQUE_CHECKS = @@UNIQUE_CHECKS, UNIQUE_CHECKS = 0;
 SET @OLD_FOREIGN_KEY_CHECKS = @@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS = 0;
 SET @OLD_SQL_MODE = @@SQL_MODE, SQL_MODE = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+
+CREATE SCHEMA IF NOT EXISTS `inventariocic` DEFAULT CHARACTER SET latin1 ;
 
 -- Crear tabla Responsables
 CREATE TABLE IF NOT EXISTS `inventariocic`.`Responsables` (
@@ -16,10 +20,10 @@ CREATE TABLE IF NOT EXISTS `inventariocic`.`Responsables` (
   `apellido_p` VARCHAR(50) NOT NULL,
   `apellido_m` VARCHAR(50) NOT NULL,
   `disponible` TINYINT(1) NOT NULL,
-  PRIMARY KEY (`pk`)
+  PRIMARY KEY (`pk`)  
 ) ENGINE = InnoDB
-DEFAULT CHARSET = utf8mb4
-COLLATE = utf8mb4_spanish_ci;
+DEFAULT CHARACTER SET = latin1;
+ 
 
 -- Crear tabla Areas
 CREATE TABLE IF NOT EXISTS `inventariocic`.`Areas` (
@@ -29,8 +33,8 @@ CREATE TABLE IF NOT EXISTS `inventariocic`.`Areas` (
   `disponible` TINYINT(1) NOT NULL,
   PRIMARY KEY (`pk`)
 ) ENGINE = InnoDB
-DEFAULT CHARSET = utf8mb4
-COLLATE = utf8mb4_spanish_ci;
+DEFAULT CHARACTER SET = latin1;
+ 
 
 -- Crear tabla Grupos
 CREATE TABLE IF NOT EXISTS `inventariocic`.`Grupos` (
@@ -40,8 +44,8 @@ CREATE TABLE IF NOT EXISTS `inventariocic`.`Grupos` (
   `disponible` TINYINT(1) NOT NULL,
   PRIMARY KEY (`pk`)
 ) ENGINE = InnoDB
-DEFAULT CHARSET = utf8mb4
-COLLATE = utf8mb4_spanish_ci;
+DEFAULT CHARACTER SET = latin1;
+ 
 
 -- Crear tabla Articulos
 CREATE TABLE IF NOT EXISTS `inventariocic`.`Articulos` (
@@ -64,8 +68,8 @@ CREATE TABLE IF NOT EXISTS `inventariocic`.`Articulos` (
     FOREIGN KEY (`Area_pk`) REFERENCES `inventariocic`.`Areas` (`pk`)
     ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE = InnoDB
-DEFAULT CHARSET = utf8mb4
-COLLATE = utf8mb4_spanish_ci;
+DEFAULT CHARACTER SET = latin1;
+ 
 
 -- Crear tabla Condiciones
 CREATE TABLE IF NOT EXISTS `inventariocic`.`Condiciones` (
@@ -79,8 +83,8 @@ CREATE TABLE IF NOT EXISTS `inventariocic`.`Condiciones` (
     FOREIGN KEY (`Articulos_pk`) REFERENCES `inventariocic`.`Articulos` (`pk`)
     ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE = InnoDB
-DEFAULT CHARSET = utf8mb4
-COLLATE = utf8mb4_spanish_ci;
+DEFAULT CHARACTER SET = latin1;
+ 
 
 -- Crear tabla Imagenes
 CREATE TABLE IF NOT EXISTS `inventariocic`.`Imagenes` (
@@ -91,14 +95,15 @@ CREATE TABLE IF NOT EXISTS `inventariocic`.`Imagenes` (
     FOREIGN KEY (`Condiciones_pk`) REFERENCES `inventariocic`.`Condiciones` (`pk`)
     ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE = InnoDB
-DEFAULT CHARSET = utf8mb4
-COLLATE = utf8mb4_spanish_ci;
+DEFAULT CHARACTER SET = latin1;
+ 
 
 
 -- Crear tabla Asignaciones
 CREATE TABLE IF NOT EXISTS `inventariocic`.`Asignaciones` (
   `pk` INT NOT NULL AUTO_INCREMENT,
-  `fecha_recibido` DATE NOT NULL,
+  `fecha_asignacion` DATETIME NOT NULL,
+  `fecha_devolucion` DATETIME,
   `Responsables_pk` INT NOT NULL,
   `Articulos_pk` INT NOT NULL,
   `disponible` TINYINT(1) NOT NULL,
@@ -112,14 +117,13 @@ CREATE TABLE IF NOT EXISTS `inventariocic`.`Asignaciones` (
     FOREIGN KEY (`Responsables_pk`) REFERENCES `inventariocic`.`Responsables` (`pk`)
     ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE = InnoDB
-DEFAULT CHARSET = utf8mb4
-COLLATE = utf8mb4_spanish_ci;
+DEFAULT CHARACTER SET = latin1;
+ 
 
 -- Crear tabla Documentos
 CREATE TABLE IF NOT EXISTS `inventariocic`.`Documentos` (
   `pk` INT NOT NULL AUTO_INCREMENT,
   `doc_firma` VARCHAR(250) NOT NULL,
-  `fecha` DATE NOT NULL,
   `Asignaciones_pk` INT NOT NULL,
   `disponible` TINYINT(1) NOT NULL,
   PRIMARY KEY (`pk`),
@@ -128,8 +132,8 @@ CREATE TABLE IF NOT EXISTS `inventariocic`.`Documentos` (
     FOREIGN KEY (`Asignaciones_pk`) REFERENCES `inventariocic`.`Asignaciones` (`pk`)
     ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE = InnoDB
-DEFAULT CHARSET = utf8mb4
-COLLATE = utf8mb4_spanish_ci;
+DEFAULT CHARACTER SET = latin1;
+ 
 
 -- Crear tabla Funciones
 CREATE TABLE IF NOT EXISTS `inventariocic`.`Funciones` (
@@ -137,8 +141,8 @@ CREATE TABLE IF NOT EXISTS `inventariocic`.`Funciones` (
   `nombre` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`pk`)
 ) ENGINE = InnoDB
-DEFAULT CHARSET = utf8mb4
-COLLATE = utf8mb4_spanish_ci;
+DEFAULT CHARACTER SET = latin1;
+ 
 
 -- Crear tabla Usuarios
 CREATE TABLE IF NOT EXISTS `inventariocic`.`Usuarios` (
@@ -151,8 +155,8 @@ CREATE TABLE IF NOT EXISTS `inventariocic`.`Usuarios` (
   `disponible` TINYINT(1) NOT NULL,
   PRIMARY KEY (`pk`)
 ) ENGINE = InnoDB
-DEFAULT CHARSET = utf8mb4
-COLLATE = utf8mb4_spanish_ci;
+DEFAULT CHARACTER SET = latin1;
+ 
 
 -- Crear tabla Permisos
 CREATE TABLE IF NOT EXISTS `inventariocic`.`Permisos` (
@@ -165,14 +169,14 @@ CREATE TABLE IF NOT EXISTS `inventariocic`.`Permisos` (
   CONSTRAINT `fk_Permisos_Funciones`
     FOREIGN KEY (`Funciones_pk`) REFERENCES `inventariocic`.`Funciones` (`pk`)
 ) ENGINE = InnoDB
-DEFAULT CHARSET = utf8mb4
-COLLATE = utf8mb4_spanish_ci;
+DEFAULT CHARACTER SET = latin1;
+ 
 
 -- Crear tabla Historial
 CREATE TABLE IF NOT EXISTS `inventariocic`.`Historial` (
   `pk` INT NOT NULL AUTO_INCREMENT,
   `descripcion` VARCHAR(250) NOT NULL,
-  `fecha_accion` DATE NOT NULL,
+  `fecha_accion` DATETIME NOT NULL,
   `Usuarios_pk` INT NOT NULL,
   `disponible` TINYINT(1) NOT NULL,
   PRIMARY KEY (`pk`),
@@ -181,8 +185,8 @@ CREATE TABLE IF NOT EXISTS `inventariocic`.`Historial` (
     FOREIGN KEY (`Usuarios_pk`) REFERENCES `inventariocic`.`Usuarios` (`pk`)
     ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE = InnoDB
-DEFAULT CHARSET = utf8mb4
-COLLATE = utf8mb4_spanish_ci;
+DEFAULT CHARACTER SET = latin1;
+ 
 
 -- Activar nuevamente las restricciones
 SET SQL_MODE = @OLD_SQL_MODE;

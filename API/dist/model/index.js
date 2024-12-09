@@ -28,6 +28,25 @@ Asignaciones.belongsTo(Responsables, {
   as: 'Responsable'
 });
 
+Asignaciones.belongsTo(Articulos, { 
+  foreignKey: 'Articulos_pk' 
+});
+Asignaciones.belongsTo(Responsables, { 
+  foreignKey: 'Responsables_pk' 
+});
+
+Articulos.hasMany(Asignaciones, {
+  foreignKey: 'Articulos_pk',
+  sourceKey: 'pk',
+  as: 'Asignaciones'
+});
+
+Asignaciones.belongsTo(Articulos, {
+  foreignKey: 'Articulos_pk',
+  targetKey: 'pk',
+  as: 'Articulos'
+});
+
 // Areas -> Articulos
 Areas.hasMany(Articulos, {
   foreignKey: 'Area_pk',
