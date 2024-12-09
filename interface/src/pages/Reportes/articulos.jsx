@@ -12,10 +12,9 @@ const peticion = () => {
 
   const Buscar = async ({ query }) => {
     try {
-      const response = await instance.get(`/${section}/search/${encodeURIComponent(query)}`);
+      const response = await instance.get(`/${section}/articulos/search/${encodeURIComponent(query)}`);
       return response.data; // Suponiendo que response.data es el array esperado
     } catch (error) {
-      console.error(error.response?.data?.error || error.message);
       throw new Error(error.response?.data?.error || 'Error en la interacción con la API');
     }
   };
@@ -113,9 +112,9 @@ const ViewReportArticles = () => {
             {data.map((element,index) => 
               ((index <= limit.max && index >= limit.min) && (
                 <Componentes.Table.columna key={element.pk}>
-                  <Componentes.Table.fila children={element.Articulo.no_inventario}/>
-                  <Componentes.Table.fila children={element.Articulo.nombre}/>
-                  <Componentes.Table.fila children={element.Articulo.costo}/>
+                  <Componentes.Table.fila children={element.no_inventario}/>
+                  <Componentes.Table.fila children={element.nombre}/>
+                  <Componentes.Table.fila children={element.costo}/>
                   <Componentes.Table.fila>
                     <Componentes.Botones.Saltar Onclick={() =>handleHop(element.pk)}/>
                   </Componentes.Table.fila>

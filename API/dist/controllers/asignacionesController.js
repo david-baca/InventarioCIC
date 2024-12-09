@@ -4,9 +4,6 @@ const asignacionView = require('../views/asignacionesView');
 const XlsxPopulate = require('xlsx-populate');
 const { Documentos, Asignaciones, Articulos, Responsables, Historial, Condiciones, Imagenes } = require('../model');
 const { Op } = require('sequelize');
-// Definir las relaciones solo para esta consulta, sin modificar los modelos globalmente
-Asignaciones.belongsTo(Articulos, { foreignKey: 'Articulos_pk' });
-Asignaciones.belongsTo(Responsables, { foreignKey: 'Responsables_pk' });
 
 exports.buscarAsignaciones = async (req, res) => {
     const { query } = req.params;
@@ -37,6 +34,69 @@ exports.buscarAsignaciones = async (req, res) => {
             return res.status(404).json({ message: 'No se encontraron asignaciones.' });
         }
 
+        // Devolver el resultado en JSON
+        return res.json(resultado);
+    } catch (error) {
+        // Mostrar el error en la consola para depurar
+        console.error('Error al buscar asignaciones:', error);
+        return res.status(500).json({ error: error.message });
+    }
+};
+
+exports.buscarAsignacionesArticulos = async (req, res) => {
+    const { query } = req.params;
+    // Validar si el query está vacío
+    try {
+        const whereConditions = {};
+        if (query && query !== null) {
+            whereConditions[Op.or] = [
+                { nombre: { [Op.like]: `%${query}%` } },
+                { no_inventario: { [Op.like]: `%${query}%` } }
+            ];
+        }
+        // Realizar la búsqueda en la base de datos usando Sequelize
+        const resultado = await Articulos.findAll({
+            where: whereConditions,
+            include: [
+                {
+                    required: true,
+                    model: Asignaciones,
+                    as: 'Asignaciones',
+                }
+            ]
+        });
+        // Devolver el resultado en JSON
+        return res.json(resultado);
+    } catch (error) {
+        // Mostrar el error en la consola para depurar
+        console.error('Error al buscar asignaciones:', error);
+        return res.status(500).json({ error: error.message });
+    }
+};
+
+exports.buscarAsignacionesResponsables = async (req, res) => {
+    const { query } = req.params;
+    // Validar si el query está vacío
+    try {
+        const whereConditions = {};
+        if (query && query !== null) {
+            whereConditions[Op.or] = [
+                { nombres: { [Op.like]: `%${query}%` } },
+                { apellido_p: { [Op.like]: `%${query}%` } },
+                { apellido_m: { [Op.like]: `%${query}%` } },
+            ];
+        }
+        // Realizar la búsqueda en la base de datos usando Sequelize
+        const resultado = await Responsables.findAll({
+            where: whereConditions,
+            include: [
+                {
+                    required: true,
+                    model: Asignaciones,
+                    as: 'Asignaciones',
+                }
+            ]
+        });
         // Devolver el resultado en JSON
         return res.json(resultado);
     } catch (error) {
@@ -214,7 +274,6 @@ exports.registroAsignacionesPorArticulo = async (req, res) => {
         return res.status(500).json({ error: 'Error al obtener asignaciones por artículo.' });
     }
 };
-
 exports.registroArticuloExcel = async (req, res) => {
     try {
         const { fk_Articulo } = req.params;
@@ -237,20 +296,18 @@ exports.registroArticuloExcel = async (req, res) => {
                     as: 'Documentos'
                 }
             ],
-            raw: true
         });
         // Si no se encuentran asignaciones para ese artículo
         if (!asignaciones || asignaciones.length === 0) return res.status(404).json({ error: 'No se encontraron asignaciones para este artículo.' });
         // Crear un nuevo archivo de Excel con xlsx-populate
         // Formatear datos para el Excel
-        console.log(asignaciones)
     
         // Formatear datos para el Excel
         let formattedData = [];
         const baseApi = process.env.BASE_API
         asignaciones.forEach((asignacion) => {
-            const documentoAsignacion = asignacion['Documentos.pk'] && asignacion['Documentos.doc_firma'] ? asignacion['Documentos.doc_firma'] : "sin documento";
-            const documentoRecepcion = asignacion['Documentos.Asignaciones_pk'] && asignacion['Documentos.doc_firma'] ? asignacion['Documentos.doc_firma'] : "sin documento";
+            const documentoAsignacion = asignacion.Documentos[0] ? baseApi+asignacion.Documentos[0].doc_firma : "sin documento";
+            const documentoRecepcion = asignacion.Documentos[1] ? baseApi+asignacion.Documentos[1].doc_firma : "sin documento";
             const fechaAsignacion = new Date(asignacion.fecha_asignacion);
             const fechaDevolucion = new Date(asignacion.fecha_devolucion);
             formattedData.push({
@@ -270,10 +327,10 @@ exports.registroArticuloExcel = async (req, res) => {
                     minute: '2-digit',// Minutos con 2 dígitos
                     hour12: false,    // Formato de 24 horas
                   }),
-                'Nombre del Responsable': `${asignacion['Responsable.nombres']} ${asignacion['Responsable.apellido_p']} ${asignacion['Responsable.apellido_m']}`,
-                'Correo Responsable': asignacion['Responsable.correo'],
-                'Documento de Asignación': baseApi+documentoAsignacion,
-                'Documento de Recepción': baseApi+documentoRecepcion
+                'Nombre del Responsable': `${asignacion.Responsable.nombres} ${asignacion.Responsable.apellido_p} ${asignacion.Responsable.apellido_m}`,
+                'Correo Responsable': asignacion.Responsable.correo,
+                'Documento de Asignación': documentoAsignacion,
+                'Documento de Recepción': documentoRecepcion
             });
         });
 
@@ -303,7 +360,7 @@ exports.registroArticuloExcel = async (req, res) => {
                 });
             });
             // Ajustar el ancho de las columnas
-            const columnWidths = [20, 40, 50, 15, 15, 50];
+            const columnWidths = [20, 20, 28, 30, 100, 100];
             columnWidths.forEach((width, index) => {
                 sheetGeneral.column(index + 1).width(width);
             });
@@ -323,16 +380,116 @@ exports.registroArticuloExcel = async (req, res) => {
         res.status(500).send('Error al generar el archivo Excel');
     }
 };
+exports.registroReponsableExcel = async (req, res) => {
+    try {
+        const { fk_Reponsable } = req.params;
+        // Validar que el artículo está presente
+        if (!fk_Reponsable) return res.status(400).json({ error: 'El responsable es inválido o no se proporcionó.' });
+        // Buscar asignaciones relacionadas con el artículo en la base de datos
+        const asignaciones = await Asignaciones.findAll({
+            where: { Responsables_pk: fk_Reponsable }, // Filtrar por el número del artículo
+            include: [
+                {
+                    model: Articulos, // Incluir los detalles del artículo
+                    as: 'Articulo'
+                },
+                {
+                    model: Responsables, // Incluir los detalles del responsable
+                    as: 'Responsable',
+                },
+                {
+                    model: Documentos, // Incluir los documentos relacionados
+                    as: 'Documentos',
+                }
+            ],
+        });
+        // Si no se encuentran asignaciones para ese artículo
+        if (!asignaciones || asignaciones.length === 0) return res.status(404).json({ error: 'No se encontraron asignaciones para este artículo.' });
+        // Crear un nuevo archivo de Excel con xlsx-populate
+        // Formatear datos para el Excel
+    
+        // Formatear datos para el Excel
+        let formattedData = [];
+        const baseApi = process.env.BASE_API
+        asignaciones.forEach((asignacion) => {
+            console.log(asignacion.Documentos[0])
+            const documentoAsignacion = asignacion.Documentos[0] ? baseApi+asignacion.Documentos[0].doc_firma : "sin documento";
+            const documentoRecepcion = asignacion.Documentos[1] ? baseApi+asignacion.Documentos[1].doc_firma : "sin documento";
+            const fechaAsignacion = new Date(asignacion.fecha_asignacion);
+            const fechaDevolucion = new Date(asignacion.fecha_devolucion);
+            formattedData.push({
+                'Fecha de Asignación': fechaAsignacion.toLocaleTimeString('es-ES', {
+                    day: '2-digit',   // Día con 2 dígitos
+                    month: '2-digit', // Mes con 2 dígitos
+                    year: 'numeric',
+                    hour: '2-digit',  // Hora con 2 dígitos
+                    minute: '2-digit',// Minutos con 2 dígitos
+                    hour12: false,    // Formato de 24 horas
+                  }),
+                'Fecha de Devolución': fechaDevolucion.toLocaleTimeString('es-ES', {
+                    day: '2-digit',   // Día con 2 dígitos
+                    month: '2-digit', // Mes con 2 dígitos
+                    year: 'numeric',
+                    hour: '2-digit',  // Hora con 2 dígitos
+                    minute: '2-digit',// Minutos con 2 dígitos
+                    hour12: false,    // Formato de 24 horas
+                  }),
+                'Nombre del Responsable': `${asignacion.Responsable.nombres} ${asignacion.Responsable.apellido_p} ${asignacion.Responsable.apellido_m}`,
+                'Correo Responsable': asignacion.Responsable.correo,
+                'Documento de Asignación': documentoAsignacion,
+                'Documento de Recepción': documentoRecepcion
+            });
+        });
 
+        console.log(formattedData);
+
+        const generateExcel = async () => {
+            const workbook = await XlsxPopulate.fromBlankAsync();
+            const sheetGeneral = workbook.addSheet('General');
+            //eliminar la hoja por defecto 
+            workbook.deleteSheet('Sheet1');
+            // Agregar encabezados
+            const headersGeneral = [
+                'Fecha de Asignación',
+                'Fecha de Devolución',
+                'Nombre del Responsable',
+                'Correo Responsable',
+                'Documento de Asignación',
+                'Documento de Recepción',
+            ];
+            headersGeneral.forEach((header, index) => {
+                sheetGeneral.cell(1, index + 1).value(header);
+            });
+            // Agregar datos
+            formattedData.forEach((item, rowIndex) => {
+                Object.keys(item).forEach((key, colIndex) => {
+                    sheetGeneral.cell(rowIndex + 2, colIndex + 1).value(item[key]);
+                });
+            });
+            // Ajustar el ancho de las columnas
+            const columnWidths = [20, 20, 28, 30, 100, 100];
+            columnWidths.forEach((width, index) => {
+                sheetGeneral.column(index + 1).width(width);
+            });
+            // Convertir el libro en un buffer
+            const buffer = await workbook.outputAsync();
+            // Configurar la respuesta para descarga de archivo
+            res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            res.setHeader('Content-Disposition', 'attachment; filename=Reporte.xlsx');
+            // Enviar el buffer como respuesta
+            res.end(buffer);
+        }
+
+        // Generar y enviar el archivo
+        generateExcel();
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error al generar el archivo Excel');
+    }
+};
 // Registro de asignaciones por Responsable
 exports.registroAsignacionesPorResponsable = async (req, res) => {
     const { fk_Responsable } = req.params;
-
-    // Validar que el fk_Responsable es un número válido
-    if (isNaN(fk_Responsable)) {
-        return res.status(400).json({ error: 'El ID del responsable es inválido.' });
-    }
-
     try {
         // Buscar asignaciones relacionadas con el responsable en la base de datos
         const asignaciones = await Asignaciones.findAll({
@@ -341,17 +498,14 @@ exports.registroAsignacionesPorResponsable = async (req, res) => {
                 {
                     model: Articulos, // Incluir los detalles del artículo
                     as: 'Articulo',
-                    attributes: ['nombre', 'descripcion']
                 },
                 {
                     model: Responsables, // Incluir los detalles del responsable
                     as: 'Responsable',
-                    attributes: ['nombres', 'apellido_p', 'apellido_m']
                 },
                 {
                     model: Documentos, // Incluir los documentos relacionados
                     as: 'Documentos',
-                    attributes: ['doc_firma', 'fecha']
                 }
             ]
         });
