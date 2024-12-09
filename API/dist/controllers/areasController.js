@@ -36,7 +36,7 @@ exports.detallesArea = async (req, res) => {
     }
 };
 exports.crearArea = async (req, res) => {
-    const { codigo, descripcion, articulos } = req.body; // Captura la lista de artículos
+    const { codigo, descripcion, articulos, localUser } = req.body; // Captura la lista de artículos
     try {
         const nuevaArea = await Areas.create({ codigo, descripcion });
 
@@ -48,12 +48,12 @@ exports.crearArea = async (req, res) => {
                     x.Area_pk = nuevaArea.pk;
                     await x.save();  // Guarda los cambios
                 } else {
-                    console.log(`No se encontró el artículo con PK ${articulos[i]}`);
+                    console.log(`No se encontró el área con PK ${articulos[i]}`);
                 }
             }
         }
         await Historial.create({
-            descripcion: "Se realizo una asignacion con el documento nombrado "+req.file.path,
+            descripcion: "Se creo un área con numero de inventario "+nuevaArea.codigo,
             fecha_accion: new Date(),
             Usuarios_pk: localUser, 
             disponible: 1,
@@ -65,7 +65,7 @@ exports.crearArea = async (req, res) => {
 };
 exports.editarArea = async (req, res) => {
     const { id } = req.params;
-    const { codigo, descripcion, articulos } = req.body; // Captura la lista de artículos (pks)
+    const { codigo, descripcion, articulos, localUser, motivo } = req.body; // Captura la lista de artículos (pks)
     
     try {
         const area = await Areas.findByPk(id);
@@ -91,7 +91,12 @@ exports.editarArea = async (req, res) => {
                 }
             }
         }
-
+        await Historial.create({
+            descripcion: "Se edito un área codigo "+area.codigo+" "+motivo,
+            fecha_accion: new Date(),
+            Usuarios_pk: localUser, 
+            disponible: 1,
+        });
         res.json(areaView.confirmacionEdicion(area)); // Adaptado a 'areaView'
     } catch (error) {
         res.status(500).json({ error: 'Error al editar el área: ' + error });
@@ -99,12 +104,19 @@ exports.editarArea = async (req, res) => {
 };
 exports.darDeBajaArea = async (req, res) => {
     const { id } = req.params;
+    const { localUser, motivo } = req.body;
     try {
         const area = await Areas.findByPk(id);
         if (!area) {
             return res.status(404).json(areaView.errorArea('Área no encontrada'));
         }
         await area.update({ disponible: 0 }); // Marcar como no disponible
+        await Historial.create({
+            descripcion: "Se efectuo una baja de área con codigo "+area.codigo+" "+motivo,
+            fecha_accion: new Date(),
+            Usuarios_pk: localUser, 
+            disponible: 1,
+        });
         res.json(areaView.confirmacionBaja(area)); // Adaptado a 'areaView'
     } catch (error) {
         res.status(500).json({ error: 'Error al dar de baja el área' });
