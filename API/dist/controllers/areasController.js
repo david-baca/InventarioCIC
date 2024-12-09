@@ -1,6 +1,6 @@
 // src/controllers/areaController.js
 const areaView = require('../views/areasView');
-const { Areas, Articulos } = require('../model');
+const { Areas, Articulos, Historial } = require('../model');
 const { Op } = require('sequelize');
 exports.buscarAreas = async (req, res) => {
     const { query } = req.params;
@@ -52,7 +52,12 @@ exports.crearArea = async (req, res) => {
                 }
             }
         }
-
+        await Historial.create({
+            descripcion: "Se realizo una asignacion con el documento nombrado "+req.file.path,
+            fecha_accion: new Date(),
+            Usuarios_pk: localUser, 
+            disponible: 1,
+        });
         res.json(areaView.datosAreaCreada(nuevaArea)); // Adaptado a 'areaView'
     } catch (error) {
         res.status(500).json({ error: 'Error al crear el área'+error });
