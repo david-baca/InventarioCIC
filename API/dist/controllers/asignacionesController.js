@@ -314,25 +314,25 @@ exports.registroArticuloExcel = async (req, res) => {
         asignaciones.forEach((asignacion) => {
             const documentoAsignacion = asignacion.Documentos[0] ? baseApi+asignacion.Documentos[0].doc_firma : "sin documento";
             const documentoRecepcion = asignacion.Documentos[1] ? baseApi+asignacion.Documentos[1].doc_firma : "sin documento";
-            const fechaAsignacion = new Date(asignacion.fecha_asignacion);
-            const fechaDevolucion = new Date(asignacion.fecha_devolucion);
+            const fechaAsignacion = asignacion.fecha_asignacion ? new Date(asignacion.fecha_asignacion).toLocaleTimeString('es-ES', {
+                day: '2-digit',   // Día con 2 dígitos
+                month: '2-digit', // Mes con 2 dígitos
+                year: 'numeric',
+                hour: '2-digit',  // Hora con 2 dígitos
+                minute: '2-digit',// Minutos con 2 dígitos
+                hour12: false,    // Formato de 24 horas
+              }): "sin asignar";              ;
+            const fechaDevolucion = asignacion.fecha_devolucion? new Date(asignacion.fecha_devolucion).toLocaleTimeString('es-ES', {
+                day: '2-digit',   // Día con 2 dígitos
+                month: '2-digit', // Mes con 2 dígitos
+                year: 'numeric',
+                hour: '2-digit',  // Hora con 2 dígitos
+                minute: '2-digit',// Minutos con 2 dígitos
+                hour12: false,    // Formato de 24 horas
+              }): "sin asignar";  
             formattedData.push({
-                'Fecha de Asignación': fechaAsignacion.toLocaleTimeString('es-ES', {
-                    day: '2-digit',   // Día con 2 dígitos
-                    month: '2-digit', // Mes con 2 dígitos
-                    year: 'numeric',
-                    hour: '2-digit',  // Hora con 2 dígitos
-                    minute: '2-digit',// Minutos con 2 dígitos
-                    hour12: false,    // Formato de 24 horas
-                  }),
-                'Fecha de Devolución': fechaDevolucion.toLocaleTimeString('es-ES', {
-                    day: '2-digit',   // Día con 2 dígitos
-                    month: '2-digit', // Mes con 2 dígitos
-                    year: 'numeric',
-                    hour: '2-digit',  // Hora con 2 dígitos
-                    minute: '2-digit',// Minutos con 2 dígitos
-                    hour12: false,    // Formato de 24 horas
-                  }),
+                'Fecha de Asignación': fechaAsignacion,
+                'Fecha de Devolución': fechaDevolucion,
                 'Nombre del Responsable': `${asignacion.Responsable.nombres} ${asignacion.Responsable.apellido_p} ${asignacion.Responsable.apellido_m}`,
                 'Correo Responsable': asignacion.Responsable.correo,
                 'Documento de Asignación': documentoAsignacion,
@@ -418,28 +418,27 @@ exports.registroReponsableExcel = async (req, res) => {
         let formattedData = [];
         const baseApi = process.env.BASE_API
         asignaciones.forEach((asignacion) => {
-            console.log(asignacion.Documentos[0])
             const documentoAsignacion = asignacion.Documentos[0] ? baseApi+asignacion.Documentos[0].doc_firma : "sin documento";
             const documentoRecepcion = asignacion.Documentos[1] ? baseApi+asignacion.Documentos[1].doc_firma : "sin documento";
-            const fechaAsignacion = new Date(asignacion.fecha_asignacion);
-            const fechaDevolucion = new Date(asignacion.fecha_devolucion);
+            const fechaAsignacion = asignacion.fecha_asignacion ? new Date(asignacion.fecha_asignacion).toLocaleTimeString('es-ES', {
+                day: '2-digit',   // Día con 2 dígitos
+                month: '2-digit', // Mes con 2 dígitos
+                year: 'numeric',
+                hour: '2-digit',  // Hora con 2 dígitos
+                minute: '2-digit',// Minutos con 2 dígitos
+                hour12: false,    // Formato de 24 horas
+              }): "sin asignar";              ;
+            const fechaDevolucion = asignacion.fecha_devolucion? new Date(asignacion.fecha_devolucion).toLocaleTimeString('es-ES', {
+                day: '2-digit',   // Día con 2 dígitos
+                month: '2-digit', // Mes con 2 dígitos
+                year: 'numeric',
+                hour: '2-digit',  // Hora con 2 dígitos
+                minute: '2-digit',// Minutos con 2 dígitos
+                hour12: false,    // Formato de 24 horas
+              }): "sin asignar";  
             formattedData.push({
-                'Fecha de Asignación': fechaAsignacion.toLocaleTimeString('es-ES', {
-                    day: '2-digit',   // Día con 2 dígitos
-                    month: '2-digit', // Mes con 2 dígitos
-                    year: 'numeric',
-                    hour: '2-digit',  // Hora con 2 dígitos
-                    minute: '2-digit',// Minutos con 2 dígitos
-                    hour12: false,    // Formato de 24 horas
-                  }),
-                'Fecha de Devolución': fechaDevolucion.toLocaleTimeString('es-ES', {
-                    day: '2-digit',   // Día con 2 dígitos
-                    month: '2-digit', // Mes con 2 dígitos
-                    year: 'numeric',
-                    hour: '2-digit',  // Hora con 2 dígitos
-                    minute: '2-digit',// Minutos con 2 dígitos
-                    hour12: false,    // Formato de 24 horas
-                  }),
+                'Fecha de Asignación': fechaAsignacion,
+                'Fecha de Devolución': fechaDevolucion,
                 'Nombre del Responsable': `${asignacion.Responsable.nombres} ${asignacion.Responsable.apellido_p} ${asignacion.Responsable.apellido_m}`,
                 'Correo Responsable': asignacion.Responsable.correo,
                 'Documento de Asignación': documentoAsignacion,

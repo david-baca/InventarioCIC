@@ -1,5 +1,5 @@
 const responsableView = require('../views/responsablesView');
-const { Responsables, Asignaciones, Articulos, Documentos } = require('../model'); // Asegúrate de tener el modelo Responsables importado
+const { Responsables, Asignaciones, Articulos, Documentos, Historial } = require('../model'); // Asegúrate de tener el modelo Responsables importado
 const { Op, Sequelize } = require('sequelize');
 exports.buscarResponsable=async(req,res)=>{
     const { pk } = req.params;

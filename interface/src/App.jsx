@@ -41,11 +41,11 @@ function App() {
           <Route path="/devoluciones/" element={<Aut children={<Page.Movimientos.Devoluciones.seleccionResponsable />} />} />
           <Route path="/devoluciones/:pkResponsable" element={<Aut children={<Page.Movimientos.Devoluciones.seleccionArticulos />} />} />
           <Route path="/devoluciones/:pkResponsable/:pkArticulo" element={<Aut children={<Page.Movimientos.Devoluciones.panel />} />} />
-          <Route path="/reportes/articulo/:pk" element={<Aut children={<Page.Reportes.articulo />} />} />
-          <Route path="/reportes/articulos" element={<Aut children={<Page.Reportes.articulos />} />} />
+          <Route path="/reportes-articulo/:pk" element={<Aut children={<Page.Reportes.articulo />} />} />
+          <Route path="/reportes-articulos" element={<Aut children={<Page.Reportes.articulos />} />} />
           <Route path="/reportes" element={<Aut children={<Page.Reportes.panel />} />} />
-          <Route path="/reportes/responsable/:pk" element={<Aut children={<Page.Reportes.responsable />} />} />
-          <Route path="/reportes/responsables" element={<Aut children={<Page.Reportes.responsables />} />} />
+          <Route path="/reportes-responsable/:pk" element={<Aut children={<Page.Reportes.responsable />} />} />
+          <Route path="/reportes-responsables" element={<Aut children={<Page.Reportes.responsables />} />} />
           <Route path="/historial" element={<Aut children={<Page.Historial.panel />} />} />
           <Route path="/coordinadores" element={<Aut children={<Page.Users.panel />} />} />
           <Route path="/coordinadores/edit/:pk" element={<Aut children={<Page.Users.edit />} />} />

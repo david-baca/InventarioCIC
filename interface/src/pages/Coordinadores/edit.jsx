@@ -17,10 +17,10 @@ const ViewUserEdit = () => {
   const permisosDisponibles = {
     Artículo: [1, 2, 3],
     Grupos: [4, 5, 6],
-    Responsable: [7, 8, 9],
-    Movimientos: [10, 11, 12],
-    Reporte: [13, 14, 16],
-    Historial: [15, 17, 18],
+    Almacen: [7, 8, 9],
+    Responsable: [10, 11, 12],
+    Movimientos: [13, 14, 15],
+    Reporte: [16, 17, 18],
   };
 
   useEffect(() => {

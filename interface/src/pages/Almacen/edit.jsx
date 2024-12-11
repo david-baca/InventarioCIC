@@ -15,8 +15,22 @@ const ViewAreaEdit = () => {
   const [selectedArticulos, setSelectedArticulos] = useState([]);  // Artículos seleccionados para el área
   const [query, setQuery] = useState('');
   const [debounceTimeout, setDebounceTimeout] = useState(null); // Para el debounce de búsqueda
-  const [error, setError] = useState(null);
   const Peticion = peticionDetalles();
+  //variables de modals
+  const [showInfo, setShowInfo] = useState(); 
+  const [success, setSuccess] = useState(); 
+  const [error, setError] = useState();
+
+  const handleActionInfo = () => {
+    setShowInfo(null); 
+  };
+  const handleActionEror = () => {
+    setError(null); 
+  };
+  const handleActionSuccess= () => {
+    setSuccess(null);
+    navigate('/almacen');
+  };
   // Cargar detalles del área
   useEffect(() => {
     const cargarArea = async () => {
@@ -72,13 +86,17 @@ const ViewAreaEdit = () => {
     try {
       await Peticion.Editar(pk,
         { motivo, codigo, descripcion, articulos: [...selectedArticulos] })
-      navigate('/almacen'); // Navega a la vista de almacenamiento después de guardar
+      setSuccess("área exitosamente editada") // Navega a la vista de almacenamiento después de guardar
     } catch (err) {
       setError(err.message);
     }
   };
   if (!area) return <div>Esperando respuesta del servidor...</div>;  // Muestra un mensaje mientras carga el área
   return (
+    <>
+    <Componentes.Modals.success mensaje={success} action={handleActionSuccess}/>
+    <Componentes.Modals.info mensaje={showInfo} action={handleActionInfo}/>
+    <Componentes.Modals.error mensaje={error} action={handleActionEror}/>
     <form onSubmit={handleSubmit} className="space-y-6">
       <Componentes.Inputs.TitleHeader text={"Edición de Área"} />
       <Componentes.Inputs.TitleSubtitle titulo={"Información del Área"} contenido={"Actualiza los detalles del área."} />
@@ -137,6 +155,7 @@ const ViewAreaEdit = () => {
         <Componentes.Botones.ConfirmarVerde text={"Guardar Cambios"} />
       </div>
     </form>
+    </>
   );
 };
 

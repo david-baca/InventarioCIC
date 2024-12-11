@@ -74,7 +74,7 @@ const ViewReportResponsibles = () => {
     setDebounceTimeout(newTimeout);
   };
   const handleHop = (pk) => {
-    navigate(`/reportes/responsable/${pk}`)
+    navigate(`/reportes-responsable/${pk}`)
   };
   return (
     <>

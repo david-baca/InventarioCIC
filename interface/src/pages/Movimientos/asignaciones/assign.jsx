@@ -161,7 +161,6 @@ const ViewAssigned = () => {
           />
         </div>
           <Componentes.Botones.Imprimir 
-            text={"hola"}
             onClick={generateAndPrint}
           />
         </div>

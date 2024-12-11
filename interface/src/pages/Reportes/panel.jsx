@@ -17,14 +17,14 @@ const ViewReport = () => {
             <div className="flex flex-col lg:flex-row justify-center gap-4">
               
               {/* Primer recuadro interno */}
-              <Link to="/reportes/articulos" className="flex-1 max-w-xs border rounded-md p-4 text-center hover:shadow-lg">
+              <Link to="/reportes-articulos" className="flex-1 max-w-xs border rounded-md p-4 text-center hover:shadow-lg">
                 <h2 className="text-lg font-semibold mb-2">Artículos</h2>
                 <p>Daños y Asignaciones.</p>
                 <img src={articulosImg} alt="Artículos" className="mt-4 mx-auto h-32 w-auto" />
               </Link>
               
               {/* Segundo recuadro interno */}
-              <Link to="/reportes/responsables" className="flex-1 max-w-xs border rounded-md p-4 text-center hover:shadow-lg">
+              <Link to="/reportes-responsables" className="flex-1 max-w-xs border rounded-md p-4 text-center hover:shadow-lg">
                 <h2 className="text-lg font-semibold mb-2">Responsables</h2>
                 <p>Asignaciones actuales.</p>
                 <img src={responsableImg} alt="Responsables" className="mt-4 mx-auto h-32 w-auto" />

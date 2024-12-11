@@ -73,7 +73,7 @@ const ViewReportArticles = () => {
     setDebounceTimeout(newTimeout);
   };
   const handleHop = (pk) => {
-    navigate(`/reportes/articulo/${pk}`)
+    navigate(`/reportes-articulo/${pk}`)
   };
   return (
     <>

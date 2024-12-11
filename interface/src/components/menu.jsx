@@ -63,10 +63,10 @@ const options = [
     name: "Reportes",
     routes: [
       { path: "/reportes", codePermiso: 13 },
-      { path: "/reportes/articulo/:pk", codePermiso: 13 },
-      { path: "/reportes/articulos", codePermiso: 13 },
-      { path: "/reportes/responsable/:pk", codePermiso: 13 },
-      { path: "/reportes/responsables", codePermiso: 13 }
+      { path: "/reportes-articulo/:pk", codePermiso: 13 },
+      { path: "/reportes-articulos", codePermiso: 13 },
+      { path: "/reportes-responsable/:pk", codePermiso: 13 },
+      { path: "/reportes-responsables", codePermiso: 13 }
     ]
   },
   {
